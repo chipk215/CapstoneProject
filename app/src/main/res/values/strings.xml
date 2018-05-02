@@ -37,4 +37,7 @@
     <string name="one">ONE</string>
     <string name="two">TWO</string>
 
+    <string name="trip_list">Trip List</string>
+    <string name="new_trip">New Trip</string>
+
 </resources>
