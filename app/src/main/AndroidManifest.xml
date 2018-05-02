@@ -28,6 +28,10 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
 
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAqMU0ZbhvtFuK9SeMCJAC2zmr2V9n1Ges" />
+
         <provider
             android:name=".data.TracksContentProvider"
             android:authorities="com.keyeswest.trackme"
