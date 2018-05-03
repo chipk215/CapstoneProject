@@ -39,5 +39,9 @@
 
     <string name="trip_list">Trip List</string>
     <string name="new_trip">New Trip</string>
+    <string name="permission_justify">Location  access permission required.</string>
+    <string name="exit_app">Location permission not granted. Exit application.</string>
+    <string name="exit">Exit</string>
+
 
 </resources>

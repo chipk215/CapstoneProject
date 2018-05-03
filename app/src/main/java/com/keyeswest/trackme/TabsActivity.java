@@ -1,6 +1,15 @@
 package com.keyeswest.trackme;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -8,11 +17,19 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public class TabsActivity extends AppCompatActivity {
+
+   public static Intent newIntent(Context packageContext){
+       Intent intent = new Intent(packageContext, TabsActivity.class);
+       return intent;
+   }
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -28,6 +45,19 @@ public class TabsActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
+        setUpTabLayout();
+
+
+    }
+
+
+
+
+    //------------------------------UI Functions ---------------------------------------------------
+
+
+
+    private void setUpTabLayout(){
         viewPager =  findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
