@@ -9,7 +9,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.keyeswest.fleettracker.locationupdatespendingintent.action.PROCESS_MOCK_UPDATES" />
+                <action android:name="com.keyeswest.trackme.locationupdatespendingintent.action.PROCESS_MOCK_UPDATES" />
             </intent-filter>
         </receiver>
 

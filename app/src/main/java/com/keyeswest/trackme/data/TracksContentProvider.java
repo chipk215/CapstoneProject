@@ -57,7 +57,7 @@ public class TracksContentProvider extends ContentProvider {
                 SEGMENT_WITH_ID);
 
         // segment location join query
-        // e.g. content://com.keyeswest.fleettracker/relationship_join_segment_get_locations/id
+        // e.g. content://com.keyeswest.trackme/relationship_join_segment_get_locations/id
         //  where id is the row id (_id) of the segment to join on
         matcher.addURI(LocationSchema.AUTHORITY, PATH_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS +
         "/#",LOCATION_FROM_JOIN);

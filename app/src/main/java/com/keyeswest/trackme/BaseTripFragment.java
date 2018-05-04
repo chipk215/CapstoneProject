@@ -1,46 +1,45 @@
 package com.keyeswest.trackme;
 
-
 import android.content.Context;
-import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
-
-public abstract class TrackerBaseActivity extends AppCompatActivity
+public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived {
 
-    private Button mStartUpdatesButton;
-    private Button mStopUpdatesButton;
+    private Unbinder mUnbinder;
 
-    private ProcessedLocationSampleReceiver mSampleReceiver;
+    @BindView(R.id.request_updates_button)
+    Button mStartUpdatesButton;
 
+    @BindView(R.id.remove_updates_button)
+    Button mStopUpdatesButton;
+
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
-        setContentView(R.layout.activity_tracker);
+        View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
+        mUnbinder = ButterKnife.bind(this, view);
 
-        mSampleReceiver = new ProcessedLocationSampleReceiver();
-        mSampleReceiver.registerCallback(this);
-        IntentFilter filter = new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE);
-        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(this);
-        lbm.registerReceiver(mSampleReceiver, filter);
-
-
-        // Locate the UI widgets.
-        mStartUpdatesButton =  findViewById(R.id.request_updates_button);
         mStartUpdatesButton.setEnabled(true);
         mStartUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +66,7 @@ public abstract class TrackerBaseActivity extends AppCompatActivity
             }
         });
 
-        mStopUpdatesButton = findViewById(R.id.remove_updates_button);
+
         mStopUpdatesButton.setEnabled(false);
         mStopUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,10 +79,13 @@ public abstract class TrackerBaseActivity extends AppCompatActivity
             }
         });
 
+        return view;
     }
+
 
     protected abstract void startUpdates();
     protected abstract void stopUpdates();
+
 
     @Override
     public void updatePlot(List<Location> locations) {
@@ -93,4 +95,11 @@ public abstract class TrackerBaseActivity extends AppCompatActivity
                     Double.toString(location.getLongitude()));
         }
     }
+
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        mUnbinder.unbind();
+    }
+
 }
