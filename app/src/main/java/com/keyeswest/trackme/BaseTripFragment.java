@@ -11,11 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
@@ -32,6 +36,13 @@ public abstract class BaseTripFragment extends Fragment
     private Unbinder mUnbinder;
 
     private GoogleMap mMap;
+
+    private Location mLastLocation;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+
+    private boolean mMapReady = false;
+    private boolean mLocationReady = false;
 
     @BindView(R.id.request_updates_button)
     Button mStartUpdatesButton;
@@ -87,6 +98,8 @@ public abstract class BaseTripFragment extends Fragment
             }
         });
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
+        getLastLocation();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.plot_map);
@@ -119,12 +132,38 @@ public abstract class BaseTripFragment extends Fragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        displayMap();
+        mMapReady = true;
+        if (mLocationReady){
+            displayMap();
+        }
+
 
     }
 
 
     private void displayMap(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6755846,-116.3092006 ), 15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),
+                mLastLocation.getLongitude() ), 15));
+    }
+
+
+    @SuppressWarnings("MissingPermission")
+    private void getLastLocation(){
+        mFusedLocationClient.getLastLocation()
+                .addOnCompleteListener(getActivity(),new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            mLastLocation = task.getResult();
+                            mLocationReady = true;
+                            if (mMapReady){
+                                displayMap();
+                            }
+                        }else{
+                            // handle error case where location not known
+                        }
+
+                    }
+                });
     }
 }
