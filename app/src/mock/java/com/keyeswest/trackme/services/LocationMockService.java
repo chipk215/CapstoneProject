@@ -106,7 +106,7 @@ public class LocationMockService extends Service {
                     sendBroadcast(intent);
 
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }

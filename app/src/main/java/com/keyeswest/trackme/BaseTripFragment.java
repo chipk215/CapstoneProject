@@ -1,11 +1,13 @@
 package com.keyeswest.trackme;
 
 import android.content.Context;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
@@ -29,6 +33,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
+
+import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
 
 public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback {
@@ -43,6 +49,11 @@ public abstract class BaseTripFragment extends Fragment
 
     private boolean mMapReady = false;
     private boolean mLocationReady = false;
+
+    private PolylineOptions mPolylineOptions;
+    private Polyline mPlot;
+
+    private ProcessedLocationSampleReceiver mSampleReceiver;
 
     @BindView(R.id.request_updates_button)
     Button mStartUpdatesButton;
@@ -106,6 +117,12 @@ public abstract class BaseTripFragment extends Fragment
 
         mapFragment.getMapAsync(this);
 
+        mSampleReceiver = new ProcessedLocationSampleReceiver();
+        mSampleReceiver.registerCallback(this);
+        IntentFilter filter = new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE);
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(getContext());
+        lbm.registerReceiver(mSampleReceiver, filter);
+
         return view;
     }
 
@@ -117,10 +134,23 @@ public abstract class BaseTripFragment extends Fragment
     @Override
     public void updatePlot(List<Location> locations) {
         Timber.d("Received Sample Broadcast message in updatePlot");
+
+        if (mPolylineOptions == null){
+            mPolylineOptions = new PolylineOptions();
+            mPlot = mMap.addPolyline(mPolylineOptions);
+        }
+
+        List<LatLng> points = mPlot.getPoints();
+
+
         for (Location location : locations){
             Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
                     Double.toString(location.getLongitude()));
+            points.add(new LatLng(location.getLatitude(), location.getLongitude()));
+
         }
+
+        mPlot.setPoints(points);
     }
 
     @Override

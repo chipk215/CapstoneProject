@@ -75,7 +75,7 @@ public class LocationProcessorService extends IntentService {
 
                 LatLonBounds bounds = saveLocationSamples(locations, segmentId);
 
-                // broadcst the location samples for plotting
+                // broadcast the location samples for plotting
                 broadcastLocationSamples(locations);
 
                 if (previousLocationCursor.getCount() == 1){
