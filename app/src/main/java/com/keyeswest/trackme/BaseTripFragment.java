@@ -11,6 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
@@ -22,9 +27,11 @@ import butterknife.Unbinder;
 import timber.log.Timber;
 
 public abstract class BaseTripFragment extends Fragment
-        implements ProcessedLocationSampleReceiver.OnSamplesReceived {
+        implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback {
 
     private Unbinder mUnbinder;
+
+    private GoogleMap mMap;
 
     @BindView(R.id.request_updates_button)
     Button mStartUpdatesButton;
@@ -80,6 +87,12 @@ public abstract class BaseTripFragment extends Fragment
             }
         });
 
+
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.plot_map);
+
+        mapFragment.getMapAsync(this);
+
         return view;
     }
 
@@ -103,4 +116,15 @@ public abstract class BaseTripFragment extends Fragment
         mUnbinder.unbind();
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        displayMap();
+
+    }
+
+
+    private void displayMap(){
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.6755846,-116.3092006 ), 15));
+    }
 }
