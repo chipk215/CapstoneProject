@@ -1,4 +1,4 @@
-package com.keyeswest.trackme;
+package com.keyeswest.trackme.receivers;
 
 
 import android.content.BroadcastReceiver;

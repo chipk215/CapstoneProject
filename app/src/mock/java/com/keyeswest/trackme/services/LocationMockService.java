@@ -14,7 +14,7 @@ import android.os.Process;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.keyeswest.trackme.LocationUpdatesBroadcastReceiver;
+import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
 import com.keyeswest.trackme.LocationWrapper;
 import com.keyeswest.trackme.R;
 
@@ -25,7 +25,7 @@ import java.util.Scanner;
 
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.LocationUpdatesBroadcastReceiver.MOCK_LOCATION_EXTRA_KEY;
+import static com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver.MOCK_LOCATION_EXTRA_KEY;
 
 public class LocationMockService extends Service {
 

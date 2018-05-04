@@ -5,7 +5,7 @@
     <application>
 
         <receiver
-            android:name=".LocationUpdatesBroadcastReceiver"
+            android:name=".receivers.LocationUpdatesBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

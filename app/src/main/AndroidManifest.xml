@@ -13,8 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
-        <activity android:name=".TrackLogActivity" />
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
