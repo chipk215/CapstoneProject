@@ -19,7 +19,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
@@ -29,7 +31,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
 
-public class TripListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TripListFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
     private Unbinder mUnbinder;
 
@@ -44,6 +47,8 @@ public class TripListFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        Stetho.initializeWithDefaults(getContext());
     }
 
     @Override
@@ -96,25 +101,16 @@ public class TripListFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         Timber.d("onCreateLoader invoked");
-        return SegmentLoader.newAllSegmentsInstance(getContext());
+        return SegmentLoader.newAllSegmentsInstanceOrderByDate(getContext());
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         Timber.d("onCreateLoader invoked");
         if (cursor != null) {
-            Timber.d("NUmber of records = " + cursor.getCount());
-            TrackLogAdapter adapter = new TrackLogAdapter(new SegmentCursor(cursor), new TrackLogAdapter.SegmentClickListener() {
-                @Override
-                public void onSegmentClick(Uri segmentUri) {
-                    Timber.d("Segment Selected");
-                    Timber.d("Segment Uri: " + segmentUri);
+            Timber.d("Number of records = %s", cursor.getCount());
+            TrackLogAdapter adapter = new TrackLogAdapter(new SegmentCursor(cursor), this);
 
-                    Intent intent = MapsActivity.newIntent(getContext(), segmentUri);
-                    startActivity(intent);
-                }
-            });
-            adapter.setHasStableIds(true);
             mTrackLogListView.setAdapter(adapter);
         }
     }
@@ -122,5 +118,28 @@ public class TripListFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         mTrackLogListView.setAdapter(null);
+    }
+
+    @Override
+    public void onSegmentClick(Uri segmentUri) {
+        Timber.d("Segment Selected");
+        Timber.d("Segment Uri: " + segmentUri);
+
+        Intent intent = MapsActivity.newIntent(getContext(), segmentUri);
+        startActivity(intent);
+
+    }
+
+    @Override
+    public void onDeleteClick(Uri segmentUri) {
+        Toast.makeText(getContext(), "URI Trash Clicked: " + segmentUri.toString(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onFavoriteClick(Uri segmentUri, boolean makeFavorite) {
+        Toast.makeText(getContext(), "Favorite Clicked: " + segmentUri.toString(),
+                Toast.LENGTH_SHORT).show();
+
     }
 }

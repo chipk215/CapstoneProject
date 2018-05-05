@@ -7,16 +7,18 @@ import android.support.v4.content.CursorLoader;
 public class SegmentLoader extends CursorLoader {
 
 
-    public static SegmentLoader newAllSegmentsInstance(Context context){
-        return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI);
+    public static SegmentLoader newAllSegmentsInstanceOrderByDate(Context context){
+        String orderByClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " DESC ";
+        return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, orderByClause);
 
     }
 
+    // request a particular segment
     public static SegmentLoader newSegmentInstance(Context context, Uri segmentUri){
-        return new SegmentLoader(context, segmentUri);
+        return new SegmentLoader(context, segmentUri, null);
     }
 
-    private SegmentLoader(Context context, Uri uri){
+    private SegmentLoader(Context context, Uri uri, String sortOrder){
         super(context, uri, null, null, null, null);
     }
 }
