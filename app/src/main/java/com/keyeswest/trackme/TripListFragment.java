@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,6 +54,9 @@ public class TripListFragment extends Fragment implements LoaderManager.LoaderCa
         mUnbinder = ButterKnife.bind(this, view);
 
         mTrackLogListView.setLayoutManager(new LinearLayoutManager(getContext()));
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
+        mTrackLogListView.addItemDecoration(itemDecorator);
 
 
         getActivity().getSupportLoaderManager().initLoader(0, null, this);

@@ -6,6 +6,8 @@ import java.util.UUID;
 
 public class Segment {
 
+    private static double METERS_TO_MILES = 0.000621371;
+
     private UUID mId;
     private long mTimeStamp;
     private boolean mMocked;
@@ -84,6 +86,10 @@ public class Segment {
         return mDistance;
     }
 
+    public Double getDistanceMiles(){
+        return mDistance * METERS_TO_MILES;
+    }
+
     public void setDistance(Double distance) {
         mDistance = distance;
     }
@@ -97,6 +103,20 @@ public class Segment {
         Date date = new Date(mTimeStamp * 1000);
         String dateString = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date);
         return dateString;
+    }
+
+    public String getDate(){
+        Date date = new Date(mTimeStamp * 1000);
+        String dateString = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
+        return dateString;
+
+    }
+
+    public String getTime(){
+        Date date = new Date(mTimeStamp * 1000);
+        String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+        return timeString;
+
     }
 
     public long getRowId() {

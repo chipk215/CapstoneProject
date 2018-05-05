@@ -43,5 +43,10 @@
     <string name="exit_app">Location permission not granted. Exit application.</string>
     <string name="exit">Exit</string>
 
+    <string name="mile">miles</string>
+    <string name="delete">delete</string>
+    <string name="favorite">favorite</string>
+    <string name="distance">Distance: </string>
+
 
 </resources>
