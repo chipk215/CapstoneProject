@@ -17,8 +17,11 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
 
+
         <activity
-            android:name=".TabsActivity"/>
+            android:name=".TripListActivity"/>
+
+        <activity android:name=".NewTripActivity"/>
 
 
         <activity android:name=".PermissionActivity">

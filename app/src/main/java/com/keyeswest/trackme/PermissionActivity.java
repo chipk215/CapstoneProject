@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import timber.log.Timber;
 
@@ -58,7 +57,7 @@ public class PermissionActivity extends AppCompatActivity {
             requestPermissions();
 
         }else {
-            startTabsActivity();
+            startTripListActivity();
         }
 
 
@@ -107,7 +106,7 @@ public class PermissionActivity extends AppCompatActivity {
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Timber.i( "Permission granted.");
 
-                startTabsActivity();
+                startTripListActivity();
             } else {
 
 
@@ -201,9 +200,10 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
 
-    private void startTabsActivity(){
-        Intent intent = TabsActivity.newIntent(this);
+    private void startTripListActivity(){
+        Intent intent = TripListActivity.newIntent(this);
         startActivity(intent);
+        finish();
     }
 
     @Override
