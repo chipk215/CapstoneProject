@@ -47,6 +47,7 @@
     <string name="delete">delete</string>
     <string name="favorite">favorite</string>
     <string name="distance">Distance: </string>
+    <string name="display_trips">Display Trips</string>
 
 
 </resources>

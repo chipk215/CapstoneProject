@@ -61,11 +61,13 @@
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fav_btn"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/delete_trash"
-        android:contentDescription="@string/delete" />
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/delete_trash" />
 
     <ImageButton
         android:id="@+id/fav_btn"
@@ -73,10 +75,13 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="21dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/favorite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/fav_star_border"
-        android:contentDescription="@string/favorite" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/fav_star_border" />
 
     <TextView
         android:id="@+id/dist_label"

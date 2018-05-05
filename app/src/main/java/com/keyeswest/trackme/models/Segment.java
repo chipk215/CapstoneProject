@@ -1,6 +1,7 @@
 package com.keyeswest.trackme.models;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -86,8 +87,9 @@ public class Segment {
         return mDistance;
     }
 
-    public Double getDistanceMiles(){
-        return mDistance * METERS_TO_MILES;
+    public String getDistanceMiles(){
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        return decimalFormat.format(mDistance * METERS_TO_MILES);
     }
 
     public void setDistance(Double distance) {

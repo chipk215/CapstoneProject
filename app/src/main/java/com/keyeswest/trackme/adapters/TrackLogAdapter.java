@@ -56,7 +56,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         mCursor.moveToPosition(position);
         holder.mDateView.setText(mCursor.getSegment().getDate());
         holder.mTimeView.setText(mCursor.getSegment().getTime());
-        holder.mDistanceView.setText(Double.toString(mCursor.getSegment().getDistanceMiles()));
+        holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
 
     }
 
