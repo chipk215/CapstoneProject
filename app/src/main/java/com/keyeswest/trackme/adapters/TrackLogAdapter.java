@@ -27,7 +27,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     private SegmentClickListener mSegmentClickListener;
 
     public interface SegmentClickListener{
-        void onSegmentClick(Uri segmentUri);
+
         void onDeleteClick(Uri segmentUri);
         void onFavoriteClick(Uri segmentUri, boolean makeFavorite);
 
@@ -36,6 +36,24 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public TrackLogAdapter(SegmentCursor cursor, SegmentClickListener listener){
         mCursor = cursor;
         mSegmentClickListener = listener;
+    }
+
+
+    public List<Uri> getSelectedTrips(){
+        List<Uri> selectedItems = new ArrayList<>();
+
+        for (int i=0;  i < mCheckedStateArray.size();i++){
+            int key = mCheckedStateArray.keyAt(i);
+            boolean isChecked = mCheckedStateArray.get(key);
+            if (isChecked){
+                mCursor.moveToPosition(key);
+                Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(mCursor.getSegment().getRowId());
+                selectedItems.add(itemUri);
+            }
+        }
+
+
+        return selectedItems;
     }
 
 
@@ -59,9 +77,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
                     mCheckedStateArray.put(adapterPosition, false);
 
                 }
-               // mCursor.moveToPosition(holder.getAdapterPosition());
-               // Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(mCursor.getSegment().getRowId());
-              //  mSegmentClickListener.onSegmentClick(itemUri);
+
 
             }
         });

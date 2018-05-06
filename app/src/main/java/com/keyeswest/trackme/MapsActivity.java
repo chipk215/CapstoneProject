@@ -26,6 +26,9 @@ import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.models.Location;
 import com.keyeswest.trackme.models.Segment;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import timber.log.Timber;
 
 public class MapsActivity extends FragmentActivity
@@ -36,9 +39,21 @@ public class MapsActivity extends FragmentActivity
     private static final int SEGMENT_LOADER  = 0;
     private static final int LOCATION_LOADER = 1;
 
-    public static Intent newIntent(Context packageContext, Uri segmentUri){
+    /*public static Intent newIntent(Context packageContext, Uri segmentUri){
         Intent intent = new Intent(packageContext, MapsActivity.class);
         intent.putExtra(EXTRA_URI, segmentUri);
+        return intent;
+    }*/
+
+    public static Intent newIntent(Context packageContext, List<Uri> segments){
+        if ((segments == null) || (segments.size() < 1 )){
+            return null;
+        }
+
+        Intent intent = new Intent(packageContext, MapsActivity.class);
+        ArrayList<Uri> arrayList = new ArrayList<>(segments);
+        intent.putParcelableArrayListExtra(EXTRA_URI, arrayList);
+
         return intent;
     }
 
@@ -49,6 +64,7 @@ public class MapsActivity extends FragmentActivity
     private LocationCursor mLocationCursor;
 
     private GoogleMap mMap;
+    private List<Uri> mSegmentList;
     private Uri mSegmentUri;
     private Segment mSegment;
 
@@ -57,7 +73,13 @@ public class MapsActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        mSegmentUri = getIntent().getParcelableExtra(EXTRA_URI);
+
+        // get a list of segment Uris
+        mSegmentList = getIntent().getParcelableArrayListExtra(EXTRA_URI);
+
+        // temp
+        mSegmentUri = mSegmentList.get(0);
+
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -93,7 +115,8 @@ public class MapsActivity extends FragmentActivity
 
     private void displayMap(){
 
-        if (mSegment != null) {
+        if (mSegmentList != null) {
+
             LatLngBounds bounds = new LatLngBounds(new LatLng(mSegment.getMinLatitude(),
                     mSegment.getMinLongitude()), new LatLng(mSegment.getMaxLatitude(),
                     mSegment.getMaxLongitude()));

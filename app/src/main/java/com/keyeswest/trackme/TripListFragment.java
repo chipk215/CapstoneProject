@@ -19,12 +19,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +42,12 @@ public class TripListFragment extends Fragment
 
     @BindView(R.id.track_log_recycler_view)
     RecyclerView mTrackLogListView;
+
+    @BindView(R.id.display_btn)
+    Button mDisplayButton;
+
+
+    private TrackLogAdapter mTrackLogAdapter;
 
     public TripListFragment() {
         // Required empty public constructor
@@ -57,6 +67,24 @@ public class TripListFragment extends Fragment
         // Inflate the layout for this fragment
         View view =inflater.inflate(R.layout.fragmemt_trip_list, container, false);
         mUnbinder = ButterKnife.bind(this, view);
+
+
+        mDisplayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mTrackLogAdapter != null){
+
+                    List<Uri> selectedTrips = mTrackLogAdapter.getSelectedTrips();
+                    if (selectedTrips.size() > 0){
+                        // plot them
+                        Intent intent = MapsActivity.newIntent(getContext(), selectedTrips);
+                        startActivity(intent);
+                    }
+
+                }
+
+            }
+        });
 
         mTrackLogListView.setLayoutManager(new LinearLayoutManager(getContext()));
         DividerItemDecoration itemDecorator = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
@@ -109,26 +137,19 @@ public class TripListFragment extends Fragment
         Timber.d("onCreateLoader invoked");
         if (cursor != null) {
             Timber.d("Number of records = %s", cursor.getCount());
-            TrackLogAdapter adapter = new TrackLogAdapter(new SegmentCursor(cursor), this);
+            mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor), this);
 
-            mTrackLogListView.setAdapter(adapter);
+            mTrackLogListView.setAdapter(mTrackLogAdapter);
         }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        mTrackLogAdapter = null;
         mTrackLogListView.setAdapter(null);
     }
 
-    @Override
-    public void onSegmentClick(Uri segmentUri) {
-        Timber.d("Segment Selected");
-        Timber.d("Segment Uri: " + segmentUri);
 
-        Intent intent = MapsActivity.newIntent(getContext(), segmentUri);
-        startActivity(intent);
-
-    }
 
     @Override
     public void onDeleteClick(Uri segmentUri) {
