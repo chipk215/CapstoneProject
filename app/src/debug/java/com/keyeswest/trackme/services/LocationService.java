@@ -17,7 +17,7 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.keyeswest.trackme.LocationUpdatesBroadcastReceiver;
+import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
 
 import timber.log.Timber;
 

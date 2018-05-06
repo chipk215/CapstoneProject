@@ -8,6 +8,7 @@ import android.net.Uri;
 
 import com.keyeswest.trackme.models.Segment;
 
+import java.util.List;
 import java.util.UUID;
 
 import timber.log.Timber;
@@ -175,5 +176,33 @@ public class Queries {
 
         LocationCursor locCursor = new LocationCursor(cursor);
         return locCursor;
+    }
+
+    public static SegmentCursor getSegmentsFromUriList(Context context, List<Uri> segments){
+
+
+        String selectionClause = SegmentSchema.SegmentTable._ID + " IN ( ";
+        for (int i=0; i< segments.size(); i++){
+            String segmentRowId = segments.get(i).getLastPathSegment();
+            if (i== (segments.size() -1 )){
+                selectionClause = selectionClause.concat(segmentRowId + " ");
+            }else{
+                selectionClause = selectionClause.concat(segmentRowId + ", ");
+            }
+
+        }
+        selectionClause = selectionClause.concat(")");
+
+        Uri queryUri = SegmentSchema.SegmentTable.CONTENT_URI;
+
+        ContentResolver contentResolver = context.getContentResolver();
+
+        Cursor cursor = contentResolver.query(queryUri, null, selectionClause,
+                null, null);
+
+        SegmentCursor segmentCursor = new SegmentCursor(cursor);
+
+        return segmentCursor;
+
     }
 }

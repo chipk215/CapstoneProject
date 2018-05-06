@@ -38,7 +38,7 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
     public void testSimpleSegmentQueryForAllRecords(){
 
         // insert 10 records
-        List<Segment> segments = insertSegmentRecords(10);
+        List<Segment> segments = insertSegmentRecords(database,10);
 
         // query for all the segments
         ContentResolver resolver = mContext.getContentResolver();
@@ -92,7 +92,7 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
     public void testSegmentTimeStampBetweenValues(){
 
         // insert 10 records
-        insertSegmentRecords(10);
+        insertSegmentRecords(database,10);
 
         // query for all the segments
         ContentResolver resolver = mContext.getContentResolver();
@@ -129,7 +129,7 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
     public void testRetrievingLocationsBelongingToSegment(){
 
         // insert 2 segment records
-        List<Segment> segments =insertSegmentRecords(2);
+        List<Segment> segments =insertSegmentRecords(database,2);
 
         // insert 5 location records for each segment
         UUID[] segmentIds = new UUID[2];
@@ -137,7 +137,7 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
         segmentIds[1] = segments.get(1).getId();
 
         // insert location records
-        insertLocationRecords(5, segmentIds);
+        insertLocationRecords(database,5, segmentIds);
 
         //query for all of the locations (10)
         ContentResolver resolver = mContext.getContentResolver();
@@ -214,13 +214,13 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
         int numberLocationsRecords = 5;
 
         //insert a segment
-        List<Segment> segments =insertSegmentRecords(numberSegments);
+        List<Segment> segments =insertSegmentRecords(database,numberSegments);
         // insert 5 location records for each segment
         UUID[] segmentIds = new UUID[numberSegments];
         segmentIds[0] = segments.get(0).getId();
 
         // insert location records
-        insertLocationRecords(numberLocationsRecords, segmentIds);
+        insertLocationRecords(database, numberLocationsRecords, segmentIds);
 
         LocationCursor locationCursor = Queries.getLatestLocationBySegmentId(mContext,
                 segmentIds[0].toString());
@@ -235,67 +235,6 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
 
     }
 
-
-
-    private List<Segment> makeSegments(int numberToInsert){
-        List<Segment> segmentList = new ArrayList<>();
-        for (int i=0; i< numberToInsert; i++){
-            UUID id = UUID.randomUUID();
-            Segment segment = new Segment(id);
-            segment.setTimeStamp(i);
-            segment.setMocked(false);
-            segmentList.add(segment);
-        }
-
-        return segmentList;
-    }
-
-    private List<Segment> insertSegmentRecords(int numberToInsert){
-        List<Segment> segments = makeSegments(numberToInsert);
-        for (Segment s : segments){
-
-            ContentValues testValues = createSegmentRecord(s.getId().toString(),
-                    s.getTimeStamp(), s.isMocked() ? 1:0);
-
-            database.insert(SegmentSchema.SegmentTable.TABLE_NAME,
-                    null,
-                    testValues);
-        }
-
-        return segments;
-    }
-
-
-    private List<Location> makeLocationRecords(int numberToInsert, UUID segmentId){
-        List<Location> locations = new ArrayList<Location>();
-        for (int i=0; i< numberToInsert; i++){
-            Location location = new Location();
-            location.setSegmentId(segmentId);
-            location.setTimeStamp(i);
-            location.setLatitude(45.0d);
-            location.setLongitude(60.0d);
-            locations.add(location);
-        }
-
-        return locations;
-    }
-
-
-    private List<Location> insertLocationRecords(int numberToInsert, UUID[] segmentIds){
-        List<Location> locations = new ArrayList<>();
-        for (UUID segmentId : segmentIds){
-            locations.addAll(makeLocationRecords(numberToInsert, segmentId));
-        }
-
-        for (Location location : locations){
-            ContentValues values = createLocationRecord(location.getTimeStamp(),
-                    location.getLatitude(), location.getLongitude(),
-                    location.getSegmentId().toString());
-            database.insert(LocationSchema.LocationTable.TABLE_NAME, null, values);
-        }
-
-        return locations;
-    }
 
 
 

@@ -7,12 +7,16 @@ import android.net.Uri;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationSchema;
 import com.keyeswest.trackme.data.Queries;
+import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.models.Location;
 import com.keyeswest.trackme.models.Segment;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.keyeswest.trackme.data.Queries.getLocationsForSegment;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
@@ -58,6 +62,27 @@ public class QueriesTests extends TracksContentProviderBaseTest {
         Assert.assertNotNull(sameSegment);
         Assert.assertTrue(segment.getId().equals(sameSegment.getId()));
         Assert.assertEquals(segment.getTimeStamp(), sameSegment.getTimeStamp());
+    }
+
+
+    @Test
+    public void getSegmentsFromListOfSegmentUrisTest(){
+        int numberOfSegments = 10;
+        List<Uri> segments = new ArrayList<>();
+        for (int i=0; i< numberOfSegments; i++){
+            Uri segmentUri = Queries.createNewSegment(mContext);
+            segments.add(segmentUri);
+        }
+
+
+
+        // retrieve the first 5 segments
+        int subsetQuantity = 5;
+        List<Uri> querySegments = segments.subList(0,subsetQuantity);
+        SegmentCursor cursor = Queries.getSegmentsFromUriList(mContext, querySegments);
+        Assert.assertNotNull(cursor);
+        Assert.assertTrue(cursor.getCount() == subsetQuantity);
+
     }
 
     @Test
