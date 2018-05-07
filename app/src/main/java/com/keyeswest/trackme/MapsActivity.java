@@ -1,12 +1,16 @@
 package com.keyeswest.trackme;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -19,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
@@ -33,6 +38,8 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static java.lang.Thread.sleep;
+
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -40,6 +47,8 @@ public class MapsActivity extends FragmentActivity
 
     private static final int SEGMENT_LOADER  = 0;
     private static final int LOCATION_LOADER = 1;
+    private static final int PLOT_MESSAGE = 999;
+    private static final String POINT_KEY = "POINT_KEY";
 
 
     /**
@@ -70,6 +79,28 @@ public class MapsActivity extends FragmentActivity
 
     private int mLocationLoadsFinishedCount;
     List<LocationCursor> mPlotLocations = new ArrayList<>();
+
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message message) {
+
+            if (message.what == PLOT_MESSAGE) {
+                Bundle bundle = message.getData();
+                LatLng point = bundle.getParcelable(POINT_KEY);
+                List<LatLng> points = mPlotLine.getPoints();
+                points.add(point);
+                mPlotLine.setPoints(points);
+
+            } else {
+
+                super.handleMessage(message);
+            }
+
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -194,6 +225,7 @@ public class MapsActivity extends FragmentActivity
     }
 
 
+
     private void displayMap(){
 
         if (mSegmentList != null) {
@@ -202,36 +234,16 @@ public class MapsActivity extends FragmentActivity
 
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15));
 
-            int count = 0;
-
             for (LocationCursor locationCursor : mPlotLocations) {
                 PolylineOptions options = new PolylineOptions();
 
+                plotPolyLine(options, locationCursor);
 
-                if (locationCursor != null) {
-                    locationCursor.moveToPosition(-1);
-                    while (locationCursor.moveToNext()) {
-                        Location location = locationCursor.getLocation();
-                        Double lat = location.getLatitude();
-                        Double lon = location.getLongitude();
-                        Timber.d("Lat: " + Double.toString(lat) + "  Lon: " + Double.toString(lon));
-                        options.add(new LatLng(lat, lon));
-
-                    }
-
-                    //TODO determine how to color plot lines
-                    if ((count % 2) == 0) {
-                        mMap.addPolyline(options.color(Color.BLUE));
-                    }else{
-                        mMap.addPolyline(options.color(Color.RED));
-                    }
-
-                    count++;
-
-                }
             }
         }
     }
+
+
 
     private boolean getMapReady(){
         return mMapReady;
@@ -257,4 +269,43 @@ public class MapsActivity extends FragmentActivity
     private  boolean getDataReady(){
         return getSegmentDataReady() && getLocationDataReady();
     }
+
+
+    private Polyline mPlotLine;
+    private void plotPolyLine(final PolylineOptions options, final LocationCursor cursor) {
+
+        cursor.moveToPosition(-1);
+        mPlotLine = mMap.addPolyline(options);
+
+        new Thread(new Runnable() {
+            public void run() {
+
+                while (cursor.moveToNext()) {
+                    Location location = cursor.getLocation();
+                    Message msg = Message.obtain();
+                    msg.what = PLOT_MESSAGE;
+                    Bundle bundle = new Bundle();
+                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    bundle.putParcelable(POINT_KEY, latLng);
+                    msg.setData(bundle);
+
+                    mHandler.sendMessage(msg);
+
+                    try{
+                        Thread.sleep(500);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+
+                }
+
+
+
+            }
+
+        }).start();
+    }
+
+
+
 }
