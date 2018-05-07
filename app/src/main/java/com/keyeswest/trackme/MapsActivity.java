@@ -42,6 +42,12 @@ public class MapsActivity extends FragmentActivity
     private static final int LOCATION_LOADER = 1;
 
 
+    /**
+     * Activity requires an intent with a list of segment URIs to be plotted on the map.
+     * @param packageContext
+     * @param segments - segment URIs
+     * @return Intent to start Activity
+     */
     public static Intent newIntent(Context packageContext, List<Uri> segments){
         if ((segments == null) || (segments.size() < 1 )){
             return null;
@@ -59,11 +65,8 @@ public class MapsActivity extends FragmentActivity
 
     private SegmentCursor mSegmentCursor;
 
-
     private GoogleMap mMap;
     private List<Uri> mSegmentList;
-
-    private Segment mSegment;
 
     private int mLocationLoadsFinishedCount;
     List<LocationCursor> mPlotLocations = new ArrayList<>();
@@ -84,19 +87,17 @@ public class MapsActivity extends FragmentActivity
 
         mapFragment.getMapAsync(this);
 
+        // Initialize the loader that will retrieve the segments corresponding to the
+        // list of segment URIs provided to the Activity. Segments will be retrieved
+        // and then the corresponding location data will be loaded.
         getSupportLoaderManager().initLoader(SEGMENT_LOADER,null, this);
-      //  getSupportLoaderManager().initLoader(LOCATION_LOADER,null, this);
+
     }
 
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -111,65 +112,16 @@ public class MapsActivity extends FragmentActivity
 
 
 
-
-    private void displayMap(){
-
-        if (mSegmentList != null) {
-
-            LatLonBounds boundingBox = new LatLonBounds();
-            mSegmentCursor.moveToPosition(-1);
-            while(mSegmentCursor.moveToNext()){
-                Segment segment = mSegmentCursor.getSegment();
-                boundingBox.update(segment.getMinLatitude(), segment.getMinLongitude());
-                boundingBox.update(segment.getMaxLatitude(), segment.getMaxLongitude());
-            }
-
-
-            LatLngBounds bounds = new LatLngBounds(new LatLng(boundingBox.getMinLat(),
-                    boundingBox.getMinLon()), new LatLng(boundingBox.getMaxLat(),
-                    boundingBox.getMaxLon()));
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15));
-
-            int count = 0;
-
-
-            for (LocationCursor locationCursor : mPlotLocations) {
-                PolylineOptions options = new PolylineOptions();
-
-
-                if (locationCursor != null) {
-                    locationCursor.moveToPosition(-1);
-                    while (locationCursor.moveToNext()) {
-                        Location location = locationCursor.getLocation();
-                        Double lat = location.getLatitude();
-                        Double lon = location.getLongitude();
-                        Timber.d("Lat: " + Double.toString(lat) + "  Lon: " + Double.toString(lon));
-                        options.add(new LatLng(lat, lon));
-
-                    }
-
-                    if ((count % 2) == 0) {
-                        mMap.addPolyline(options.color(Color.BLUE));
-                    }else{
-                        mMap.addPolyline(options.color(Color.RED));
-                    }
-
-                    count++;
-
-
-                }
-            }
-        }
-    }
-
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+
+
         if (id == SEGMENT_LOADER) {
+            // All the segments in the segment list will be loaded with a single database query
             return SegmentLoader.newSegmentsFromUriList(this, mSegmentList);
         } else if (id >= LOCATION_LOADER) {
-
+            //See notes on id for location loader in onLoadFinished method below.
             return LocationLoader.newLocationsForSegment(this, mSegmentList.get(id - LOCATION_LOADER));
         }
 
@@ -186,12 +138,17 @@ public class MapsActivity extends FragmentActivity
             // start loading the locations for each segment
             mLocationLoadsFinishedCount = 0;
             for (int i=0; i< mSegmentList.size(); i++){
+                // Each segment requires a separate load to obtain the location data
+                // The first location loader will use the LOCATION_LOADER value and each
+                // successive location load will increase the LOCATION_LOADER value by one
                 getSupportLoaderManager().initLoader(LOCATION_LOADER + i,null, this);
             }
 
         } else if(loader.getId() >= LOCATION_LOADER){
+            // handle the completed location data loads
             LocationCursor locationCursor = new LocationCursor(data);
             mPlotLocations.add(locationCursor);
+            // increment the count of location loaders that have completed
             mLocationLoadsFinishedCount++;
 
         }
@@ -205,14 +162,76 @@ public class MapsActivity extends FragmentActivity
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         if (loader.getId() == SEGMENT_LOADER){
-            mSegment = null;
             setSegmentDataReady(false);
+            mSegmentCursor.close();
         } else if (loader.getId() >= LOCATION_LOADER){
-             //TODO
+
+           for(LocationCursor cursor : mPlotLocations){
+               cursor.close();
             }
+
+            mLocationLoadsFinishedCount = 0;
+        }
 
     }
 
+
+    private LatLngBounds computeBoundingBoxForSegments(){
+        LatLonBounds boundingBox = new LatLonBounds();
+        mSegmentCursor.moveToPosition(-1);
+        while(mSegmentCursor.moveToNext()){
+            Segment segment = mSegmentCursor.getSegment();
+            boundingBox.update(segment.getMinLatitude(), segment.getMinLongitude());
+            boundingBox.update(segment.getMaxLatitude(), segment.getMaxLongitude());
+        }
+
+
+        LatLngBounds bounds = new LatLngBounds(new LatLng(boundingBox.getMinLat(),
+                boundingBox.getMinLon()), new LatLng(boundingBox.getMaxLat(),
+                boundingBox.getMaxLon()));
+
+        return bounds;
+    }
+
+
+    private void displayMap(){
+
+        if (mSegmentList != null) {
+
+            LatLngBounds bounds = computeBoundingBoxForSegments();
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15));
+
+            int count = 0;
+
+            for (LocationCursor locationCursor : mPlotLocations) {
+                PolylineOptions options = new PolylineOptions();
+
+
+                if (locationCursor != null) {
+                    locationCursor.moveToPosition(-1);
+                    while (locationCursor.moveToNext()) {
+                        Location location = locationCursor.getLocation();
+                        Double lat = location.getLatitude();
+                        Double lon = location.getLongitude();
+                        Timber.d("Lat: " + Double.toString(lat) + "  Lon: " + Double.toString(lon));
+                        options.add(new LatLng(lat, lon));
+
+                    }
+
+                    //TODO determine how to color plot lines
+                    if ((count % 2) == 0) {
+                        mMap.addPolyline(options.color(Color.BLUE));
+                    }else{
+                        mMap.addPolyline(options.color(Color.RED));
+                    }
+
+                    count++;
+
+                }
+            }
+        }
+    }
 
     private boolean getMapReady(){
         return mMapReady;
@@ -233,7 +252,6 @@ public class MapsActivity extends FragmentActivity
     private  boolean getLocationDataReady(){
         return (mLocationLoadsFinishedCount == mSegmentList.size());
     }
-
 
 
     private  boolean getDataReady(){
