@@ -26,6 +26,7 @@ import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
+import com.keyeswest.trackme.data.SegmentSchema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,7 @@ public class TripListFragment extends Fragment
     @BindView(R.id.display_btn)
     Button mDisplayButton;
 
+    private List<SegmentCursor> mSelectedSegments;
 
     private TrackLogAdapter mTrackLogAdapter;
 
@@ -59,6 +61,8 @@ public class TripListFragment extends Fragment
         setHasOptionsMenu(true);
 
         Stetho.initializeWithDefaults(getContext());
+
+        mSelectedSegments = new ArrayList<>();
     }
 
     @Override
@@ -72,18 +76,19 @@ public class TripListFragment extends Fragment
         mDisplayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTrackLogAdapter != null){
-
-                    List<Uri> selectedTrips = mTrackLogAdapter.getSelectedTrips();
-                    if (selectedTrips.size() > 0){
-                        // plot them
-                        Intent intent = MapsActivity.newIntent(getContext(), selectedTrips);
-                        startActivity(intent);
-                    }
-
+                List<Uri> selectedTrips = new ArrayList<>();
+                for (SegmentCursor segCursor : mSelectedSegments){
+                    Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segCursor.getSegment().getRowId());
+                    selectedTrips.add(itemUri);
                 }
 
+                if (selectedTrips.size() > 0){
+                    // plot them
+                    Intent intent = MapsActivity.newIntent(getContext(), selectedTrips);
+                    startActivity(intent);
+                }
             }
+
         });
 
         mTrackLogListView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -150,6 +155,15 @@ public class TripListFragment extends Fragment
     }
 
 
+    @Override
+    public void onItemChecked(SegmentCursor segmentCursor) {
+        mSelectedSegments.add(segmentCursor);
+    }
+
+    @Override
+    public void onItemUnchecked(SegmentCursor segmentCursor) {
+        mSelectedSegments.remove(segmentCursor);
+    }
 
     @Override
     public void onDeleteClick(Uri segmentUri) {

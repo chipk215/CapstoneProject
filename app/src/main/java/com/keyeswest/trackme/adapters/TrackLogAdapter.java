@@ -22,38 +22,28 @@ import java.util.List;
 
 public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHolder>   {
 
-    private SparseBooleanArray mCheckedStateArray = new SparseBooleanArray();
+    private static final int MAX_CHECKED_ITEMS = 4;
+
+
     private SegmentCursor mCursor;
     private SegmentClickListener mSegmentClickListener;
 
-    public interface SegmentClickListener{
+    private int mCheckedItems;
 
+    public interface SegmentClickListener{
+        void onItemChecked(SegmentCursor segmentCursor );
+        void onItemUnchecked(SegmentCursor segmentCursor);
         void onDeleteClick(Uri segmentUri);
         void onFavoriteClick(Uri segmentUri, boolean makeFavorite);
 
     }
 
+
+
     public TrackLogAdapter(SegmentCursor cursor, SegmentClickListener listener){
         mCursor = cursor;
         mSegmentClickListener = listener;
-    }
-
-
-    public List<Uri> getSelectedTrips(){
-        List<Uri> selectedItems = new ArrayList<>();
-
-        for (int i=0;  i < mCheckedStateArray.size();i++){
-            int key = mCheckedStateArray.keyAt(i);
-            boolean isChecked = mCheckedStateArray.get(key);
-            if (isChecked){
-                mCursor.moveToPosition(key);
-                Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(mCursor.getSegment().getRowId());
-                selectedItems.add(itemUri);
-            }
-        }
-
-
-        return selectedItems;
+        mCheckedItems = 0;
     }
 
 
@@ -64,33 +54,41 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.list_item_log, parent, false);
         final TrackLogAdapter.LogHolder holder = new TrackLogAdapter.LogHolder(view);
-        view.setOnClickListener(new View.OnClickListener() {
+
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(final @NonNull LogHolder holder, int position) {
+        mCursor.moveToPosition(position);
+        holder.mDateView.setText(mCursor.getSegment().getDate());
+        holder.mTimeView.setText(mCursor.getSegment().getTime());
+        holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
+        holder.mSegmentCursor = mCursor;
+        holder.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
 
-                int adapterPosition = holder.getAdapterPosition();
-                if (!mCheckedStateArray.get(adapterPosition, false)){
-                    holder.mCheckBox.setChecked(true);
-                    mCheckedStateArray.put(adapterPosition, true);
+                holder.mCheckBox.setChecked( ! holder.mCheckBox.isChecked());
+                if (holder.mCheckBox.isChecked()){
+                    mSegmentClickListener.onItemChecked(holder.mSegmentCursor);
+                    mCheckedItems+=1;
                 }else{
-                    holder.mCheckBox.setChecked(false);
-                    mCheckedStateArray.put(adapterPosition, false);
+                    mSegmentClickListener.onItemUnchecked(holder.mSegmentCursor);
+                    mCheckedItems-=1;
+                }
 
+
+
+                if (mCheckedItems == MAX_CHECKED_ITEMS){
+                    // disable all unchecked checkboxes
+                    //TODO
                 }
 
 
             }
         });
 
-        return holder;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull LogHolder holder, int position) {
-        mCursor.moveToPosition(position);
-        holder.mDateView.setText(mCursor.getSegment().getDate());
-        holder.mTimeView.setText(mCursor.getSegment().getTime());
-        holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
 
     }
 
@@ -98,6 +96,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public int getItemCount() {
         return mCursor.getCount();
     }
+
+
 
     @Override
     public long getItemId(int position) {
@@ -109,7 +109,10 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         return position;
     }
 
-    class LogHolder extends RecyclerView.ViewHolder {
+
+
+
+     class LogHolder extends RecyclerView.ViewHolder {
 
         private TextView mDateView;
         private TextView mTimeView;
@@ -118,13 +121,17 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         private ImageButton mTrashButton;
         private ImageButton mFavoriteButton;
         private CheckBox mCheckBox;
+        private View mItemView;
+        private SegmentCursor mSegmentCursor;
 
         public LogHolder(View view){
             super(view);
+            mItemView = view;
             mDateView = view.findViewById(R.id.date_tv);
             mDistanceView = view.findViewById(R.id.distance_tv);
             mTimeView = view.findViewById(R.id.time_tv);
             mCheckBox = view.findViewById(R.id.checkBox);
+            mCheckBox.setClickable(false);
 
 
             mTrashButton = view.findViewById(R.id.delete_btn);
@@ -157,6 +164,12 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             });
 
         }
+
+        public void setOnClickListener(View.OnClickListener onClickListener){
+            mItemView.setOnClickListener(onClickListener);
+        }
+
+
 
 
 
