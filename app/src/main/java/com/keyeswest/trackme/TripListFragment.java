@@ -143,7 +143,7 @@ public class TripListFragment extends Fragment
         if (cursor != null) {
             Timber.d("Number of records = %s", cursor.getCount());
             mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor), this);
-
+            mTrackLogAdapter.setHasStableIds(true);
             mTrackLogListView.setAdapter(mTrackLogAdapter);
         }
     }
@@ -166,15 +166,18 @@ public class TripListFragment extends Fragment
     }
 
     @Override
-    public void onDeleteClick(Uri segmentUri) {
-        Toast.makeText(getContext(), "URI Trash Clicked: " + segmentUri.toString(),
-                Toast.LENGTH_SHORT).show();
+    public void onDeleteClick(SegmentCursor segmentCursor) {
+
     }
 
     @Override
-    public void onFavoriteClick(Uri segmentUri, boolean makeFavorite) {
-        Toast.makeText(getContext(), "Favorite Clicked: " + segmentUri.toString(),
-                Toast.LENGTH_SHORT).show();
+    public void onFavoriteClick(SegmentCursor segmentCursor) {
+
+
+    }
+
+    @Override
+    public void onUnFavoriteClicked(SegmentCursor segmentCursor) {
 
     }
 }

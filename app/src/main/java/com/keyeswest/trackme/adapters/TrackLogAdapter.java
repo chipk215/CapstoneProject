@@ -33,8 +33,9 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public interface SegmentClickListener{
         void onItemChecked(SegmentCursor segmentCursor );
         void onItemUnchecked(SegmentCursor segmentCursor);
-        void onDeleteClick(Uri segmentUri);
-        void onFavoriteClick(Uri segmentUri, boolean makeFavorite);
+        void onDeleteClick(SegmentCursor segmentCursor);
+        void onFavoriteClick(SegmentCursor segmentCursor);
+        void onUnFavoriteClicked(SegmentCursor segmentCursor);
 
     }
 
@@ -99,6 +100,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
 
 
+    //TODO Figure out why the next two methods are needed so that the trip list items are stable
     @Override
     public long getItemId(int position) {
         return position;
@@ -108,7 +110,6 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public int getItemViewType(int position) {
         return position;
     }
-
 
 
 
@@ -138,28 +139,17 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             mTrashButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION){
-                        mCursor.moveToPosition(position);
-                        Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(mCursor.getSegment().getRowId());
-                        mSegmentClickListener.onDeleteClick(itemUri);
-
-                    }
-
+                    mSegmentClickListener.onDeleteClick(mCursor);
                 }
             });
 
             mFavoriteButton = view.findViewById(R.id.fav_btn);
 
+            // need to handle unfavorite as well
             mFavoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION) {
-                        mCursor.moveToPosition(position);
-                        Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(mCursor.getSegment().getRowId());
-                        mSegmentClickListener.onFavoriteClick(itemUri, true);
-                    }
+                    mSegmentClickListener.onFavoriteClick(mCursor);
                 }
             });
 
