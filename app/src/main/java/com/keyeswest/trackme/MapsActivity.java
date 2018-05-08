@@ -69,43 +69,45 @@ public class MapsActivity extends FragmentActivity
         return intent;
     }
 
+
+    private SegmentPlotter<Polyline> mSegmentPlotter;
+
     private boolean mMapReady=false;
     private boolean mSegmentDataReady=false;
 
     private SegmentCursor mSegmentCursor;
 
     private GoogleMap mMap;
+    private Polyline mPlotLine;
     private List<Uri> mSegmentList;
 
     private int mLocationLoadsFinishedCount;
     List<LocationCursor> mPlotLocations = new ArrayList<>();
 
 
-    @SuppressLint("HandlerLeak")
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message message) {
-
-            if (message.what == PLOT_MESSAGE) {
-                Bundle bundle = message.getData();
-                LatLng point = bundle.getParcelable(POINT_KEY);
-                List<LatLng> points = mPlotLine.getPoints();
-                points.add(point);
-                mPlotLine.setPoints(points);
-
-            } else {
-
-                super.handleMessage(message);
-            }
-
-        }
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Handler responseHandler = new Handler();
+
+        mSegmentPlotter = new SegmentPlotter<>(responseHandler);
+        mSegmentPlotter.setSegmentPlotterListener(new SegmentPlotter.SegmentPlotterListener<Polyline>() {
+            @Override
+            public void plotLocation(Polyline target, LatLng locationSample) {
+                List<LatLng> points = mPlotLine.getPoints();
+                points.add(locationSample);
+                mPlotLine.setPoints(points);
+
+            }
+        });
+
+
+        mSegmentPlotter.start();
+        mSegmentPlotter.getLooper();
+        Timber.d("Background segment plotter thread started");
 
 
         // get a list of segment Uris
@@ -206,6 +208,13 @@ public class MapsActivity extends FragmentActivity
 
     }
 
+    @Override
+    public void onDestroy(){
+        mSegmentPlotter.quit();
+
+        super.onDestroy();
+    }
+
 
     private LatLngBounds computeBoundingBoxForSegments(){
         LatLonBounds boundingBox = new LatLonBounds();
@@ -271,39 +280,13 @@ public class MapsActivity extends FragmentActivity
     }
 
 
-    private Polyline mPlotLine;
     private void plotPolyLine(final PolylineOptions options, final LocationCursor cursor) {
 
         cursor.moveToPosition(-1);
         mPlotLine = mMap.addPolyline(options);
 
-        new Thread(new Runnable() {
-            public void run() {
+        mSegmentPlotter.queueSegment(mPlotLine, cursor);
 
-                while (cursor.moveToNext()) {
-                    Location location = cursor.getLocation();
-                    Message msg = Message.obtain();
-                    msg.what = PLOT_MESSAGE;
-                    Bundle bundle = new Bundle();
-                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    bundle.putParcelable(POINT_KEY, latLng);
-                    msg.setData(bundle);
-
-                    mHandler.sendMessage(msg);
-
-                    try{
-                        Thread.sleep(500);
-                    }catch(InterruptedException e){
-                        e.printStackTrace();
-                    }
-
-                }
-
-
-
-            }
-
-        }).start();
     }
 
 
