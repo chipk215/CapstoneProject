@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
@@ -39,7 +40,11 @@ import timber.log.Timber;
 public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
+    private static final int MAX_TRIP_SELECTIONS = 4;
+
     private Unbinder mUnbinder;
+
+    private View mFragmentView;
 
     @BindView(R.id.track_log_recycler_view)
     RecyclerView mTrackLogListView;
@@ -70,6 +75,7 @@ public class TripListFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =inflater.inflate(R.layout.fragmemt_trip_list, container, false);
+        mFragmentView = view;
         mUnbinder = ButterKnife.bind(this, view);
 
 
@@ -158,11 +164,20 @@ public class TripListFragment extends Fragment
     @Override
     public void onItemChecked(SegmentCursor segmentCursor) {
         mSelectedSegments.add(segmentCursor);
+
+        if (mSelectedSegments.size() >= MAX_TRIP_SELECTIONS){
+            mTrackLogAdapter.setSelectionsFrozen(true);
+            showSnackbar(mFragmentView, getString(R.string.max_select_snack), Snackbar.LENGTH_SHORT);
+        }
     }
 
     @Override
     public void onItemUnchecked(SegmentCursor segmentCursor) {
         mSelectedSegments.remove(segmentCursor);
+
+        if (mSelectedSegments.size() == (MAX_TRIP_SELECTIONS-1)){
+            mTrackLogAdapter.setSelectionsFrozen(false);
+        }
     }
 
     @Override
@@ -179,5 +194,20 @@ public class TripListFragment extends Fragment
     @Override
     public void onUnFavoriteClicked(SegmentCursor segmentCursor) {
 
+    }
+
+
+    private void showSnackbar(View view, String message, int duration){
+        // Create snackbar
+        final Snackbar snackbar = Snackbar.make(view, message, duration);
+
+        // Set an action on it, and a handler
+        snackbar.setAction(R.string.dismiss, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
     }
 }

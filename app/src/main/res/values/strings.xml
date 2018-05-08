@@ -48,6 +48,9 @@
     <string name="favorite">favorite</string>
     <string name="distance">Distance: </string>
     <string name="display_trips">Display Trips</string>
+    <string name="max_trips_selected">Only 4 trips can be selected</string>
+    <string name="dismiss">DISMISS</string>
+    <string name="max_select_snack">A maximum of 4 trips can be selected.</string>
 
 
 </resources>

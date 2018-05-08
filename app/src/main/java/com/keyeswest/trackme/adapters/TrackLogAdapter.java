@@ -22,9 +22,7 @@ import java.util.List;
 
 public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHolder>   {
 
-    private static final int MAX_CHECKED_ITEMS = 4;
-
-
+    private boolean mSelectionsFrozen;
     private SegmentCursor mCursor;
     private SegmentClickListener mSegmentClickListener;
 
@@ -45,6 +43,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         mCursor = cursor;
         mSegmentClickListener = listener;
         mCheckedItems = 0;
+        mSelectionsFrozen = false;
     }
 
 
@@ -70,26 +69,23 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             @Override
             public void onClick(View v) {
 
-                holder.mCheckBox.setChecked( ! holder.mCheckBox.isChecked());
-                if (holder.mCheckBox.isChecked()){
-                    mSegmentClickListener.onItemChecked(holder.mSegmentCursor);
-                    mCheckedItems+=1;
+                if (mSelectionsFrozen &&  (! holder.mCheckBox.isChecked()) ){
+
+                    Toast.makeText(v.getContext(), R.string.max_trips_selected, Toast.LENGTH_SHORT).show();
+
                 }else{
-                    mSegmentClickListener.onItemUnchecked(holder.mSegmentCursor);
-                    mCheckedItems-=1;
+                    holder.mCheckBox.setChecked( ! holder.mCheckBox.isChecked());
+                    if (holder.mCheckBox.isChecked()){
+                        mSegmentClickListener.onItemChecked(holder.mSegmentCursor);
+                        mCheckedItems+=1;
+                    }else{
+                        mSegmentClickListener.onItemUnchecked(holder.mSegmentCursor);
+                        mCheckedItems-=1;
+                    }
                 }
-
-
-
-                if (mCheckedItems == MAX_CHECKED_ITEMS){
-                    // disable all unchecked checkboxes
-                    //TODO
-                }
-
 
             }
         });
-
 
     }
 
@@ -112,6 +108,9 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     }
 
 
+    public void setSelectionsFrozen(boolean freeze){
+        mSelectionsFrozen = freeze;
+    }
 
      class LogHolder extends RecyclerView.ViewHolder {
 
@@ -160,8 +159,6 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         }
 
 
-
-
-
     }
+
 }
