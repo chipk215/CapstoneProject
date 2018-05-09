@@ -96,10 +96,10 @@ public class MapsActivity extends FragmentActivity
         mSegmentPlotter = new SegmentPlotter<>(responseHandler);
         mSegmentPlotter.setSegmentPlotterListener(new SegmentPlotter.SegmentPlotterListener<Polyline>() {
             @Override
-            public void plotLocation(Polyline target, List<LatLng> newPoints ){
-                List<LatLng> points = mPlotLine.getPoints();
+            public void plotLocation(Polyline plotLine, List<LatLng> newPoints ){
+                List<LatLng> points = plotLine.getPoints();
                 points.addAll(newPoints);
-                mPlotLine.setPoints(points);
+                plotLine.setPoints(points);
 
             }
         });
