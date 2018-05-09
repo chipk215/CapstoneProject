@@ -26,6 +26,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     private boolean mSelectionsFrozen;
     private SegmentCursor mCursor;
     private SegmentClickListener mSegmentClickListener;
+    private List<Segment> mInitialSelectedSegments;
 
 
 
@@ -40,10 +41,10 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
 
 
-    public TrackLogAdapter(SegmentCursor cursor, SegmentClickListener listener){
+    public TrackLogAdapter(SegmentCursor cursor, List<Segment> selectedSegments,SegmentClickListener listener){
         mCursor = cursor;
         mSegmentClickListener = listener;
-
+        mInitialSelectedSegments = selectedSegments;
         mSelectionsFrozen = false;
     }
 
@@ -67,6 +68,12 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
         holder.mSegment = mCursor.getSegment();
 
+        // check the box if we are reloading the cursor data
+        if (mInitialSelectedSegments.contains(holder.mSegment)){
+            holder.checkSelection();
+        }
+
+
         holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +90,12 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
                     }else{
                         mSegmentClickListener.onItemUnchecked(holder.mSegment);
 
+                        // once the segment is unselected we don't have to bind against it
+                        if (mInitialSelectedSegments.contains(holder.mSegment)){
+                            mInitialSelectedSegments.remove(holder.mSegment);
+                        }
+
+
                     }
                 }
 
@@ -96,7 +109,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         return mCursor.getCount();
     }
 
-
+/*
 
     //TODO Figure out why the next two methods are needed so that the trip list items are stable
     @Override
@@ -108,13 +121,14 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public int getItemViewType(int position) {
         return position;
     }
-
+*/
 
     public void setSelectionsFrozen(boolean freeze){
         mSelectionsFrozen = freeze;
     }
 
-     class LogHolder extends RecyclerView.ViewHolder {
+
+     public class LogHolder extends RecyclerView.ViewHolder {
 
         private TextView mDateView;
         private TextView mTimeView;
@@ -125,6 +139,14 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         private CheckBox mCheckBox;
         private View mItemView;
         private Segment mSegment;
+
+        public Segment getSegment(){
+            return mSegment;
+        }
+
+        public void checkSelection(){
+            mCheckBox.setChecked(true);
+        }
 
 
         public LogHolder(View view){

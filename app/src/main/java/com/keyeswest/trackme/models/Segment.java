@@ -128,4 +128,26 @@ public class Segment {
     public void setRowId(long rowId) {
         this.rowId = rowId;
     }
+
+
+    @Override
+    public boolean equals(Object o){
+
+        // If the object is compared with itself then return true
+        if (o == this) {
+            return true;
+        }
+
+        /* Check if o is an instance of Segment or not
+          "null instanceof [type]" also returns false */
+        if (!(o instanceof Segment)) {
+            return false;
+        }
+
+        Segment segment = (Segment) o;
+
+        return mId.equals(segment.getId());
+
+
+    }
 }

@@ -32,6 +32,7 @@ import com.keyeswest.trackme.models.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,6 +67,9 @@ public class TripListFragment extends Fragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
+
+        Timber.d("onCreate invoked");
+
         Stetho.initializeWithDefaults(getContext());
 
         mSelectedSegments = new ArrayList<>();
@@ -78,6 +82,8 @@ public class TripListFragment extends Fragment
         View view =inflater.inflate(R.layout.fragmemt_trip_list, container, false);
         mFragmentView = view;
         mUnbinder = ButterKnife.bind(this, view);
+
+        Timber.d("onCreateView invoked");
 
 
         mDisplayButton.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +117,27 @@ public class TripListFragment extends Fragment
 
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+        Timber.d("onActivityCreated invoked");
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Timber.d("onResume invoked");
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        Timber.d("onPause invoked");
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
 
@@ -133,6 +160,7 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onDestroyView(){
+        Timber.d("onDestroyView invoked");
         super.onDestroyView();
         mUnbinder.unbind();
     }
@@ -146,20 +174,28 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        Timber.d("onCreateLoader invoked");
+        Timber.d("onLoadFinished invoked");
         if (cursor != null) {
             Timber.d("Number of records = %s", cursor.getCount());
-            mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor), this);
-            mTrackLogAdapter.setHasStableIds(true);
+            mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor),mSelectedSegments, this);
+            mTrackLogAdapter.setHasStableIds(false);
             mTrackLogListView.setAdapter(mTrackLogAdapter);
         }
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        Timber.d("onLoaderReset invoked");
         mTrackLogAdapter = null;
         mTrackLogListView.setAdapter(null);
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        Timber.d("onSaveInstanceState invoked");
+    }
+
+
 
 
     @Override
