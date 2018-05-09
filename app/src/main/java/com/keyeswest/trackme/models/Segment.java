@@ -1,11 +1,14 @@
 package com.keyeswest.trackme.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class Segment {
+public class Segment implements Parcelable {
 
     private static double METERS_TO_MILES = 0.000621371;
 
@@ -17,9 +20,81 @@ public class Segment {
     private Double mMinLongitude = null;
     private Double mMaxLongitude = null;
     private Double mDistance = null;
+    private long mRowId = 0;
 
 
-    private long rowId = 0;
+    public static final Parcelable.Creator<Segment> CREATOR
+            = new Parcelable.Creator<Segment>(){
+
+        public Segment createFromParcel(Parcel in){
+            return new Segment(in);
+        };
+
+        public Segment[] newArray(int size){
+            return new Segment[size];
+        }
+    };
+
+    private Segment(Parcel in){
+
+        String id = in.readString();
+        mId = UUID.fromString(id);
+
+        mTimeStamp = in.readLong();
+        mMocked = in.readByte() != 0;
+
+        mMinLatitude = in.readDouble();
+        mMaxLatitude = in.readDouble();
+        mMinLongitude = in.readDouble();
+        mMaxLongitude = in.readDouble();
+        mDistance = in.readDouble();
+
+        mRowId = in.readLong();
+
+    }
+
+
+    @Override
+    public boolean equals(Object o){
+
+        // If the object is compared with itself then return true
+        if (o == this) {
+            return true;
+        }
+
+        /* Check if o is an instance of Segment or not
+          "null instanceof [type]" also returns false */
+        if (!(o instanceof Segment)) {
+            return false;
+        }
+
+        Segment segment = (Segment) o;
+
+        return mId.equals(segment.getId());
+
+
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId.toString());
+        dest.writeLong(mTimeStamp);
+        dest.writeByte((byte)(mMocked ? 1:0));
+        dest.writeDouble(mMinLatitude);
+        dest.writeDouble(mMaxLatitude);
+        dest.writeDouble(mMinLongitude);
+        dest.writeDouble(mMaxLongitude);
+        dest.writeDouble(mDistance);
+        dest.writeLong(mRowId);
+
+    }
+
+
 
     public Segment(){}
 
@@ -122,32 +197,12 @@ public class Segment {
     }
 
     public long getRowId() {
-        return rowId;
+        return mRowId;
     }
 
     public void setRowId(long rowId) {
-        this.rowId = rowId;
+        this.mRowId = rowId;
     }
 
 
-    @Override
-    public boolean equals(Object o){
-
-        // If the object is compared with itself then return true
-        if (o == this) {
-            return true;
-        }
-
-        /* Check if o is an instance of Segment or not
-          "null instanceof [type]" also returns false */
-        if (!(o instanceof Segment)) {
-            return false;
-        }
-
-        Segment segment = (Segment) o;
-
-        return mId.equals(segment.getId());
-
-
-    }
 }

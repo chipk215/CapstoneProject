@@ -20,6 +20,8 @@ import com.keyeswest.trackme.models.Segment;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 
 public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHolder>   {
 
@@ -70,6 +72,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
         // check the box if we are reloading the cursor data
         if (mInitialSelectedSegments.contains(holder.mSegment)){
+            Timber.d("Setting checkbox for Segment ID: " +
+                    holder.mSegment.getId().toString());
             holder.checkSelection();
         }
 
@@ -109,7 +113,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         return mCursor.getCount();
     }
 
-/*
+
 
     //TODO Figure out why the next two methods are needed so that the trip list items are stable
     @Override
@@ -121,7 +125,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public int getItemViewType(int position) {
         return position;
     }
-*/
+
 
     public void setSelectionsFrozen(boolean freeze){
         mSelectionsFrozen = freeze;

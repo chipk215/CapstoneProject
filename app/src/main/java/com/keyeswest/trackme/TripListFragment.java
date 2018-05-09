@@ -43,6 +43,7 @@ public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
     private static final int MAX_TRIP_SELECTIONS = 4;
+    public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
     private Unbinder mUnbinder;
 
@@ -72,7 +73,12 @@ public class TripListFragment extends Fragment
 
         Stetho.initializeWithDefaults(getContext());
 
-        mSelectedSegments = new ArrayList<>();
+        if (savedInstanceState != null){
+            mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
+
+        }else {
+            mSelectedSegments = new ArrayList<>();
+        }
     }
 
     @Override
@@ -177,8 +183,10 @@ public class TripListFragment extends Fragment
         Timber.d("onLoadFinished invoked");
         if (cursor != null) {
             Timber.d("Number of records = %s", cursor.getCount());
-            mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor),mSelectedSegments, this);
-            mTrackLogAdapter.setHasStableIds(false);
+            mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor),
+                    mSelectedSegments, this);
+
+            mTrackLogAdapter.setHasStableIds(true);
             mTrackLogListView.setAdapter(mTrackLogAdapter);
         }
     }
@@ -193,6 +201,12 @@ public class TripListFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
         Timber.d("onSaveInstanceState invoked");
+
+        savedInstanceState.putParcelableArrayList(ARG_SELECTED_SEGMENTS,
+                new ArrayList<>(mSelectedSegments) );
+
+        super.onSaveInstanceState(savedInstanceState);
+
     }
 
 
@@ -217,7 +231,8 @@ public class TripListFragment extends Fragment
             mTrackLogAdapter.setSelectionsFrozen(false);
         }
     }
-/*
+
+ /*
     @Override
     public void onDeleteClick(SegmentCursor segmentCursor) {
 
@@ -234,8 +249,7 @@ public class TripListFragment extends Fragment
 
     }
 
-    */
-
+ */
 
     private void showSnackbar(View view, String message, int duration){
         // Create snackbar
