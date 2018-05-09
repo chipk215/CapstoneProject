@@ -41,7 +41,7 @@ public class LocationProcessorService extends IntentService {
 
 
     /**
-     * A new location sample has arrived.
+     * A new location sample (or samples) has arrived.
      *
      * Generally, we want to save the location in the db and update the segment to which the
      * location belongs.
@@ -74,6 +74,7 @@ public class LocationProcessorService extends IntentService {
                 LocationCursor previousLocationCursor = Queries.getLatestLocationBySegmentId(
                         this, segmentId);
 
+                // bounding box for new samples
                 LatLonBounds bounds = saveLocationSamples(locations, segmentId);
 
                 // broadcast the location samples for plotting
@@ -89,6 +90,8 @@ public class LocationProcessorService extends IntentService {
 
                     // we are going to need to read the segment record
                     Segment segment = Queries.getSegmentFromSegmentId(this,segmentId);
+
+                    bounds = adjustSegmentBounds(segment, bounds);
 
                     // get the last location sample
                     Location lastSample = locations.get(locations.size()-1);
@@ -124,6 +127,28 @@ public class LocationProcessorService extends IntentService {
 
     }
 
+
+    private LatLonBounds adjustSegmentBounds(Segment segment, LatLonBounds bounds){
+
+        if (segment.getMinLatitude() != null) {
+            bounds.setMinLat(min(bounds.getMinLat(), segment.getMinLatitude()));
+        }
+
+        if (segment.getMinLongitude() != null) {
+            bounds.setMinLon(min(bounds.getMinLon(), segment.getMinLongitude()));
+        }
+
+        if (segment.getMaxLatitude() != null) {
+            bounds.setMaxLat(max(bounds.getMaxLat(), segment.getMaxLatitude()));
+        }
+
+        if (segment.getMaxLongitude() != null) {
+            bounds.setMaxLon(max(bounds.getMaxLon(), segment.getMaxLongitude()));
+        }
+
+
+        return bounds;
+    }
 
 
     private LatLonBounds saveLocationSamples(List<Location> locations, String segmentId){

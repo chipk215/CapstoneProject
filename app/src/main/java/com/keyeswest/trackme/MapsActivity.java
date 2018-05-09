@@ -242,8 +242,14 @@ public class MapsActivity extends FragmentActivity
         if (mSegmentList != null) {
 
             LatLngBounds bounds = computeBoundingBoxForSegments();
+            Timber.d("Bounds: maxLat= "+  Double.toString(bounds.northeast.latitude));
+            Timber.d("Bounds: maxLon= "+  Double.toString(bounds.northeast.longitude));
+            Timber.d("Bounds: minLat= "+  Double.toString(bounds.southwest.latitude));
+            Timber.d("Bounds: minLon= "+  Double.toString(bounds.southwest.longitude));
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 8));
+
+          //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 8));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 16));
 
             for (LocationCursor locationCursor : mPlotLocations) {
                 PolylineOptions options = new PolylineOptions();
