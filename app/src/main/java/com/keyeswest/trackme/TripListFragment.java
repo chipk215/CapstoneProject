@@ -28,6 +28,7 @@ import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
+import com.keyeswest.trackme.models.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class TripListFragment extends Fragment
     @BindView(R.id.display_btn)
     Button mDisplayButton;
 
-    private List<SegmentCursor> mSelectedSegments;
+    private List<Segment> mSelectedSegments;
 
     private TrackLogAdapter mTrackLogAdapter;
 
@@ -83,8 +84,8 @@ public class TripListFragment extends Fragment
             @Override
             public void onClick(View v) {
                 List<Uri> selectedTrips = new ArrayList<>();
-                for (SegmentCursor segCursor : mSelectedSegments){
-                    Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segCursor.getSegment().getRowId());
+                for (Segment segment : mSelectedSegments){
+                    Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
                     selectedTrips.add(itemUri);
                 }
 
@@ -162,8 +163,9 @@ public class TripListFragment extends Fragment
 
 
     @Override
-    public void onItemChecked(SegmentCursor segmentCursor) {
-        mSelectedSegments.add(segmentCursor);
+    public void onItemChecked(Segment segment) {
+
+        mSelectedSegments.add(segment);
 
         if (mSelectedSegments.size() >= MAX_TRIP_SELECTIONS){
             mTrackLogAdapter.setSelectionsFrozen(true);
@@ -172,14 +174,14 @@ public class TripListFragment extends Fragment
     }
 
     @Override
-    public void onItemUnchecked(SegmentCursor segmentCursor) {
-        mSelectedSegments.remove(segmentCursor);
+    public void onItemUnchecked(Segment segment) {
+        mSelectedSegments.remove(segment);
 
         if (mSelectedSegments.size() == (MAX_TRIP_SELECTIONS-1)){
             mTrackLogAdapter.setSelectionsFrozen(false);
         }
     }
-
+/*
     @Override
     public void onDeleteClick(SegmentCursor segmentCursor) {
 
@@ -195,6 +197,8 @@ public class TripListFragment extends Fragment
     public void onUnFavoriteClicked(SegmentCursor segmentCursor) {
 
     }
+
+    */
 
 
     private void showSnackbar(View view, String message, int duration){

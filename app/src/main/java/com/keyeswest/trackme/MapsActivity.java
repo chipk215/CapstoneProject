@@ -96,9 +96,9 @@ public class MapsActivity extends FragmentActivity
         mSegmentPlotter = new SegmentPlotter<>(responseHandler);
         mSegmentPlotter.setSegmentPlotterListener(new SegmentPlotter.SegmentPlotterListener<Polyline>() {
             @Override
-            public void plotLocation(Polyline target, LatLng locationSample) {
+            public void plotLocation(Polyline target, List<LatLng> newPoints ){
                 List<LatLng> points = mPlotLine.getPoints();
-                points.add(locationSample);
+                points.addAll(newPoints);
                 mPlotLine.setPoints(points);
 
             }
@@ -180,6 +180,8 @@ public class MapsActivity extends FragmentActivity
         } else if(loader.getId() >= LOCATION_LOADER){
             // handle the completed location data loads
             LocationCursor locationCursor = new LocationCursor(data);
+
+
             mPlotLocations.add(locationCursor);
             // increment the count of location loaders that have completed
             mLocationLoadsFinishedCount++;
@@ -241,7 +243,7 @@ public class MapsActivity extends FragmentActivity
 
             LatLngBounds bounds = computeBoundingBoxForSegments();
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 8));
 
             for (LocationCursor locationCursor : mPlotLocations) {
                 PolylineOptions options = new PolylineOptions();

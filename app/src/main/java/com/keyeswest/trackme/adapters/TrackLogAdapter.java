@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentSchema;
+import com.keyeswest.trackme.models.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +27,14 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     private SegmentCursor mCursor;
     private SegmentClickListener mSegmentClickListener;
 
-    private int mCheckedItems;
+
 
     public interface SegmentClickListener{
-        void onItemChecked(SegmentCursor segmentCursor );
-        void onItemUnchecked(SegmentCursor segmentCursor);
-        void onDeleteClick(SegmentCursor segmentCursor);
-        void onFavoriteClick(SegmentCursor segmentCursor);
-        void onUnFavoriteClicked(SegmentCursor segmentCursor);
+        void onItemChecked(Segment segment );
+        void onItemUnchecked(Segment segment);
+      //  void onDeleteClick(Segment segment);
+     //   void onFavoriteClick(Segment segment);
+     //   void onUnFavoriteClicked(Segment segment);
 
     }
 
@@ -42,7 +43,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public TrackLogAdapter(SegmentCursor cursor, SegmentClickListener listener){
         mCursor = cursor;
         mSegmentClickListener = listener;
-        mCheckedItems = 0;
+
         mSelectionsFrozen = false;
     }
 
@@ -64,7 +65,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         holder.mDateView.setText(mCursor.getSegment().getDate());
         holder.mTimeView.setText(mCursor.getSegment().getTime());
         holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
-        holder.mSegmentCursor = mCursor;
+        holder.mSegment = mCursor.getSegment();
+
         holder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,11 +78,11 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
                 }else{
                     holder.mCheckBox.setChecked( ! holder.mCheckBox.isChecked());
                     if (holder.mCheckBox.isChecked()){
-                        mSegmentClickListener.onItemChecked(holder.mSegmentCursor);
-                        mCheckedItems+=1;
+                        mSegmentClickListener.onItemChecked(holder.mSegment);
+
                     }else{
-                        mSegmentClickListener.onItemUnchecked(holder.mSegmentCursor);
-                        mCheckedItems-=1;
+                        mSegmentClickListener.onItemUnchecked(holder.mSegment);
+
                     }
                 }
 
@@ -122,7 +124,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         private ImageButton mFavoriteButton;
         private CheckBox mCheckBox;
         private View mItemView;
-        private SegmentCursor mSegmentCursor;
+        private Segment mSegment;
+
 
         public LogHolder(View view){
             super(view);
@@ -138,7 +141,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             mTrashButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mSegmentClickListener.onDeleteClick(mCursor);
+                   // mSegmentClickListener.onDeleteClick(mCursor);
                 }
             });
 
@@ -148,7 +151,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             mFavoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mSegmentClickListener.onFavoriteClick(mCursor);
+                  //  mSegmentClickListener.onFavoriteClick(mCursor);
                 }
             });
 

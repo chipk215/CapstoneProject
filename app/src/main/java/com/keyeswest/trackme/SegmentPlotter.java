@@ -9,6 +9,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.models.Location;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -17,6 +19,8 @@ import timber.log.Timber;
 public class SegmentPlotter<T> extends HandlerThread {
     private static final String TAG= "SegmentPlotter";
     private static final int MESSAGE_PLOT = 0;
+
+    private static final int NUMBER_LOCATION_BATCHES = 10;
 
     private boolean mHasQuit = false;
     private Handler mRequestHandler;
@@ -28,7 +32,7 @@ public class SegmentPlotter<T> extends HandlerThread {
 
 
     public interface SegmentPlotterListener<T>{
-        void plotLocation(T target, LatLng locationSample);
+        void plotLocation(T target, List<LatLng> points);
     }
 
     public void setSegmentPlotterListener(SegmentPlotterListener<T> listener){
@@ -72,27 +76,58 @@ public class SegmentPlotter<T> extends HandlerThread {
     }
 
 
+
     private void handleRequest(final T target){
+
         LocationCursor locationCursor = mRequestMap.get(target);
+        locationCursor.moveToPosition(-1);
+        int numberLocationSamples = locationCursor.getCount();
+        Timber.d("Location samples= " + numberLocationSamples);
 
-        while (locationCursor.moveToNext()) {
-            Location location = locationCursor.getLocation();
-            final LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        // create 10 batches of locations
+        int batchSize = numberLocationSamples / NUMBER_LOCATION_BATCHES;
 
-             mResponseHandler.post(new Runnable(){
-                 @Override
-                 public void run() {
-                     mSegmentPlotterListener.plotLocation(target, latLng);
-                 }
-             });
+        // process all but the last batch whose size may be bigger
+        for (int batch =0; batch < NUMBER_LOCATION_BATCHES-1; batch++){
+            final List<LatLng> batchList = new ArrayList<>();
+            // add locations to batch
+            for (int i=0; i< batchSize; i++){
+                locationCursor.moveToNext();
+                Location location = locationCursor.getLocation();
+                batchList.add(new LatLng(location.getLatitude(), location.getLongitude()));
+            }
+            // plot the batch
+            mResponseHandler.post(new Runnable(){
+                @Override
+                public void run() {
+
+                    mSegmentPlotterListener.plotLocation(target, batchList);
+                }
+            });
 
             try{
-                Thread.sleep(500);
+                Thread.sleep(150);
             }catch(InterruptedException e){
                 e.printStackTrace();
             }
 
         }
+
+        //process the last batch
+        final List<LatLng> batchList = new ArrayList<>();
+        while (locationCursor.moveToNext()) {
+            Location location = locationCursor.getLocation();
+            batchList.add(new LatLng(location.getLatitude(), location.getLongitude()));
+        }
+        mResponseHandler.post(new Runnable(){
+            @Override
+            public void run() {
+
+                mSegmentPlotterListener.plotLocation(target, batchList);
+            }
+        });
+
+
         mRequestMap.remove(target);
     }
 
