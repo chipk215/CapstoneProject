@@ -1,7 +1,6 @@
 package com.keyeswest.trackme;
 
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,8 +8,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -29,16 +26,14 @@ import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
-import com.keyeswest.trackme.models.Location;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import timber.log.Timber;
-
-import static java.lang.Thread.sleep;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, LoaderManager.LoaderCallbacks<Cursor> {
@@ -47,8 +42,11 @@ public class MapsActivity extends FragmentActivity
 
     private static final int SEGMENT_LOADER  = 0;
     private static final int LOCATION_LOADER = 1;
-    private static final int PLOT_MESSAGE = 999;
-    private static final String POINT_KEY = "POINT_KEY";
+
+
+
+    private static final int[] plotLineColorResources = {R.color.plotOne,
+            R.color.plotTwo, R.color.plotThree, R.color.plotFour};
 
 
     /**
@@ -78,12 +76,11 @@ public class MapsActivity extends FragmentActivity
     private SegmentCursor mSegmentCursor;
 
     private GoogleMap mMap;
-    private Polyline mPlotLine;
+ //   private Polyline mPlotLine;
     private List<Uri> mSegmentList;
 
     private int mLocationLoadsFinishedCount;
     List<LocationCursor> mPlotLocations = new ArrayList<>();
-
 
 
     @Override
@@ -91,12 +88,15 @@ public class MapsActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        // Handles plotting a batch of location points
         Handler responseHandler = new Handler();
 
+        // SegmentPlotter implements algorithm for plotting trip
         mSegmentPlotter = new SegmentPlotter<>(responseHandler);
         mSegmentPlotter.setSegmentPlotterListener(new SegmentPlotter.SegmentPlotterListener<Polyline>() {
             @Override
             public void plotLocation(Polyline plotLine, List<LatLng> newPoints ){
+                Timber.d("Line color= " + Integer.toString(plotLine.getColor()));
                 List<LatLng> points = plotLine.getPoints();
                 points.addAll(newPoints);
                 plotLine.setPoints(points);
@@ -142,7 +142,6 @@ public class MapsActivity extends FragmentActivity
         }
 
     }
-
 
 
     @NonNull
@@ -227,7 +226,6 @@ public class MapsActivity extends FragmentActivity
             boundingBox.update(segment.getMaxLatitude(), segment.getMaxLongitude());
         }
 
-
         LatLngBounds bounds = new LatLngBounds(new LatLng(boundingBox.getMinLat(),
                 boundingBox.getMinLon()), new LatLng(boundingBox.getMaxLat(),
                 boundingBox.getMaxLon()));
@@ -242,17 +240,18 @@ public class MapsActivity extends FragmentActivity
         if (mSegmentList != null) {
 
             LatLngBounds bounds = computeBoundingBoxForSegments();
-            Timber.d("Bounds: maxLat= "+  Double.toString(bounds.northeast.latitude));
-            Timber.d("Bounds: maxLon= "+  Double.toString(bounds.northeast.longitude));
-            Timber.d("Bounds: minLat= "+  Double.toString(bounds.southwest.latitude));
-            Timber.d("Bounds: minLon= "+  Double.toString(bounds.southwest.longitude));
+            Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
+            Timber.d("Bounds: maxLon= %s", Double.toString(bounds.northeast.longitude));
+            Timber.d("Bounds: minLat= %s", Double.toString(bounds.southwest.latitude));
+            Timber.d("Bounds: minLon= %s", Double.toString(bounds.southwest.longitude));
 
-
-          //  mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 8));
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 16));
 
+            int plotLineCounter =0;
             for (LocationCursor locationCursor : mPlotLocations) {
-                PolylineOptions options = new PolylineOptions();
+                PolylineOptions options = new PolylineOptions().color(getResources()
+                        .getColor(plotLineColorResources[plotLineCounter++]));
+
 
                 plotPolyLine(options, locationCursor);
 
@@ -291,9 +290,8 @@ public class MapsActivity extends FragmentActivity
     private void plotPolyLine(final PolylineOptions options, final LocationCursor cursor) {
 
         cursor.moveToPosition(-1);
-        mPlotLine = mMap.addPolyline(options);
 
-        mSegmentPlotter.queueSegment(mPlotLine, cursor);
+        mSegmentPlotter.queueSegment(mMap.addPolyline(options), cursor);
 
     }
 

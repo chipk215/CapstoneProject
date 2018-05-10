@@ -6,4 +6,8 @@
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
     <color name="colorAccent">#c8e8ff</color>
+    <color name="plotOne">#ffff0000</color>
+    <color name="plotTwo">#ff0000ff</color>
+    <color name="plotThree">#ff00ff00</color>
+    <color name="plotFour">#ffffff00</color>
 </resources>
