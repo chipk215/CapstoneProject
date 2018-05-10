@@ -34,8 +34,6 @@
     </plurals>
     <string name="title_activity_maps">Map</string>
 
-    <string name="one">ONE</string>
-    <string name="two">TWO</string>
 
     <string name="trip_list">Trip List</string>
     <string name="new_trip">New Trip</string>
@@ -54,6 +52,8 @@
     <string name="confirm_trip_delete">Confirm Trip Deletion</string>
     <string name="delete_confirm">DELETE</string>
     <string name="cancel">CANCEL</string>
+    <string name="trip_deleted">Trip Deleted</string>
+    <string name="trip_delete_cancel">Trip Delete Cancelled</string>
 
 
 </resources>

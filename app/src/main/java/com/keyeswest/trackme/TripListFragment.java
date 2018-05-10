@@ -1,5 +1,6 @@
 package com.keyeswest.trackme;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -22,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
@@ -30,11 +30,9 @@ import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
-import com.keyeswest.trackme.tasks.DeleteTripTask;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,8 +44,8 @@ public class TripListFragment extends Fragment
 
     private static final int MAX_TRIP_SELECTIONS = 4;
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
+    private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
-
 
     private Unbinder mUnbinder;
 
@@ -72,7 +70,6 @@ public class TripListFragment extends Fragment
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-
         Timber.d("onCreate invoked");
 
         Stetho.initializeWithDefaults(getContext());
@@ -94,7 +91,6 @@ public class TripListFragment extends Fragment
         mUnbinder = ButterKnife.bind(this, view);
 
         Timber.d("onCreateView invoked");
-
 
         mDisplayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,7 +114,6 @@ public class TripListFragment extends Fragment
         DividerItemDecoration itemDecorator = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
-
 
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
 
@@ -215,7 +210,6 @@ public class TripListFragment extends Fragment
 
 
 
-
     @Override
     public void onItemChecked(Segment segment) {
 
@@ -242,15 +236,39 @@ public class TripListFragment extends Fragment
        // Toast.makeText(getContext(), segment.getId().toString(), Toast.LENGTH_SHORT).show();
         //DeleteTripTask task = new DeleteTripTask(getContext());
        // task.execute(segment.getId());
-        ConfirmDeleteDialogFragment dialog = new ConfirmDeleteDialogFragment();
-        dialog.setSegmentId(segment.getId());
+        ConfirmDeleteDialogFragment dialog =
+                ConfirmDeleteDialogFragment.newInstance(segment.getId());
+
+        dialog.setTargetFragment(TripListFragment.this, REQUEST_TRIP_DELETE_CONFIRM);
+
         FragmentManager manager = getFragmentManager();
         dialog.show(manager, DIALOG_DELETE_CONFIRM);
 
 
     }
 
-/*
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode != Activity.RESULT_OK){
+            return;
+        }
+
+        if (requestCode == REQUEST_TRIP_DELETE_CONFIRM){
+            boolean deleted = data.getBooleanExtra(ConfirmDeleteDialogFragment.EXTRA_CONFIRM,
+                    false);
+
+            if (deleted){
+                showSnackbar(mFragmentView, getString(R.string.trip_deleted), Snackbar.LENGTH_SHORT);
+            }else{
+                showSnackbar(mFragmentView, getString(R.string.trip_delete_cancel), Snackbar.LENGTH_SHORT);
+            }
+
+        }
+    }
+
+
+    /*
     @Override
     public void onFavoriteClick(SegmentCursor segmentCursor) {
 
