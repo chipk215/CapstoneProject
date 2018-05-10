@@ -51,6 +51,9 @@
     <string name="max_trips_selected">Only 4 trips can be selected</string>
     <string name="dismiss">DISMISS</string>
     <string name="max_select_snack">A maximum of 4 trips can be selected.</string>
+    <string name="confirm_trip_delete">Confirm Trip Deletion</string>
+    <string name="delete_confirm">DELETE</string>
+    <string name="cancel">CANCEL</string>
 
 
 </resources>

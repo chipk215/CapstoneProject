@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
@@ -44,7 +45,9 @@ public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
     private static final int MAX_TRIP_SELECTIONS = 4;
+    private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
+
 
     private Unbinder mUnbinder;
 
@@ -236,11 +239,13 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onDeleteClick(Segment segment) {
-        Toast.makeText(getContext(), segment.getId().toString(), Toast.LENGTH_SHORT).show();
-        DeleteTripTask task = new DeleteTripTask(getContext());
-        task.execute(segment.getId());
-
-
+       // Toast.makeText(getContext(), segment.getId().toString(), Toast.LENGTH_SHORT).show();
+        //DeleteTripTask task = new DeleteTripTask(getContext());
+       // task.execute(segment.getId());
+        ConfirmDeleteDialogFragment dialog = new ConfirmDeleteDialogFragment();
+        dialog.setSegmentId(segment.getId());
+        FragmentManager manager = getFragmentManager();
+        dialog.show(manager, DIALOG_DELETE_CONFIRM);
 
 
     }
