@@ -1,13 +1,10 @@
 package com.keyeswest.trackme.adapters;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -15,10 +12,8 @@ import android.widget.Toast;
 
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.data.SegmentCursor;
-import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
@@ -153,8 +148,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         public LogHolder(View view){
             super(view);
             mItemView = view;
-            mDateView = view.findViewById(R.id.date_tv);
-            mDistanceView = view.findViewById(R.id.distance_tv);
+            mDateView = view.findViewById(R.id.date_lbl);
+            mDistanceView = view.findViewById(R.id.distance_lb);
             mTimeView = view.findViewById(R.id.time_tv);
             mCheckBox = view.findViewById(R.id.checkBox);
             mCheckBox.setClickable(false);

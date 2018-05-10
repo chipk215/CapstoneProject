@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/distance_lb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/distance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/duration_lbl" />
+
+    <TextView
+        android:id="@+id/duration_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/duration"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/start_time_lbl" />
+
+    <TextView
+        android:id="@+id/summary_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/trip_summary"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/ok_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ok"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/distance_lb" />
+
+    <TextView
+        android:id="@+id/date_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/summary_lbl" />
+
+    <TextView
+        android:id="@+id/start_time_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/start_time"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/date_lbl" />
+
+    <TextView
+        android:id="@+id/date_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        tools:text="5/1/2018"
+        app:layout_constraintStart_toEndOf="@+id/date_lbl"
+        app:layout_constraintTop_toTopOf="@+id/date_lbl" />
+
+    <TextView
+        android:id="@+id/start_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        tools:text="10:00 AM"
+        app:layout_constraintStart_toEndOf="@+id/start_time_lbl"
+        app:layout_constraintTop_toTopOf="@+id/start_time_lbl" />
+
+    <TextView
+        android:id="@+id/duration_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        tools:text="30 minutes"
+        app:layout_constraintStart_toEndOf="@+id/duration_lbl"
+        app:layout_constraintTop_toTopOf="@+id/duration_lbl" />
+
+    <TextView
+        android:id="@+id/distance_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        tools:text="10"
+        app:layout_constraintStart_toEndOf="@+id/distance_lb"
+        app:layout_constraintTop_toTopOf="@+id/distance_lb" />
+
+    <TextView
+        android:id="@+id/distance_unit_lbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/mile"
+        app:layout_constraintStart_toEndOf="@+id/distance_tv"
+        app:layout_constraintTop_toTopOf="@+id/distance_tv" />
+
+</android.support.constraint.ConstraintLayout>

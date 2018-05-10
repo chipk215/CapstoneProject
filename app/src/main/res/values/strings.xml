@@ -54,6 +54,11 @@
     <string name="cancel">CANCEL</string>
     <string name="trip_deleted">Trip Deleted</string>
     <string name="trip_delete_cancel">Trip Delete Cancelled</string>
+    <string name="duration">Duration:</string>
+    <string name="trip_summary">Trip Summary</string>
+    <string name="date">Date:</string>
+    <string name="start_time">Start Time:</string>
+
 
 
 </resources>

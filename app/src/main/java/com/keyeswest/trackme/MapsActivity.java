@@ -12,7 +12,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.widget.Toast;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,13 +36,9 @@ import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import timber.log.Timber;
 
@@ -91,9 +93,9 @@ public class MapsActivity extends FragmentActivity
     // Look up segments by URI
     private Hashtable<Uri, LocationCursor> mSegmentToLocationsMap = new Hashtable<>();
 
-
     private int mLocationLoadsFinishedCount;
-  //  List<LocationCursor> mPlotLocations = new ArrayList<>();
+
+
 
 
     @Override
@@ -155,8 +157,35 @@ public class MapsActivity extends FragmentActivity
 
             @Override
             public void onPolylineClick(Polyline polyline) {
-                String segmentId =  ((Segment)polyline.getTag()).getId().toString();
-                Toast.makeText(MapsActivity.this,"Clicked polyline:" + segmentId, Toast.LENGTH_SHORT ).show();
+                Segment segment = (Segment)polyline.getTag();
+              //  String segmentId =  ((Segment)polyline.getTag()).getId().toString();
+              //  Toast.makeText(MapsActivity.this,"Clicked polyline:" + segmentId, Toast.LENGTH_SHORT ).show();
+
+                LayoutInflater layoutInflater =   MapsActivity.this.getLayoutInflater();
+                View customView = layoutInflater.inflate(R.layout.trip_popup,null);
+                final PopupWindow popup = new PopupWindow(customView, ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                Button okButton = customView.findViewById(R.id.ok_button);
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        popup.dismiss();
+                    }
+                });
+
+
+                TextView dateView = customView.findViewById(R.id.date_tv);
+                dateView.setText(segment.getDate());
+
+                TextView distanceView = customView.findViewById(R.id.distance_tv);
+                distanceView.setText(segment.getDistanceMiles());
+
+                TextView startTimeView = customView.findViewById(R.id.start_time_tv);
+                startTimeView.setText(segment.getTime());
+
+                popup.showAtLocation(MapsActivity.this.findViewById(R.id.map), Gravity.CENTER, 0, 0);
+
             }
         });
         if (getDataReady()){
