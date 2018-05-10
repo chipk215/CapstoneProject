@@ -195,7 +195,30 @@ public class TracksContentProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        throw new UnsupportedOperationException("Not implemented");
+        final SQLiteDatabase db = mTrackerBaseHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+        int rowsDeleted = 0;
+
+        switch (match){
+            case LOCATION_DIRECTORY:
+                rowsDeleted = db.delete(LocationSchema.LocationTable.TABLE_NAME, selection, selectionArgs);
+
+                break;
+
+            case SEGMENT_DIRECTORY:
+                rowsDeleted = db.delete(SegmentSchema.SegmentTable.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            default:
+                throw new UnsupportedOperationException("Unsupported delete operation.");
+
+        }
+
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return rowsDeleted;
+
     }
 
     @Override

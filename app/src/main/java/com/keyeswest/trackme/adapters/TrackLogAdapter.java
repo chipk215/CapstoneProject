@@ -7,6 +7,7 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -35,7 +36,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public interface SegmentClickListener{
         void onItemChecked(Segment segment );
         void onItemUnchecked(Segment segment);
-      //  void onDeleteClick(Segment segment);
+        void onDeleteClick(Segment segment);
      //   void onFavoriteClick(Segment segment);
      //   void onUnFavoriteClicked(Segment segment);
 
@@ -72,7 +73,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
         // check the box if we are reloading the cursor data
         if (mInitialSelectedSegments.contains(holder.mSegment)){
-            Timber.d("Setting checkbox for Segment ID: " +
+            Timber.d("Setting checkbox for Segment ID: %s",
                     holder.mSegment.getId().toString());
             holder.checkSelection();
         }
@@ -98,14 +99,10 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
                         if (mInitialSelectedSegments.contains(holder.mSegment)){
                             mInitialSelectedSegments.remove(holder.mSegment);
                         }
-
-
                     }
                 }
-
             }
         });
-
     }
 
     @Override
@@ -167,7 +164,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             mTrashButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                   // mSegmentClickListener.onDeleteClick(mCursor);
+                    mSegmentClickListener.onDeleteClick(mSegment);
                 }
             });
 

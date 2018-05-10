@@ -205,4 +205,23 @@ public class Queries {
         return segmentCursor;
 
     }
+
+
+    public static void deleteTrip(Context context, UUID segmentId){
+
+        // delete locations first
+        Uri locationQueryUri = LocationSchema.LocationTable.CONTENT_URI;
+        String selectionClause = LocationSchema.LocationTable.COLUMN_SEGMENT_ID + " = ?";
+        String[] selectionArgs = {segmentId.toString()};
+
+        ContentResolver contentResolver = context.getContentResolver();
+        contentResolver.delete(locationQueryUri, selectionClause, selectionArgs);
+
+        //delete segment
+        Uri segmentQueryUri =  SegmentSchema.SegmentTable.CONTENT_URI;
+        selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
+        contentResolver.delete(segmentQueryUri, selectionClause, selectionArgs);
+
+
+    }
 }

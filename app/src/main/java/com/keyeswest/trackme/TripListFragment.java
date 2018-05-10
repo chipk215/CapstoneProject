@@ -29,6 +29,7 @@ import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.tasks.DeleteTripTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -232,12 +233,19 @@ public class TripListFragment extends Fragment
         }
     }
 
- /*
+
     @Override
-    public void onDeleteClick(SegmentCursor segmentCursor) {
+    public void onDeleteClick(Segment segment) {
+        Toast.makeText(getContext(), segment.getId().toString(), Toast.LENGTH_SHORT).show();
+        DeleteTripTask task = new DeleteTripTask(getContext());
+        task.execute(segment.getId());
+
+
+
 
     }
 
+/*
     @Override
     public void onFavoriteClick(SegmentCursor segmentCursor) {
 

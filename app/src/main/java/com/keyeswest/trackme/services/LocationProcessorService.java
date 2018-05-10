@@ -195,8 +195,4 @@ public class LocationProcessorService extends IntentService {
     }
 
 
-
-
-
-
 }
