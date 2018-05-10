@@ -54,17 +54,4 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
         return builder.create();
     }
 
-    private void showSnackbar(View view, String message, int duration){
-        // Create snackbar
-        final Snackbar snackbar = Snackbar.make(view, message, duration);
-
-        // Set an action on it, and a handler
-        snackbar.setAction(R.string.dismiss, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        });
-        snackbar.show();
-    }
 }
