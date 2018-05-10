@@ -4,7 +4,6 @@ package com.keyeswest.trackme;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,12 +26,17 @@ import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
+import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import timber.log.Timber;
 
@@ -76,11 +81,19 @@ public class MapsActivity extends FragmentActivity
     private SegmentCursor mSegmentCursor;
 
     private GoogleMap mMap;
- //   private Polyline mPlotLine;
-    private List<Uri> mSegmentList;
+
+    private List<Uri> mSegmentUriList;
+
+    private List<Segment> mSegmentList;
+
+    private List<Polyline> mPolyLines = new ArrayList<>();
+
+    // Look up segments by URI
+    private Hashtable<Uri, LocationCursor> mSegmentToLocationsMap = new Hashtable<>();
+
 
     private int mLocationLoadsFinishedCount;
-    List<LocationCursor> mPlotLocations = new ArrayList<>();
+  //  List<LocationCursor> mPlotLocations = new ArrayList<>();
 
 
     @Override
@@ -111,7 +124,7 @@ public class MapsActivity extends FragmentActivity
 
 
         // get a list of segment Uris
-        mSegmentList = getIntent().getParcelableArrayListExtra(EXTRA_URI);
+        mSegmentUriList = getIntent().getParcelableArrayListExtra(EXTRA_URI);
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -137,6 +150,15 @@ public class MapsActivity extends FragmentActivity
 
         setMapReady(true);
         mMap = googleMap;
+
+        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener(){
+
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                String segmentId =  ((Segment)polyline.getTag()).getId().toString();
+                Toast.makeText(MapsActivity.this,"Clicked polyline:" + segmentId, Toast.LENGTH_SHORT ).show();
+            }
+        });
         if (getDataReady()){
             displayMap();
         }
@@ -151,10 +173,12 @@ public class MapsActivity extends FragmentActivity
 
         if (id == SEGMENT_LOADER) {
             // All the segments in the segment list will be loaded with a single database query
-            return SegmentLoader.newSegmentsFromUriList(this, mSegmentList);
+            return SegmentLoader.newSegmentsFromUriList(this, mSegmentUriList);
         } else if (id >= LOCATION_LOADER) {
             //See notes on id for location loader in onLoadFinished method below.
-            return LocationLoader.newLocationsForSegment(this, mSegmentList.get(id - LOCATION_LOADER));
+
+
+            return LocationLoader.newLocationsForSegment(this, mSegmentUriList.get(id - LOCATION_LOADER));
         }
 
         return null;
@@ -165,11 +189,23 @@ public class MapsActivity extends FragmentActivity
         if (loader.getId() == SEGMENT_LOADER){
             mSegmentCursor = new SegmentCursor(data);
 
+            mSegmentList = new ArrayList<>();
+
+            mSegmentCursor.moveToPosition(-1);
+            while(mSegmentCursor.moveToNext()){
+                Segment segment = mSegmentCursor.getSegment();
+                mSegmentList.add(segment);
+            }
+
+
             setSegmentDataReady(true);
 
             // start loading the locations for each segment
             mLocationLoadsFinishedCount = 0;
+
             for (int i=0; i< mSegmentList.size(); i++){
+
+
                 // Each segment requires a separate load to obtain the location data
                 // The first location loader will use the LOCATION_LOADER value and each
                 // successive location load will increase the LOCATION_LOADER value by one
@@ -179,9 +215,10 @@ public class MapsActivity extends FragmentActivity
         } else if(loader.getId() >= LOCATION_LOADER){
             // handle the completed location data loads
             LocationCursor locationCursor = new LocationCursor(data);
+            Uri segmentUri = mSegmentUriList.get(loader.getId() - LOCATION_LOADER);
 
-
-            mPlotLocations.add(locationCursor);
+            mSegmentToLocationsMap.put(segmentUri, locationCursor);
+           // mPlotLocations.add(locationCursor);
             // increment the count of location loaders that have completed
             mLocationLoadsFinishedCount++;
 
@@ -199,8 +236,9 @@ public class MapsActivity extends FragmentActivity
             setSegmentDataReady(false);
             mSegmentCursor.close();
         } else if (loader.getId() >= LOCATION_LOADER){
+            List<LocationCursor> cursors = (List<LocationCursor>) mSegmentToLocationsMap.values();
 
-           for(LocationCursor cursor : mPlotLocations){
+           for(LocationCursor cursor : cursors){
                cursor.close();
             }
 
@@ -213,15 +251,18 @@ public class MapsActivity extends FragmentActivity
     public void onDestroy(){
         mSegmentPlotter.quit();
 
+        for(Polyline plotLine : mPolyLines){
+            plotLine.setTag(null);
+        }
+
         super.onDestroy();
     }
 
 
     private LatLngBounds computeBoundingBoxForSegments(){
         LatLonBounds boundingBox = new LatLonBounds();
-        mSegmentCursor.moveToPosition(-1);
-        while(mSegmentCursor.moveToNext()){
-            Segment segment = mSegmentCursor.getSegment();
+
+        for(Segment segment : mSegmentList){
             boundingBox.update(segment.getMinLatitude(), segment.getMinLongitude());
             boundingBox.update(segment.getMaxLatitude(), segment.getMaxLongitude());
         }
@@ -237,25 +278,32 @@ public class MapsActivity extends FragmentActivity
 
     private void displayMap(){
 
-        if (mSegmentList != null) {
+        LatLngBounds bounds = computeBoundingBoxForSegments();
+        Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
+        Timber.d("Bounds: maxLon= %s", Double.toString(bounds.northeast.longitude));
+        Timber.d("Bounds: minLat= %s", Double.toString(bounds.southwest.latitude));
+        Timber.d("Bounds: minLon= %s", Double.toString(bounds.southwest.longitude));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 16));
 
-            LatLngBounds bounds = computeBoundingBoxForSegments();
-            Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
-            Timber.d("Bounds: maxLon= %s", Double.toString(bounds.northeast.longitude));
-            Timber.d("Bounds: minLat= %s", Double.toString(bounds.southwest.latitude));
-            Timber.d("Bounds: minLon= %s", Double.toString(bounds.southwest.longitude));
+        int plotLineCounter =0;
+        for(Segment segment : mSegmentList){
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 16));
-
-            int plotLineCounter =0;
-            for (LocationCursor locationCursor : mPlotLocations) {
-                PolylineOptions options = new PolylineOptions().color(getResources()
-                        .getColor(plotLineColorResources[plotLineCounter++]));
+            Uri segmentUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
+            LocationCursor locationCursor = mSegmentToLocationsMap.get(segmentUri);
 
 
-                plotPolyLine(options, locationCursor);
+            PolylineOptions options = new PolylineOptions()
+                        .color(getResources().getColor(plotLineColorResources[plotLineCounter++]))
+                        .clickable(true);
 
-            }
+            Polyline plotLine = mMap.addPolyline(options);
+            plotLine.setTag(segment);
+            mPolyLines.add(plotLine);
+
+            locationCursor.moveToPosition(-1);
+            mSegmentPlotter.queueSegment(plotLine, locationCursor);
+
+
         }
     }
 
@@ -278,7 +326,7 @@ public class MapsActivity extends FragmentActivity
     }
 
     private  boolean getLocationDataReady(){
-        return (mLocationLoadsFinishedCount == mSegmentList.size());
+        return (mLocationLoadsFinishedCount == mSegmentUriList.size());
     }
 
 
@@ -287,13 +335,7 @@ public class MapsActivity extends FragmentActivity
     }
 
 
-    private void plotPolyLine(final PolylineOptions options, final LocationCursor cursor) {
 
-        cursor.moveToPosition(-1);
-
-        mSegmentPlotter.queueSegment(mMap.addPolyline(options), cursor);
-
-    }
 
 
 
