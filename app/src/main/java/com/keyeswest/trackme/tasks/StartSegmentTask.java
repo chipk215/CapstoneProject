@@ -8,6 +8,10 @@ import android.os.AsyncTask;
 import com.keyeswest.trackme.data.Queries;
 import com.keyeswest.trackme.models.Segment;
 
+/**
+ * Creates a new segment record in the database, retrieves segment and saves segment id in
+ * shared preferences for later access.
+ */
 public class StartSegmentTask extends AsyncTask<Void, Void, String> {
 
     public static final String SEGMENT_ID_KEY = "com.keyeswest.fleetracker.com.segmentId";

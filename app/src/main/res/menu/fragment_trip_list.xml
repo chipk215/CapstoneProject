@@ -7,4 +7,9 @@
         android:title="@string/new_trip"
         app:showAsAction="ifRoom|withText"/>
 
+    <item
+        android:id="@+id/filter"
+        android:title="@string/filter"
+        app:showAsAction="ifRoom|withText"/>
+
 </menu>

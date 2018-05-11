@@ -39,6 +39,8 @@ import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_B
 public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback {
 
+    private static String IS_TRACKING_EXTRA = "isTrackingExtra";
+
     private Unbinder mUnbinder;
 
     private GoogleMap mMap;
@@ -71,6 +73,19 @@ public abstract class BaseTripFragment extends Fragment
         mUnbinder = ButterKnife.bind(this, view);
 
         mStartUpdatesButton.setEnabled(true);
+        mStopUpdatesButton.setEnabled(false);
+        if (savedInstanceState != null) {
+            boolean isTracking = savedInstanceState.getByte(IS_TRACKING_EXTRA) != 0;
+            if (isTracking) {
+                mStartUpdatesButton.setEnabled(false);
+                mStopUpdatesButton.setEnabled(true);
+
+            }
+
+            //TODO on a configuration change we need to replot previously plotted points
+        }
+
+
         mStartUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,7 +96,9 @@ public abstract class BaseTripFragment extends Fragment
                     mStartUpdatesButton.setEnabled(false);
                     mStopUpdatesButton.setEnabled(true);
 
-                    StartSegmentTask task = new StartSegmentTask(context, new StartSegmentTask.ResultsCallback() {
+                    // create a segment record in the db to hold the location samples
+                    StartSegmentTask task = new StartSegmentTask(context,
+                            new StartSegmentTask.ResultsCallback() {
                         @Override
                         public void onComplete(String segmentId) {
                             Timber.d("Starting track segment id: " + segmentId);
@@ -97,7 +114,7 @@ public abstract class BaseTripFragment extends Fragment
         });
 
 
-        mStopUpdatesButton.setEnabled(false);
+
         mStopUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,6 +184,18 @@ public abstract class BaseTripFragment extends Fragment
             displayMap();
         }
 
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        Timber.d("onSaveInstanceState invoked");
+
+        // save the state of the buttons
+        boolean isTracking = mStopUpdatesButton.isEnabled();
+        savedInstanceState.putByte(IS_TRACKING_EXTRA, (byte)(isTracking ? 1 : 0));
+
+        super.onSaveInstanceState(savedInstanceState);
 
     }
 
