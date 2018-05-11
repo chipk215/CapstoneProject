@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
@@ -144,12 +145,18 @@ public class TripListFragment extends Fragment
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        Intent intent;
         switch(item.getItemId()){
 
             case R.id.new_trip:
-                Intent intent = NewTripActivity.newIntent(getContext());
+                intent = NewTripActivity.newIntent(getContext());
                 startActivity(intent);
                 return true;
+            case R.id.filter:
+                Toast.makeText(getContext(),"Filters coming soon...",Toast.LENGTH_SHORT).show();
+                intent = FilterActivity.newIntent(getContext());
+                startActivity(intent);
 
             default:
                 return super.onOptionsItemSelected(item);

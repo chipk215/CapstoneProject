@@ -41,6 +41,8 @@
     <string name="delete">delete</string>
     <string name="favorite">favorite</string>
     <string name="distance">Distance: </string>
+    <string name="distance_lbl">Distance</string>
+
     <string name="display_trips">Display Trips</string>
     <string name="max_trips_selected">Only 4 trips can be selected</string>
     <string name="dismiss">DISMISS</string>
@@ -53,8 +55,18 @@
     <string name="duration">Duration:</string>
     <string name="trip_summary">Trip Summary</string>
     <string name="date">Date:</string>
+    <string name="date_lbl">Date</string>
     <string name="start_time">Start Time:</string>
     <string name="filter">Filter</string>
+    <string name="sort_trip_list">Sort trip list by:</string>
+    <string name="recent_trips_first">Recent trips first.</string>
+    <string name="oldest_trips_first">Oldest trips first.</string>
+    <string name="shortest_trips_first">Shortest trips first.</string>
+    <string name="longest_trips_first">Longest trips first.</string>
+
+    <string name="filter_trip_list">Filter trip list by:</string>
+    <string name="favorites_only">Favorites Only</string>
+    <string name="date_range">Date Range</string>
 
 
 </resources>
