@@ -9,6 +9,8 @@ import com.keyeswest.trackme.SortPreference;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 import static com.keyeswest.trackme.TripListFragment.DEFAULT_FILTER;
 import static com.keyeswest.trackme.TripListFragment.FILTER_PREFERENCES;
 import static com.keyeswest.trackme.TripListFragment.SORT_PREFERENCES_KEY;
@@ -18,6 +20,8 @@ public class SegmentLoader extends CursorLoader {
 
 
     public static SegmentLoader newAllSegmentsSortedFilteredByPreferences(Context context){
+
+        Timber.d("newAllSegmentsSortedFilteredByPreferences invoked");
 
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
@@ -42,7 +46,7 @@ public class SegmentLoader extends CursorLoader {
 
 
     public static SegmentLoader newAllSegmentsInstanceOrderByShortestDistance(Context context){
-        String orderByClause = SegmentSchema.SegmentTable.COLUMN_DISTANCE + " DESC ";
+        String orderByClause = SegmentSchema.SegmentTable.COLUMN_DISTANCE + " ASC ";
         return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, null,
                 null, null, orderByClause);
 

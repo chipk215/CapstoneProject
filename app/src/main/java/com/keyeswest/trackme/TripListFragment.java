@@ -1,9 +1,8 @@
 package com.keyeswest.trackme;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,19 +40,18 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
 
+
 public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
     private static final int MAX_TRIP_SELECTIONS = 4;
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
+
     private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
+    private static final int REQUEST_FILTER_PREFERENCES = 10;
+
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
-    public static final String FILTER_PREFERENCES = "filterPreferences";
-    public static final String SORT_PREFERENCES_KEY = "sortPreferencesKey";
-    public static final String FAVORITE_PREFERENCES_KEY = "favoritePreferencesKey";
-    public static final SortPreference DEFAULT_FILTER = SortPreference.NEWEST;
-    private static final boolean DEFAULT_FAVORITES_ONLY_FILTER = false;
 
     private Unbinder mUnbinder;
 
@@ -83,7 +81,7 @@ public class TripListFragment extends Fragment
 
         setHasOptionsMenu(true);
 
-        saveDefaultPreferences(getContext(),false);
+        FilterPreferences.saveDefaultPreferences(getContext(),false);
 
 
         if (savedInstanceState != null){
@@ -167,7 +165,7 @@ public class TripListFragment extends Fragment
             case R.id.filter:
 
                 intent = FilterActivity.newIntent(getContext());
-                startActivity(intent);
+                startActivityForResult(intent,REQUEST_FILTER_PREFERENCES );
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -251,9 +249,7 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onDeleteClick(Segment segment) {
-       // Toast.makeText(getContext(), segment.getId().toString(), Toast.LENGTH_SHORT).show();
-        //DeleteTripTask task = new DeleteTripTask(getContext());
-       // task.execute(segment.getId());
+
         ConfirmDeleteDialogFragment dialog =
                 ConfirmDeleteDialogFragment.newInstance(segment.getId());
 
@@ -282,6 +278,13 @@ public class TripListFragment extends Fragment
                 showSnackbar(mFragmentView, getString(R.string.trip_delete_cancel), Snackbar.LENGTH_SHORT);
             }
 
+        } else if (requestCode == REQUEST_FILTER_PREFERENCES){
+            boolean filtersChanged = FilterActivity.getFilterChangedResult(data);
+
+            if (filtersChanged){
+                Timber.d("Handling filter change, restarting segment loader");
+                getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+            }
         }
     }
 
@@ -315,41 +318,4 @@ public class TripListFragment extends Fragment
     }
 
 
-    /**
-     * Save default sorting and filtering preferences.
-     * @param force - if true overwrite existing preferences, otherwise only save preferences if
-     *              they have not previously been saved.
-     */
-    public static void saveDefaultPreferences(Context context, boolean force){
-
-        SharedPreferences sharedPreferences =
-                context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        if (force) {
-            // save the default values regardless of what has previously been saved
-
-            editor.putString(SORT_PREFERENCES_KEY, DEFAULT_FILTER.getCode());
-            editor.putBoolean(FAVORITE_PREFERENCES_KEY, DEFAULT_FAVORITES_ONLY_FILTER);
-            editor.commit();
-        }else{
-
-            boolean updated = false;
-            // don't save defaults if preferences have previously been saved
-            if (! sharedPreferences.contains(SORT_PREFERENCES_KEY)){
-                editor.putString(SORT_PREFERENCES_KEY, DEFAULT_FILTER.getCode());
-                updated = true;
-            }
-
-            if (! sharedPreferences.contains(FAVORITE_PREFERENCES_KEY)){
-                editor.putBoolean(FAVORITE_PREFERENCES_KEY, DEFAULT_FAVORITES_ONLY_FILTER);
-                updated = true;
-            }
-
-            if (updated){
-                editor.commit();
-            }
-        }
-
-    }
 }

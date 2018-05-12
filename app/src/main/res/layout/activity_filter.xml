@@ -90,8 +90,8 @@
 
     <Button
         android:id="@+id/submit_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="132dp"
+        android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:text="@string/submit"
         app:layout_constraintEnd_toEndOf="parent"
@@ -108,9 +108,9 @@
 
     <Button
         android:id="@+id/default_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_width="132dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="24dp"
         android:text="@string/defaults"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

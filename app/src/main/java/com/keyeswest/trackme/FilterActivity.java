@@ -8,15 +8,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
-import android.widget.Toast;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import timber.log.Timber;
 
-import static com.keyeswest.trackme.TripListFragment.FILTER_PREFERENCES;
-import static com.keyeswest.trackme.TripListFragment.SORT_PREFERENCES_KEY;
-import static com.keyeswest.trackme.TripListFragment.saveDefaultPreferences;
+import static com.keyeswest.trackme.FilterPreferences.FILTER_PREFERENCES;
+import static com.keyeswest.trackme.FilterPreferences.SORT_PREFERENCES_KEY;
 
 public class FilterActivity extends AppCompatActivity {
 
@@ -24,6 +24,14 @@ public class FilterActivity extends AppCompatActivity {
         Intent intent = new Intent(packageContext, FilterActivity.class);
         return intent;
     }
+
+    public static boolean getFilterChangedResult(Intent data){
+        boolean filtersChanged = data.getBooleanExtra(FilterActivity.EXTRA_CHANGE_RESULT,
+                true);
+        return filtersChanged;
+    }
+
+    public static final String EXTRA_CHANGE_RESULT = "extraChangeResult";
 
     private Unbinder mUnbinder;
 
@@ -40,8 +48,11 @@ public class FilterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filter);
+        setFilterResult(false);
 
         mUnbinder = ButterKnife.bind( this);
+
+
 
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,20 +61,22 @@ public class FilterActivity extends AppCompatActivity {
                 int selectedId = mRadioFilterGroup.getCheckedRadioButtonId();
                 switch (selectedId){
                     case R.id.date_newest_rb:
-
+                        Timber.d("Setting sort order to newest");
                         setSortOrder(FilterActivity.this, SortPreference.NEWEST );
 
                         break;
                     case R.id.date_oldest_rb:
-
+                        Timber.d("Setting sort order to oldest");
                         setSortOrder(FilterActivity.this, SortPreference.OLDEST );
                         break;
 
                     case R.id.dist_longest_rb:
+                        Timber.d("Setting sort order to longest");
                         setSortOrder(FilterActivity.this, SortPreference.LONGEST );
                         break;
 
                     case R.id.dist_shortest_rb:
+                        Timber.d("Setting sort order to shortest");
                         setSortOrder(FilterActivity.this, SortPreference.SHORTEST );
                         break;
 
@@ -72,16 +85,19 @@ public class FilterActivity extends AppCompatActivity {
                 }
 
                 // send back a result for a snackbar message
-
+                setFilterResult(true);
                 finish();
+
+
             }
         });
 
         mDefaultSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveDefaultPreferences(FilterActivity.this,true);
+                FilterPreferences.saveDefaultPreferences(FilterActivity.this,true);
 
+                setFilterResult(true);
                 finish();
             }
         });
@@ -89,6 +105,12 @@ public class FilterActivity extends AppCompatActivity {
     }
 
 
+    private void setFilterResult(boolean filtersChanged){
+        Intent data = new Intent();
+        data.putExtra(EXTRA_CHANGE_RESULT, filtersChanged);
+        setResult(RESULT_OK, data);
+
+    }
 
     private static void setSortOrder(Context context, SortPreference preference){
         SharedPreferences sharedPreferences =
