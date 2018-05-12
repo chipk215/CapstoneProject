@@ -5,15 +5,16 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
+import com.keyeswest.trackme.FilterPreferences;
 import com.keyeswest.trackme.SortPreference;
 
 import java.util.List;
 
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.TripListFragment.DEFAULT_FILTER;
-import static com.keyeswest.trackme.TripListFragment.FILTER_PREFERENCES;
-import static com.keyeswest.trackme.TripListFragment.SORT_PREFERENCES_KEY;
+import static com.keyeswest.trackme.FilterPreferences.FILTER_PREFERENCES;
+import static com.keyeswest.trackme.FilterPreferences.SORT_PREFERENCES_KEY;
+
 
 public class SegmentLoader extends CursorLoader {
 
@@ -26,7 +27,8 @@ public class SegmentLoader extends CursorLoader {
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
 
-        String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY, DEFAULT_FILTER.getCode());
+        String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
+                FilterPreferences.DEFAULT_FILTER.getCode());
 
         SortPreference sortPreference = SortPreference.lookupByCode(sortByCode);
 
