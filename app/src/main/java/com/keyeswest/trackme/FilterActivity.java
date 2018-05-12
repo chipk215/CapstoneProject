@@ -104,6 +104,13 @@ public class FilterActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onDestroy(){
+        mUnbinder.unbind();
+        super.onDestroy();
+
+    }
+
 
     private void setFilterResult(boolean filtersChanged){
         Intent data = new Intent();

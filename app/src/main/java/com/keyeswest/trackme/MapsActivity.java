@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import timber.log.Timber;
 
 public class MapsActivity extends FragmentActivity
@@ -50,10 +53,41 @@ public class MapsActivity extends FragmentActivity
     private static final int SEGMENT_LOADER  = 0;
     private static final int LOCATION_LOADER = 1;
 
-
-
     private static final int[] plotLineColorResources = {R.color.plotOne,
             R.color.plotTwo, R.color.plotThree, R.color.plotFour};
+
+    private Unbinder mUnbinder;
+
+    @BindView(R.id.segment_one_view)
+    View mSegmentOne;
+
+    @BindView(R.id.segment_one_show_hide)
+    TextView mShowHideSegmentOne;
+
+    @BindView(R.id.segment_two_view)
+    View mSegmentTwo;
+
+    @BindView(R.id.segment_two_show_hide)
+    TextView mShowHideSegmentTwo;
+
+    @BindView(R.id.segment_three_view)
+    View mSegmentThree;
+
+    @BindView(R.id.segment_three_show_hide)
+    TextView mShowHideSegmentThree;
+
+    @BindView(R.id.segment_four_view)
+    View mSegmentFour;
+
+    @BindView(R.id.segment_four_show_hide)
+    TextView mShowHideSegmentFour;
+
+    // these views are just the colored line segments in the legend
+    private View[] mTripViews;
+
+    private TextView[] mShowHide;
+
+    private boolean[] mSegmentHidden = {false, false, false, false};
 
 
     /**
@@ -101,6 +135,24 @@ public class MapsActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        mUnbinder = ButterKnife.bind( this);
+        mTripViews =  new View[] {mSegmentOne, mSegmentTwo, mSegmentThree, mSegmentFour};
+        mShowHide = new TextView[] {mShowHideSegmentOne, mShowHideSegmentTwo, mShowHideSegmentThree,
+                mShowHideSegmentFour};
+
+        mSegmentOne.setOnClickListener(mTripOneListener);
+        mShowHideSegmentOne.setOnClickListener(mTripOneListener);
+
+        mSegmentTwo.setOnClickListener(mTripTwoListener);
+        mShowHideSegmentTwo.setOnClickListener(mTripTwoListener);
+
+        mSegmentThree.setOnClickListener(mTripThreeListener);
+        mShowHideSegmentThree.setOnClickListener(mTripThreeListener);
+
+        mSegmentFour.setOnClickListener(mTripFourListener);
+        mShowHideSegmentFour.setOnClickListener(mTripFourListener);
+
+
         // Handles plotting a batch of location points
         Handler responseHandler = new Handler();
 
@@ -123,9 +175,10 @@ public class MapsActivity extends FragmentActivity
         Timber.d("Background segment plotter thread started");
 
 
-        // get a list of segment Uris
+        // get a list of segment Uris corresponding to the trips to plot
         mSegmentUriList = getIntent().getParcelableArrayListExtra(EXTRA_URI);
 
+        displayLegend();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -282,6 +335,8 @@ public class MapsActivity extends FragmentActivity
             plotLine.setTag(null);
         }
 
+        mUnbinder.unbind();
+
         super.onDestroy();
     }
 
@@ -361,6 +416,94 @@ public class MapsActivity extends FragmentActivity
         return getSegmentDataReady() && getLocationDataReady();
     }
 
+
+    private View.OnClickListener mTripOneListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            if (mSegmentHidden[0]){
+                // plot line is hidden so now show it
+
+                // change the label in the legend to hide (the next user action)
+                mShowHideSegmentOne.setText(R.string.hide);
+                mSegmentHidden[0] = false;
+                mPolyLines.get(0).setVisible(true);
+            }else{
+                mShowHideSegmentOne.setText(R.string.show);
+                mSegmentHidden[0] = true;
+                mPolyLines.get(0).setVisible(false);
+            }
+
+        }
+    };
+
+    private View.OnClickListener mTripTwoListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mSegmentHidden[1]){
+                mShowHideSegmentTwo.setText(R.string.hide);
+                mSegmentHidden[1] = false;
+                mPolyLines.get(1).setVisible(true);
+            }else{
+                mShowHideSegmentTwo.setText(R.string.show);
+                mSegmentHidden[1] = true;
+                mPolyLines.get(1).setVisible(false);
+            }
+
+        }
+    };
+
+    private View.OnClickListener mTripThreeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mSegmentHidden[2]){
+                mShowHideSegmentThree.setText(R.string.hide);
+                mSegmentHidden[2] = false;
+                mPolyLines.get(2).setVisible(true);
+            }else{
+                mShowHideSegmentThree.setText(R.string.show);
+                mSegmentHidden[2] = true;
+                mPolyLines.get(2).setVisible(false);
+            }
+
+        }
+    };
+
+    private View.OnClickListener mTripFourListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mSegmentHidden[3]){
+                mShowHideSegmentFour.setText(R.string.hide);
+                mSegmentHidden[3] = false;
+                mPolyLines.get(3).setVisible(true);
+            }else{
+                mShowHideSegmentFour.setText(R.string.show);
+                mSegmentHidden[3] = true;
+                mPolyLines.get(3).setVisible(false);
+            }
+
+        }
+    };
+
+
+    private void displayLegend(){
+        int segmentsToShow = mSegmentUriList.size();
+
+        if (segmentsToShow < 2){
+            return;
+        }
+
+        for (int i=0; i< segmentsToShow; i++){
+            mTripViews[i].setVisibility(View.VISIBLE);
+            mShowHide[i].setVisibility(View.VISIBLE);
+        }
+
+        for (int i=segmentsToShow; i< TripListFragment.MAX_TRIP_SELECTIONS; i++){
+            mTripViews[i].setVisibility(View.INVISIBLE);
+            mShowHide[i].setVisibility(View.INVISIBLE);
+        }
+
+    }
 
 
 }

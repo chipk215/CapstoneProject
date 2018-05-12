@@ -69,6 +69,8 @@
     <string name="date_range">Date Range</string>
     <string name="submit">Submit</string>
     <string name="defaults">Defaults</string>
+    <string name="hide">Hide</string>
+    <string name="show">Show</string>
 
 
 </resources>

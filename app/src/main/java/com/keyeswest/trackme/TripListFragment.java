@@ -44,7 +44,7 @@ import timber.log.Timber;
 public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
-    private static final int MAX_TRIP_SELECTIONS = 4;
+    public static final int MAX_TRIP_SELECTIONS = 4;
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
 
     private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
