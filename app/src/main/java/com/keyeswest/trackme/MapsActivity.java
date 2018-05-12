@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupWindow;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -61,33 +62,32 @@ public class MapsActivity extends FragmentActivity
     @BindView(R.id.segment_one_view)
     View mSegmentOne;
 
-    @BindView(R.id.segment_one_show_hide)
-    TextView mShowHideSegmentOne;
+    @BindView(R.id.switch1)
+    Switch mShowHideSegmentOne;
 
     @BindView(R.id.segment_two_view)
     View mSegmentTwo;
 
-    @BindView(R.id.segment_two_show_hide)
-    TextView mShowHideSegmentTwo;
+    @BindView(R.id.switch2)
+    Switch mShowHideSegmentTwo;
 
     @BindView(R.id.segment_three_view)
     View mSegmentThree;
 
-    @BindView(R.id.segment_three_show_hide)
-    TextView mShowHideSegmentThree;
+    @BindView(R.id.switch3)
+    Switch mShowHideSegmentThree;
 
     @BindView(R.id.segment_four_view)
     View mSegmentFour;
 
-    @BindView(R.id.segment_four_show_hide)
-    TextView mShowHideSegmentFour;
+    @BindView(R.id.switch4)
+    Switch mShowHideSegmentFour;
 
     // these views are just the colored line segments in the legend
     private View[] mTripViews;
 
     private TextView[] mShowHide;
 
-    private boolean[] mSegmentHidden = {false, false, false, false};
 
 
     /**
@@ -140,16 +140,16 @@ public class MapsActivity extends FragmentActivity
         mShowHide = new TextView[] {mShowHideSegmentOne, mShowHideSegmentTwo, mShowHideSegmentThree,
                 mShowHideSegmentFour};
 
-        mSegmentOne.setOnClickListener(mTripOneListener);
+
         mShowHideSegmentOne.setOnClickListener(mTripOneListener);
 
-        mSegmentTwo.setOnClickListener(mTripTwoListener);
+
         mShowHideSegmentTwo.setOnClickListener(mTripTwoListener);
 
-        mSegmentThree.setOnClickListener(mTripThreeListener);
+
         mShowHideSegmentThree.setOnClickListener(mTripThreeListener);
 
-        mSegmentFour.setOnClickListener(mTripFourListener);
+
         mShowHideSegmentFour.setOnClickListener(mTripFourListener);
 
 
@@ -421,18 +421,13 @@ public class MapsActivity extends FragmentActivity
         @Override
         public void onClick(View v) {
 
-            if (mSegmentHidden[0]){
-                // plot line is hidden so now show it
-
-                // change the label in the legend to hide (the next user action)
-                mShowHideSegmentOne.setText(R.string.hide);
-                mSegmentHidden[0] = false;
-                mPolyLines.get(0).setVisible(true);
-            }else{
-                mShowHideSegmentOne.setText(R.string.show);
-                mSegmentHidden[0] = true;
+            if (mShowHideSegmentOne.isChecked()){
+                // user requested the plot be hidden
                 mPolyLines.get(0).setVisible(false);
+            }else{
+                mPolyLines.get(0).setVisible(true);
             }
+
 
         }
     };
@@ -440,14 +435,11 @@ public class MapsActivity extends FragmentActivity
     private View.OnClickListener mTripTwoListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSegmentHidden[1]){
-                mShowHideSegmentTwo.setText(R.string.hide);
-                mSegmentHidden[1] = false;
-                mPolyLines.get(1).setVisible(true);
-            }else{
-                mShowHideSegmentTwo.setText(R.string.show);
-                mSegmentHidden[1] = true;
+            if (mShowHideSegmentTwo.isChecked()){
+                // user requested the plot be hidden
                 mPolyLines.get(1).setVisible(false);
+            }else{
+                mPolyLines.get(1).setVisible(true);
             }
 
         }
@@ -456,30 +448,23 @@ public class MapsActivity extends FragmentActivity
     private View.OnClickListener mTripThreeListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSegmentHidden[2]){
-                mShowHideSegmentThree.setText(R.string.hide);
-                mSegmentHidden[2] = false;
-                mPolyLines.get(2).setVisible(true);
-            }else{
-                mShowHideSegmentThree.setText(R.string.show);
-                mSegmentHidden[2] = true;
+            if (mShowHideSegmentThree.isChecked()){
+                // user requested the plot be hidden
                 mPolyLines.get(2).setVisible(false);
+            }else{
+                mPolyLines.get(2).setVisible(true);
             }
-
         }
     };
 
     private View.OnClickListener mTripFourListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (mSegmentHidden[3]){
-                mShowHideSegmentFour.setText(R.string.hide);
-                mSegmentHidden[3] = false;
-                mPolyLines.get(3).setVisible(true);
-            }else{
-                mShowHideSegmentFour.setText(R.string.show);
-                mSegmentHidden[3] = true;
+            if (mShowHideSegmentFour.isChecked()){
+                // user requested the plot be hidden
                 mPolyLines.get(3).setVisible(false);
+            }else{
+                mPolyLines.get(3).setVisible(true);
             }
 
         }

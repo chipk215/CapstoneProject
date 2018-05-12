@@ -15,97 +15,103 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
 
-        android:layout_marginBottom="8dp"
-        map:layout_constraintBottom_toTopOf="@+id/segment_one_show_hide"
+        map:layout_constraintBottom_toTopOf="@+id/switch1"
         map:layout_constraintTop_toTopOf="parent"
         tools:context=".MapsActivity" />
 
     <View
         android:id="@+id/segment_one_view"
-        android:layout_width="75dp"
+        android:layout_width="60dp"
         android:layout_height="5dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
 
+        android:layout_marginTop="10dp"
         android:background="@color/plotOne"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/segment_one_show_hide" />
-
-    <TextView
-        android:id="@+id/segment_one_show_hide"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="4dp"
-
-        android:text="@string/hide"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/segment_two_show_hide"
-        app:layout_constraintStart_toEndOf="@+id/segment_one_view" />
+        app:layout_constraintTop_toTopOf="@+id/switch1" />
 
     <View
         android:id="@+id/segment_two_view"
-        android:layout_width="75dp"
+        android:layout_width="60dp"
         android:layout_height="5dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:background="@color/plotTwo"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/segment_two_show_hide" />
+        app:layout_constraintTop_toTopOf="@+id/switch2" />
 
-    <TextView
-        android:id="@+id/segment_two_show_hide"
+    <View
+        android:id="@+id/segment_three_view"
+        android:layout_width="60dp"
+        android:layout_height="5dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/plotThree"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/switch3"
+        app:layout_constraintTop_toTopOf="@+id/switch3" />
+
+    <View
+        android:id="@+id/segment_four_view"
+        android:layout_width="60dp"
+        android:layout_height="5dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/plotFour"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/switch4"
+        app:layout_constraintTop_toTopOf="@+id/switch4" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="2dp"
+        android:textOff="@string/hide"
+        android:textOn="@string/show"
+        android:showText="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/switch2"
+        app:layout_constraintStart_toEndOf="@+id/segment_one_view" />
+
+    <Switch
+        android:id="@+id/switch2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:layout_marginStart="4dp"
-        android:text="@string/hide"
+        android:layout_marginStart="2dp"
+        android:textOff="@string/hide"
+        android:textOn="@string/show"
+        android:showText="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/segment_two_view" />
 
-    <View
-        android:id="@+id/segment_three_view"
-        android:layout_width="75dp"
-        android:layout_height="5dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/plotThree"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/segment_three_show_hide"
-        app:layout_constraintTop_toTopOf="@+id/segment_three_show_hide" />
-
-    <TextView
-        android:id="@+id/segment_three_show_hide"
+    <Switch
+        android:id="@+id/switch3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/hide"
+        android:textOff="@string/hide"
+        android:textOn="@string/show"
+        android:showText="true"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/segment_four_show_hide"
+        app:layout_constraintBottom_toTopOf="@+id/switch4"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <View
-        android:id="@+id/segment_four_view"
-        android:layout_width="75dp"
-        android:layout_height="7dp"
-        android:layout_marginEnd="4dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/plotFour"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/segment_four_show_hide"
-        app:layout_constraintTop_toTopOf="@+id/segment_four_show_hide" />
-
-    <TextView
-        android:id="@+id/segment_four_show_hide"
+    <Switch
+        android:id="@+id/switch4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/hide"
+        android:textOff="@string/hide"
+        android:textOn="@string/show"
+        android:showText="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
