@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.Task;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -40,6 +41,7 @@ public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback {
 
     private static String IS_TRACKING_EXTRA = "isTrackingExtra";
+    private static String PLOTTED_POINTS_EXTRA = "plottedPointsExtra";
 
     private Unbinder mUnbinder;
 
@@ -63,6 +65,10 @@ public abstract class BaseTripFragment extends Fragment
     @BindView(R.id.remove_updates_button)
     Button mStopUpdatesButton;
 
+    boolean mResumePlot;
+
+    List<LatLng> mPlottedPoints;
+
 
     @Nullable
     @Override
@@ -72,6 +78,8 @@ public abstract class BaseTripFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
+        mResumePlot = false;
+
         mStartUpdatesButton.setEnabled(true);
         mStopUpdatesButton.setEnabled(false);
         if (savedInstanceState != null) {
@@ -80,9 +88,12 @@ public abstract class BaseTripFragment extends Fragment
                 mStartUpdatesButton.setEnabled(false);
                 mStopUpdatesButton.setEnabled(true);
 
+                mPlottedPoints = savedInstanceState.getParcelableArrayList(PLOTTED_POINTS_EXTRA);
+                mResumePlot = true;
+
             }
 
-            //TODO on a configuration change we need to replot previously plotted points
+
         }
 
 
@@ -155,6 +166,10 @@ public abstract class BaseTripFragment extends Fragment
         if (mPolylineOptions == null){
             mPolylineOptions = new PolylineOptions();
             mPlot = mMap.addPolyline(mPolylineOptions);
+            if (mResumePlot){
+                mPlot.setPoints(mPlottedPoints);
+                mResumePlot = false;
+            }
         }
 
         List<LatLng> points = mPlot.getPoints();
@@ -194,6 +209,11 @@ public abstract class BaseTripFragment extends Fragment
         // save the state of the buttons
         boolean isTracking = mStopUpdatesButton.isEnabled();
         savedInstanceState.putByte(IS_TRACKING_EXTRA, (byte)(isTracking ? 1 : 0));
+
+        if (isTracking){
+            // save the points in the track
+            savedInstanceState.putParcelableArrayList(PLOTTED_POINTS_EXTRA, (ArrayList<LatLng>)mPlot.getPoints());
+        }
 
         super.onSaveInstanceState(savedInstanceState);
 

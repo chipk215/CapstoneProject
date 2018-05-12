@@ -214,11 +214,12 @@ public class TripListFragment extends Fragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
         Timber.d("onSaveInstanceState invoked");
 
         savedInstanceState.putParcelableArrayList(ARG_SELECTED_SEGMENTS,
-                new ArrayList<>(mSelectedSegments) );
+                (ArrayList<Segment>)mSelectedSegments);
+
 
         super.onSaveInstanceState(savedInstanceState);
 

@@ -96,8 +96,6 @@ public class MapsActivity extends FragmentActivity
     private int mLocationLoadsFinishedCount;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
