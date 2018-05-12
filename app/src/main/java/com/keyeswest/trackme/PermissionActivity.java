@@ -201,6 +201,9 @@ public class PermissionActivity extends AppCompatActivity {
 
 
     private void startTripListActivity(){
+
+
+
         Intent intent = TripListActivity.newIntent(this);
         startActivity(intent);
         finish();

@@ -67,6 +67,8 @@
     <string name="filter_trip_list">Filter trip list by:</string>
     <string name="favorites_only">Favorites Only</string>
     <string name="date_range">Date Range</string>
+    <string name="submit">Submit</string>
+    <string name="defaults">Defaults</string>
 
 
 </resources>

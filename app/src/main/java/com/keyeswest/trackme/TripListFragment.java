@@ -1,7 +1,9 @@
 package com.keyeswest.trackme;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
@@ -48,6 +49,12 @@ public class TripListFragment extends Fragment
     private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
+    public static final String FILTER_PREFERENCES = "filterPreferences";
+    public static final String SORT_PREFERENCES_KEY = "sortPreferencesKey";
+    public static final String FAVORITE_PREFERENCES_KEY = "favoritePreferencesKey";
+    public static final SortPreference DEFAULT_FILTER = SortPreference.NEWEST;
+    private static final boolean DEFAULT_FAVORITES_ONLY_FILTER = false;
+
     private Unbinder mUnbinder;
 
     private View mFragmentView;
@@ -69,11 +76,15 @@ public class TripListFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
 
         Timber.d("onCreate invoked");
 
         Stetho.initializeWithDefaults(getContext());
+
+        setHasOptionsMenu(true);
+
+        saveDefaultPreferences(getContext(),false);
+
 
         if (savedInstanceState != null){
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
@@ -154,7 +165,7 @@ public class TripListFragment extends Fragment
                 startActivity(intent);
                 return true;
             case R.id.filter:
-                Toast.makeText(getContext(),"Filters coming soon...",Toast.LENGTH_SHORT).show();
+
                 intent = FilterActivity.newIntent(getContext());
                 startActivity(intent);
 
@@ -181,7 +192,7 @@ public class TripListFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         Timber.d("onCreateLoader invoked");
-        return SegmentLoader.newAllSegmentsInstanceOrderByDate(getContext());
+        return SegmentLoader.newAllSegmentsSortedFilteredByPreferences(getContext());
     }
 
     @Override
@@ -301,5 +312,44 @@ public class TripListFragment extends Fragment
             }
         });
         snackbar.show();
+    }
+
+
+    /**
+     * Save default sorting and filtering preferences.
+     * @param force - if true overwrite existing preferences, otherwise only save preferences if
+     *              they have not previously been saved.
+     */
+    public static void saveDefaultPreferences(Context context, boolean force){
+
+        SharedPreferences sharedPreferences =
+                context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (force) {
+            // save the default values regardless of what has previously been saved
+
+            editor.putString(SORT_PREFERENCES_KEY, DEFAULT_FILTER.getCode());
+            editor.putBoolean(FAVORITE_PREFERENCES_KEY, DEFAULT_FAVORITES_ONLY_FILTER);
+            editor.commit();
+        }else{
+
+            boolean updated = false;
+            // don't save defaults if preferences have previously been saved
+            if (! sharedPreferences.contains(SORT_PREFERENCES_KEY)){
+                editor.putString(SORT_PREFERENCES_KEY, DEFAULT_FILTER.getCode());
+                updated = true;
+            }
+
+            if (! sharedPreferences.contains(FAVORITE_PREFERENCES_KEY)){
+                editor.putBoolean(FAVORITE_PREFERENCES_KEY, DEFAULT_FAVORITES_ONLY_FILTER);
+                updated = true;
+            }
+
+            if (updated){
+                editor.commit();
+            }
+        }
+
     }
 }
