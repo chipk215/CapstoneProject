@@ -276,7 +276,7 @@ public class MapsActivity extends FragmentActivity
 
     @Override
     public void onDestroy(){
-        mSegmentPlotter.quit();
+        mSegmentPlotter.quitSafely();
 
         for(Polyline plotLine : mPolyLines){
             plotLine.setTag(null);
@@ -360,9 +360,6 @@ public class MapsActivity extends FragmentActivity
     private  boolean getDataReady(){
         return getSegmentDataReady() && getLocationDataReady();
     }
-
-
-
 
 
 

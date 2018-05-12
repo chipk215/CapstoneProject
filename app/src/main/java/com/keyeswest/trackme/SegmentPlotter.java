@@ -61,9 +61,10 @@ public class SegmentPlotter<T> extends HandlerThread {
     }
 
     @Override
-    public boolean quit(){
+    public boolean quitSafely(){
         mHasQuit = true;
-        return super.quit();
+        clearQueue();
+        return super.quitSafely();
     }
 
 
@@ -89,6 +90,10 @@ public class SegmentPlotter<T> extends HandlerThread {
 
         // process all but the last batch whose size may be bigger
         for (int batch =0; batch < NUMBER_LOCATION_BATCHES-1; batch++){
+
+            if (mHasQuit){
+                return;
+            }
             final List<LatLng> batchList = new ArrayList<>();
             // add locations to batch
             for (int i=0; i< batchSize; i++){
