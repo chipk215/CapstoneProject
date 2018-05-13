@@ -95,7 +95,7 @@ public abstract class TracksContentProviderBaseTest {
         for (Segment s : segments){
 
             ContentValues testValues = createSegmentRecord(s.getId().toString(),
-                    s.getTimeStamp(), s.isMocked() ? 1:0);
+                    s.getTimeStamp());
 
             database.insert(SegmentSchema.SegmentTable.TABLE_NAME,
                     null,
@@ -111,7 +111,7 @@ public abstract class TracksContentProviderBaseTest {
             UUID id = UUID.randomUUID();
             Segment segment = new Segment(id);
             segment.setTimeStamp(i);
-            segment.setMocked(false);
+            segment.setFavorite(0);
             segmentList.add(segment);
         }
 

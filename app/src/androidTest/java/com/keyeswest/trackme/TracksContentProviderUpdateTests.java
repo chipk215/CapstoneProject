@@ -28,9 +28,9 @@ public class TracksContentProviderUpdateTests extends TracksContentProviderBaseT
         // insert a segment
         UUID segmentId = UUID.randomUUID();
         long timeStamp = 1524406840;
-        int mocked = 0;
 
-        ContentValues segmentValues = createSegmentRecord(segmentId.toString(), timeStamp, mocked);
+
+        ContentValues segmentValues = createSegmentRecord(segmentId.toString(), timeStamp);
         ContentResolver contentResolver = mContext.getContentResolver();
         Uri uri = contentResolver.insert(SegmentSchema.SegmentTable.CONTENT_URI, segmentValues);
         Assert.assertNotNull(uri);
@@ -42,7 +42,7 @@ public class TracksContentProviderUpdateTests extends TracksContentProviderBaseT
         double maxLon = -115.0d;
         double distance = 10d;
 
-        int rowsUpdated = Queries.updateSegment(mContext,segmentId.toString(), minLat, maxLat,
+        int rowsUpdated = Queries.updateSegmentBoundsAndDistance(mContext,segmentId.toString(), minLat, maxLat,
                 minLon,maxLon, distance);
 
         Assert.assertEquals(1, rowsUpdated);

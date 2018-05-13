@@ -117,7 +117,7 @@ public class LocationProcessorService extends IntentService {
                 }
 
                 //update segment with distance and bounding box data
-                Queries.updateSegment(this, segmentId,
+                Queries.updateSegmentBoundsAndDistance(this, segmentId,
                         bounds.getMinLat(), bounds.getMaxLat(),
                         bounds.getMinLon(), bounds.getMaxLon(),
                         segmentDistance);

@@ -35,10 +35,10 @@ public class TracksContentProviderInsertTests  extends TracksContentProviderBase
 
         UUID segmentId = UUID.randomUUID();
         int timeStamp = 1000;
-        int mocked = 0;
+
 
         // create a segment to insert
-        ContentValues testValues = createSegmentRecord(segmentId.toString(), timeStamp, mocked);
+        ContentValues testValues = createSegmentRecord(segmentId.toString(), timeStamp);
         TestUtilities.TestContentObserver segmentObserver = TestUtilities.getTestContentObserver();
 
         ContentResolver contentResolver = mContext.getContentResolver();

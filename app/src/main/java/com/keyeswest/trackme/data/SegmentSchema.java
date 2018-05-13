@@ -22,12 +22,14 @@ public class SegmentSchema {
         public static final String _ID = "_id";
         public static final String COLUMN_ID = "segment_id";
         public static final String COLUMN_TIME_STAMP = "timestamp";
-        public static final String COLUMN_MOCKED = "mocked";
         public static final String COLUMN_MIN_LAT = "minLat";
         public static final String COLUMN_MAX_LAT = "maxLat";
         public static final String COLUMN_MIN_LON = "minLon";
         public static final String COLUMN_MAX_LON = "maxLon";
         public static final String COLUMN_DISTANCE = "distance";
+        public static final String COLUMN_FAVORITE = "favorite";
+        public static final String COLUMN_ELAPSED_TIME = "elapsedTime";
+        public static final String COLUMN_MAX_SPEED = "maxSpeed";
 
     }
 }

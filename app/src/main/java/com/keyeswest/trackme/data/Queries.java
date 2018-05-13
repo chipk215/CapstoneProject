@@ -15,7 +15,7 @@ import timber.log.Timber;
 
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createSegmentRecord;
-import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecord;
+import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsAndDistance;
 import static com.keyeswest.trackme.data.TracksContentProvider.CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 
 public class Queries {
@@ -60,8 +60,8 @@ public class Queries {
         String segmentId = UUID.randomUUID().toString();
         // timestamp in seconds
         long timeStamp = System.currentTimeMillis() / 1000;
-        int mocked = 0;
-        ContentValues values = createSegmentRecord(segmentId, timeStamp, mocked);
+
+        ContentValues values = createSegmentRecord(segmentId, timeStamp);
 
         ContentResolver contentResolver = context.getContentResolver();
 
@@ -131,15 +131,15 @@ public class Queries {
     }
 
 
-    public static int updateSegment(Context context,String segmentId,
-                                        double minLat, double maxLat,
-                                        double minLon, double maxLon,
-                                        double distance){
+    public static int updateSegmentBoundsAndDistance(Context context, String segmentId,
+                                                     double minLat, double maxLat,
+                                                     double minLon, double maxLon,
+                                                     double distance){
 
         //update the segment
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         String[] selectionArgs = {segmentId.toString()};
-        ContentValues updateValues = updateSegmentRecord(minLat, maxLat, minLon, maxLon, distance);
+        ContentValues updateValues = updateSegmentRecordBoundsAndDistance(minLat, maxLat, minLon, maxLon, distance);
         ContentResolver resolver = context.getContentResolver();
         int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
                 selectionClause, selectionArgs);

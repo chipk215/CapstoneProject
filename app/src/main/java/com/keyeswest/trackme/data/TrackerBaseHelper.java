@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.keyeswest.trackme.models.Segment;
+
 public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
@@ -12,7 +14,7 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TrackerBase.db";
 
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
 
     public TrackerBaseHelper(Context context){
@@ -55,12 +57,14 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
                         SegmentSchema.SegmentTable._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         SegmentSchema.SegmentTable.COLUMN_ID + " TEXT UNIQUE NOT NULL, " +
                         SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " INTEGER NOT NULL," +
-                        SegmentSchema.SegmentTable.COLUMN_MOCKED + " INTEGER NOT NULL, " +
+                        SegmentSchema.SegmentTable.COLUMN_FAVORITE + " INTEGER NOT NULL, " +
                         SegmentSchema.SegmentTable.COLUMN_DISTANCE + " REAL, " +
                         SegmentSchema.SegmentTable.COLUMN_MIN_LAT + " REAL, " +
                         SegmentSchema.SegmentTable.COLUMN_MAX_LAT + " REAL, " +
                         SegmentSchema.SegmentTable.COLUMN_MIN_LON + " REAL, " +
-                        SegmentSchema.SegmentTable.COLUMN_MAX_LON + " REAL " +
+                        SegmentSchema.SegmentTable.COLUMN_MAX_LON + " REAL, " +
+                        SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME + " INTEGER NOT NULL," +
+                        SegmentSchema.SegmentTable.COLUMN_MAX_SPEED + " REAL NOT NULL " +
                         ");";
 
         db.execSQL(SQL_CREATE_SEGMENT_TABLE);
@@ -95,21 +99,26 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public static ContentValues createSegmentRecord(String id, long timeStamp, int mocked){
+    public static ContentValues createSegmentRecord(String id, long timeStamp){
         ContentValues values = new ContentValues();
         values.put(SegmentSchema.SegmentTable.COLUMN_ID, id);
         values.put(SegmentSchema.SegmentTable.COLUMN_TIME_STAMP, timeStamp);
-        values.put(SegmentSchema.SegmentTable.COLUMN_MOCKED, mocked);
+        values.put(SegmentSchema.SegmentTable.COLUMN_FAVORITE, 0);
+        values.put(SegmentSchema.SegmentTable.COLUMN_DISTANCE,0f);
+        values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME,0);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_SPEED,0f);
+
 
         return values;
     }
 
-    public static ContentValues updateSegmentRecord(double minLat, double maxLat, double minLon,
-                                                    double maxLon, double distance){
+    public static ContentValues updateSegmentRecordBoundsAndDistance(Double minLat, Double maxLat,
+                                                                     Double minLon, Double maxLon,
+                                                                     Double distance){
 
         ContentValues values = new ContentValues();
         values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LAT, minLat);
-        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LAT, maxLat);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LAT,maxLat);
         values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LON, minLon);
         values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LON, maxLon);
         values.put(SegmentSchema.SegmentTable.COLUMN_DISTANCE, distance);

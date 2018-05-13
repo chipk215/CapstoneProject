@@ -14,12 +14,14 @@ public class Segment implements Parcelable {
 
     private UUID mId;
     private long mTimeStamp;
-    private boolean mMocked;
+    private boolean mFavorite = false;
     private Double mMinLatitude = null;
     private Double mMaxLatitude = null;
     private Double mMinLongitude = null;
     private Double mMaxLongitude = null;
     private Double mDistance = null;
+    private long mElapsedTime = 0;
+    private Double mMaximumSpeed = 0d;
     private long mRowId = 0;
 
 
@@ -41,15 +43,15 @@ public class Segment implements Parcelable {
         mId = UUID.fromString(id);
 
         mTimeStamp = in.readLong();
-        mMocked = in.readByte() != 0;
-
+        mFavorite = in.readByte() != 0;
         mMinLatitude = in.readDouble();
         mMaxLatitude = in.readDouble();
         mMinLongitude = in.readDouble();
         mMaxLongitude = in.readDouble();
         mDistance = in.readDouble();
-
         mRowId = in.readLong();
+        mElapsedTime = in.readLong();
+        mMaximumSpeed = in.readDouble();
 
     }
 
@@ -84,13 +86,15 @@ public class Segment implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mId.toString());
         dest.writeLong(mTimeStamp);
-        dest.writeByte((byte)(mMocked ? 1:0));
+        dest.writeByte((byte)(mFavorite ? 1:0));
         dest.writeDouble(mMinLatitude);
         dest.writeDouble(mMaxLatitude);
         dest.writeDouble(mMinLongitude);
         dest.writeDouble(mMaxLongitude);
         dest.writeDouble(mDistance);
         dest.writeLong(mRowId);
+        dest.writeLong(mElapsedTime);
+        dest.writeDouble(mMaximumSpeed);
 
     }
 
@@ -118,16 +122,12 @@ public class Segment implements Parcelable {
         this.mTimeStamp = timeStamp;
     }
 
-    public boolean isMocked() {
-        return mMocked;
+    public boolean isFavorite() {
+        return mFavorite;
     }
 
-    public void setMocked(boolean mocked) {
-        this.mMocked = mocked;
-    }
-
-    public void setMocked(int mocked) {
-        this.mMocked = (mocked==1);
+    public void setFavorite(int favorite) {
+        this.mFavorite = (favorite==1);
     }
 
     public void setMinLatitude(Double minLatitude) {
@@ -202,6 +202,22 @@ public class Segment implements Parcelable {
 
     public void setRowId(long rowId) {
         this.mRowId = rowId;
+    }
+
+    public long getElapsedTime() {
+        return mElapsedTime;
+    }
+
+    public void setElapsedTime(long elapsedTime) {
+        mElapsedTime = elapsedTime;
+    }
+
+    public Double getMaximumSpeed() {
+        return mMaximumSpeed;
+    }
+
+    public void setMaximumSpeed(Double maximumSpeed) {
+        mMaximumSpeed = maximumSpeed;
     }
 
 
