@@ -127,5 +127,13 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public static ContentValues updateSegmentRecordFavoriteStatus(boolean favoriteStatus){
+        ContentValues values = new ContentValues();
+
+        values.put(SegmentSchema.SegmentTable.COLUMN_FAVORITE, favoriteStatus ? 1: 0);
+
+        return values;
+    }
+
 
 }

@@ -16,6 +16,7 @@ import timber.log.Timber;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createSegmentRecord;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsAndDistance;
+import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordFavoriteStatus;
 import static com.keyeswest.trackme.data.TracksContentProvider.CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 
 public class Queries {
@@ -138,7 +139,7 @@ public class Queries {
 
         //update the segment
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
-        String[] selectionArgs = {segmentId.toString()};
+        String[] selectionArgs = {segmentId};
         ContentValues updateValues = updateSegmentRecordBoundsAndDistance(minLat, maxLat, minLon, maxLon, distance);
         ContentResolver resolver = context.getContentResolver();
         int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
@@ -146,6 +147,21 @@ public class Queries {
 
         return rowsUpdated;
 
+    }
+
+    public static int updateSegmentFavoriteStatus(Context context, UUID segmentId,
+                                                  boolean favoriteStatus){
+        //update the segment
+        String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
+        String[] selectionArgs = {segmentId.toString()};
+        ContentValues updateValues = updateSegmentRecordFavoriteStatus(favoriteStatus);
+
+        ContentResolver resolver = context.getContentResolver();
+        int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
+                selectionClause, selectionArgs);
+
+
+        return rowsUpdated;
     }
 
 

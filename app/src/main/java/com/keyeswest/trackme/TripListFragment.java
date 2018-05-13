@@ -31,6 +31,7 @@ import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -290,19 +291,13 @@ public class TripListFragment extends Fragment
     }
 
 
-    /*
-    @Override
-    public void onFavoriteClick(SegmentCursor segmentCursor) {
-
-
-    }
 
     @Override
-    public void onUnFavoriteClicked(SegmentCursor segmentCursor) {
-
+    public void onFavoriteClick(Segment segment, boolean favorite) {
+        new UpdateFavoriteStatusTask(getContext(), segment.getId(), favorite).execute();
     }
 
- */
+
 
     private void showSnackbar(View view, String message, int duration){
         // Create snackbar

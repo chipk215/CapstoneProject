@@ -32,8 +32,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         void onItemChecked(Segment segment );
         void onItemUnchecked(Segment segment);
         void onDeleteClick(Segment segment);
-     //   void onFavoriteClick(Segment segment);
-     //   void onUnFavoriteClicked(Segment segment);
+        void onFavoriteClick(Segment segment, boolean selected);
+
 
     }
 
@@ -65,6 +65,15 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         holder.mTimeView.setText(mCursor.getSegment().getTime());
         holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
         holder.mSegment = mCursor.getSegment();
+
+        boolean favoriteState = holder.mSegment.isFavorite();
+        if (favoriteState){
+            holder.mFavoriteButton.setImageResource(R.drawable.fav_star_filled);
+            holder.mFavoriteButton.setTag(true);
+        }else{
+            holder.mFavoriteButton.setImageResource(R.drawable.fav_star_border);
+            holder.mFavoriteButton.setTag(false);
+        }
 
         // check the box if we are reloading the cursor data
         if (mInitialSelectedSegments.contains(holder.mSegment)){
@@ -165,11 +174,22 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
             mFavoriteButton = view.findViewById(R.id.fav_btn);
 
-            // need to handle unfavorite as well
             mFavoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                  //  mSegmentClickListener.onFavoriteClick(mCursor);
+                    boolean isFavorite = (Boolean)mFavoriteButton.getTag();
+                    if (isFavorite){
+                        // change to not favorite
+                        mFavoriteButton.setTag(false);
+                        mFavoriteButton.setImageResource(R.drawable.fav_star_border);
+                        mSegmentClickListener.onFavoriteClick(mSegment, false);
+
+                    }else{
+                        mFavoriteButton.setTag(true);
+                        mFavoriteButton.setImageResource(R.drawable.fav_star_filled);
+                        mSegmentClickListener.onFavoriteClick(mSegment, true);
+                    }
+
                 }
             });
 
