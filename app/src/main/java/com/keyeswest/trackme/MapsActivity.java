@@ -89,7 +89,6 @@ public class MapsActivity extends FragmentActivity
     private TextView[] mShowHide;
 
 
-
     /**
      * Activity requires an intent with a list of segment URIs to be plotted on the map.
      * @param packageContext
@@ -149,7 +148,6 @@ public class MapsActivity extends FragmentActivity
 
         mShowHideSegmentFour.setOnClickListener(mTripFourListener);
 
-
         // Handles plotting a batch of location points
         Handler responseHandler = new Handler();
 
@@ -205,22 +203,24 @@ public class MapsActivity extends FragmentActivity
 
             @Override
             public void onPolylineClick(Polyline polyline) {
+
+                // disable clicking on polylines while the pop up is being displayed
+                disablePolylineClicks();
+
                 Segment segment = (Segment)polyline.getTag();
-              //  String segmentId =  ((Segment)polyline.getTag()).getId().toString();
-              //  Toast.makeText(MapsActivity.this,"Clicked polyline:" + segmentId, Toast.LENGTH_SHORT ).show();
+
 
                 LayoutInflater layoutInflater =   MapsActivity.this.getLayoutInflater();
                 View customView = layoutInflater.inflate(R.layout.trip_popup,null);
                 final PopupWindow popup = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
 
-
-
                 Button okButton = customView.findViewById(R.id.ok_button);
                 okButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         popup.dismiss();
+                        enablePolylineClicks();
                     }
                 });
 
@@ -241,7 +241,6 @@ public class MapsActivity extends FragmentActivity
         if (getDataReady()){
             displayMap();
         }
-
     }
 
 
@@ -276,14 +275,12 @@ public class MapsActivity extends FragmentActivity
                 mSegmentList.add(segment);
             }
 
-
             setSegmentDataReady(true);
 
             // start loading the locations for each segment
             mLocationLoadsFinishedCount = 0;
 
             for (int i=0; i< mSegmentList.size(); i++){
-
 
                 // Each segment requires a separate load to obtain the location data
                 // The first location loader will use the LOCATION_LOADER value and each
@@ -335,7 +332,6 @@ public class MapsActivity extends FragmentActivity
         }
 
         mUnbinder.unbind();
-
         super.onDestroy();
     }
 
@@ -354,7 +350,6 @@ public class MapsActivity extends FragmentActivity
 
         return bounds;
     }
-
 
 
     private void displayMap(){
@@ -383,7 +378,6 @@ public class MapsActivity extends FragmentActivity
 
             locationCursor.moveToPosition(-1);
             mSegmentPlotter.queueSegment(plotLine, locationCursor);
-
 
         }
     }
@@ -426,8 +420,6 @@ public class MapsActivity extends FragmentActivity
             }else{
                 mPolyLines.get(0).setVisible(true);
             }
-
-
         }
     };
 
@@ -440,7 +432,6 @@ public class MapsActivity extends FragmentActivity
             }else{
                 mPolyLines.get(1).setVisible(true);
             }
-
         }
     };
 
@@ -465,7 +456,6 @@ public class MapsActivity extends FragmentActivity
             }else{
                 mPolyLines.get(3).setVisible(true);
             }
-
         }
     };
 
@@ -489,5 +479,17 @@ public class MapsActivity extends FragmentActivity
 
     }
 
+
+    private void disablePolylineClicks(){
+        for (Polyline p: mPolyLines){
+            p.setClickable(false);
+        }
+    }
+
+    private void enablePolylineClicks(){
+        for (Polyline p: mPolyLines){
+            p.setClickable(true);
+        }
+    }
 
 }
