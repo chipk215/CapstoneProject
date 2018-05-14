@@ -143,12 +143,9 @@ public class MapsActivity extends FragmentActivity
 
         mShowHideSegmentOne.setOnClickListener(mTripOneListener);
 
-
         mShowHideSegmentTwo.setOnClickListener(mTripTwoListener);
 
-
         mShowHideSegmentThree.setOnClickListener(mTripThreeListener);
-
 
         mShowHideSegmentFour.setOnClickListener(mTripFourListener);
 
@@ -214,8 +211,10 @@ public class MapsActivity extends FragmentActivity
 
                 LayoutInflater layoutInflater =   MapsActivity.this.getLayoutInflater();
                 View customView = layoutInflater.inflate(R.layout.trip_popup,null);
-                final PopupWindow popup = new PopupWindow(customView, ViewGroup.LayoutParams.MATCH_PARENT,
+                final PopupWindow popup = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
+
+
 
                 Button okButton = customView.findViewById(R.id.ok_button);
                 okButton.setOnClickListener(new View.OnClickListener() {
