@@ -73,6 +73,10 @@
     <string name="hide">Hide</string>
     <string name="show">Show</string>
     <string name="clear">Clear</string>
+    <string name="most_recent_sort">Trips ordered by most recent trip.</string>
+    <string name="trips_ordered_oldest">Trips ordered by oldest trip.</string>
+    <string name="trips_ordered_longest">Trips ordered by longest distance.</string>
+    <string name="trips_ordered_shortest">Trips ordered by shortest distance.</string>
 
 
 </resources>

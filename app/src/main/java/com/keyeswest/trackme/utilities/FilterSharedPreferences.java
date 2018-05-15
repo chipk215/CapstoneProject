@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 
-public class FilterPreferences {
+public class FilterSharedPreferences {
 
     public static final String FILTER_PREFERENCES = "filterPreferences";
     public static final String FAVORITE_PREFERENCES_KEY = "favoritePreferencesKey";

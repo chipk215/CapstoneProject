@@ -32,8 +32,9 @@ import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
-import com.keyeswest.trackme.utilities.FilterPreferences;
-import com.keyeswest.trackme.utilities.SortPreferences;
+import com.keyeswest.trackme.utilities.FilterSharedPreferences;
+import com.keyeswest.trackme.utilities.SortSharedPreferences;
+import com.keyeswest.trackme.utilities.SortResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,8 +86,8 @@ public class TripListFragment extends Fragment
 
         setHasOptionsMenu(true);
 
-        SortPreferences.saveDefaultSortPreferences(getContext(),false);
-        FilterPreferences.saveDefaultFilterPreferences(getContext(), false);
+        SortSharedPreferences.saveDefaultSortPreferences(getContext(),false);
+        FilterSharedPreferences.saveDefaultFilterPreferences(getContext(), false);
 
         if (savedInstanceState != null){
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
@@ -233,7 +234,6 @@ public class TripListFragment extends Fragment
     }
 
 
-
     @Override
     public void onItemChecked(Segment segment) {
 
@@ -287,11 +287,16 @@ public class TripListFragment extends Fragment
             }
 
         } else if (requestCode == REQUEST_SORT_PREFERENCES){
-            boolean sortChanged = SortActivity.getSortChangedResult(data);
+            SortResult sortResult = SortActivity.getSortChangedResult(data);
 
-            if (sortChanged){
+            if (sortResult.isSortChanged()){
+
                 Timber.d("Handling sort change, restarting segment loader");
                 getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+
+                showSnackbar(mFragmentView,getSortMessage(sortResult.getSelectedSort()),
+                        Snackbar.LENGTH_SHORT);
+
             }
         } else if (requestCode == REQUEST_FILTER_PREFERENCES){
             //TODO handle result
@@ -324,6 +329,26 @@ public class TripListFragment extends Fragment
             }
         });
         snackbar.show();
+    }
+
+    private String getSortMessage(SortPreferenceEnum selectedSort){
+        String result = getString(R.string.most_recent_sort);;
+        switch(selectedSort){
+            case NEWEST:
+                result =  getString(R.string.most_recent_sort);
+                break;
+            case OLDEST:
+                result =  getString(R.string.trips_ordered_oldest);
+                break;
+            case LONGEST:
+                result =  getString(R.string.trips_ordered_longest);
+                break;
+            case SHORTEST:
+                result =  getString(R.string.trips_ordered_shortest);
+                break;
+        }
+
+        return result;
     }
 
 

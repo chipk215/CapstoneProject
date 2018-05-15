@@ -5,17 +5,17 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
-import com.keyeswest.trackme.utilities.SortPreferences;
+import com.keyeswest.trackme.utilities.SortSharedPreferences;
 import com.keyeswest.trackme.SortPreferenceEnum;
 
 import java.util.List;
 
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.utilities.SortPreferences.SORT_PREFERENCES;
-import static com.keyeswest.trackme.utilities.SortPreferences.SORT_PREFERENCES_KEY;
-import static com.keyeswest.trackme.utilities.FilterPreferences.FAVORITE_PREFERENCES_KEY;
-import static com.keyeswest.trackme.utilities.FilterPreferences.FILTER_PREFERENCES;
+import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES;
+import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FAVORITE_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FILTER_PREFERENCES;
 
 
 public class SegmentLoader extends CursorLoader {
@@ -30,7 +30,7 @@ public class SegmentLoader extends CursorLoader {
                 context.getSharedPreferences(SORT_PREFERENCES, context.MODE_PRIVATE);
 
         String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
-                SortPreferences.DEFAULT_SORT.getCode());
+                SortSharedPreferences.DEFAULT_SORT.getCode());
 
         String orderByClause;
 

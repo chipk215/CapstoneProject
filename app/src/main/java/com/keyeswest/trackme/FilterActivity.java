@@ -13,8 +13,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.keyeswest.trackme.utilities.FilterPreferences.FAVORITE_PREFERENCES_KEY;
-import static com.keyeswest.trackme.utilities.FilterPreferences.FILTER_PREFERENCES;
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FAVORITE_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FILTER_PREFERENCES;
 
 public class FilterActivity extends AppCompatActivity {
 

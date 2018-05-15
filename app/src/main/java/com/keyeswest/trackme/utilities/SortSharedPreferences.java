@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import com.keyeswest.trackme.SortPreferenceEnum;
 
-public class SortPreferences {
+public class SortSharedPreferences {
 
     public static final String SORT_PREFERENCES = "sortPreferences";
     public static final String SORT_PREFERENCES_KEY = "sortPreferencesKey";
@@ -25,7 +25,7 @@ public class SortPreferences {
         if (force) {
             // save the default values regardless of what has previously been saved
 
-            editor.putString(SORT_PREFERENCES_KEY, SortPreferences.DEFAULT_SORT.getCode());
+            editor.putString(SORT_PREFERENCES_KEY, SortSharedPreferences.DEFAULT_SORT.getCode());
 
             editor.commit();
         }else{
@@ -33,7 +33,7 @@ public class SortPreferences {
             boolean updated = false;
             // don't save defaults if preferences have previously been saved
             if (! sharedPreferences.contains(SORT_PREFERENCES_KEY)){
-                editor.putString(SORT_PREFERENCES_KEY, SortPreferences.DEFAULT_SORT.getCode());
+                editor.putString(SORT_PREFERENCES_KEY, SortSharedPreferences.DEFAULT_SORT.getCode());
                 updated = true;
             }
 
