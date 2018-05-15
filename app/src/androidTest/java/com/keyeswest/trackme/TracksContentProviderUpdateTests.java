@@ -42,7 +42,7 @@ public class TracksContentProviderUpdateTests extends TracksContentProviderBaseT
         double maxLon = -115.0d;
         double distance = 10d;
 
-        int rowsUpdated = Queries.updateSegmentBoundsAndDistance(mContext,segmentId.toString(), minLat, maxLat,
+        int rowsUpdated = Queries.updateSegmentBoundsDistance(mContext,segmentId.toString(), minLat, maxLat,
                 minLon,maxLon, distance);
 
         Assert.assertEquals(1, rowsUpdated);

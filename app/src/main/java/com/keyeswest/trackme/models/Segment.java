@@ -8,6 +8,8 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import timber.log.Timber;
+
 public class Segment implements Parcelable {
 
     private static double METERS_TO_MILES = 0.000621371;
@@ -193,6 +195,15 @@ public class Segment implements Parcelable {
         Date date = new Date(mTimeStamp * 1000);
         String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
         return timeString;
+
+    }
+
+    public String getElapsedTimeString(){
+
+        String elapsedTime = Long.toString(mElapsedTime);
+        Timber.d("Elapsed Time: " + elapsedTime );;
+        return elapsedTime;
+
 
     }
 

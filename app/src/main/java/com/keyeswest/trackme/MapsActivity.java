@@ -31,10 +31,13 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
+import com.keyeswest.trackme.data.LocationSchema;
+import com.keyeswest.trackme.data.Queries;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.tasks.ComputeSegmentDurationTask;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 
 import java.util.ArrayList;
@@ -233,6 +236,23 @@ public class MapsActivity extends FragmentActivity
 
                 TextView startTimeView = customView.findViewById(R.id.start_time_tv);
                 startTimeView.setText(segment.getTime());
+
+                final TextView durationView = customView.findViewById(R.id.duration_tv);
+
+                if (segment.getElapsedTime() == 0){
+                    new ComputeSegmentDurationTask(MapsActivity.this, new ComputeSegmentDurationTask.ResultsCallback() {
+                        @Override
+                        public void onComplete(Long duration) {
+                            double deltaMinutes = (duration) /60000d;
+                            durationView.setText(Double.toString(deltaMinutes));
+                        }
+                    }).execute(segment.getId().toString());
+                }else{
+                    double deltaMinutes = (segment.getElapsedTime()) /60000d;
+                    Timber.d("Segment duration retrieved from db.");
+                    durationView.setText(Double.toString(deltaMinutes));
+                }
+
 
                 popup.showAtLocation(MapsActivity.this.findViewById(R.id.map), Gravity.CENTER, 0, 0);
 

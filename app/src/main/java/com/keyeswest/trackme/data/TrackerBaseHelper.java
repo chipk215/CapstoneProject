@@ -112,9 +112,9 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
-    public static ContentValues updateSegmentRecordBoundsAndDistance(Double minLat, Double maxLat,
-                                                                     Double minLon, Double maxLon,
-                                                                     Double distance){
+    public static ContentValues updateSegmentRecordBoundsDistance(Double minLat, Double maxLat,
+                                                                      Double minLon, Double maxLon,
+                                                                      Double distance){
 
         ContentValues values = new ContentValues();
         values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LAT, minLat);
@@ -131,6 +131,14 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 
         values.put(SegmentSchema.SegmentTable.COLUMN_FAVORITE, favoriteStatus ? 1: 0);
+
+        return values;
+    }
+
+    public static ContentValues updateSegmentDuration(long duration){
+        ContentValues values = new ContentValues();
+
+        values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME, duration);
 
         return values;
     }

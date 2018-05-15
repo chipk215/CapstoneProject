@@ -15,7 +15,8 @@ import timber.log.Timber;
 
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createSegmentRecord;
-import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsAndDistance;
+import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsDistance;
+
 import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordFavoriteStatus;
 import static com.keyeswest.trackme.data.TracksContentProvider.CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 
@@ -47,6 +48,30 @@ public class Queries {
         }
 
         return null;
+
+    }
+
+    public static Cursor getSegmentLocationFirstLastTimeStamps(Context context, String segmentId){
+        String[] selectionArgs = {segmentId};
+        String selectionClause = LocationSchema.LocationTable.COLUMN_SEGMENT_ID + " = ?";
+        String column = LocationSchema.LocationTable.COLUMN_TIME_STAMP;
+        String[] projection = {"MIN(" + column + ")", "MAX("+ column + ") "};
+
+        Uri queryUri = LocationSchema.LocationTable.CONTENT_URI;
+        ContentResolver resolver = context.getContentResolver();
+
+        Cursor cursor = resolver.query(
+                queryUri,
+                /* Columns; leaving this null returns every column in the table */
+                projection,
+                /* Optional specification for columns in the "where" clause above */
+                selectionClause,
+                /* Values for "where" clause */
+                selectionArgs,
+                /* Sort order to return in Cursor */
+                null);
+
+        return cursor;
 
     }
 
@@ -132,15 +157,16 @@ public class Queries {
     }
 
 
-    public static int updateSegmentBoundsAndDistance(Context context, String segmentId,
-                                                     double minLat, double maxLat,
-                                                     double minLon, double maxLon,
-                                                     double distance){
+    public static int updateSegmentBoundsDistance(Context context, String segmentId,
+                                                  double minLat, double maxLat,
+                                                  double minLon, double maxLon,
+                                                  double distance){
 
         //update the segment
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         String[] selectionArgs = {segmentId};
-        ContentValues updateValues = updateSegmentRecordBoundsAndDistance(minLat, maxLat, minLon, maxLon, distance);
+        ContentValues updateValues = updateSegmentRecordBoundsDistance(minLat, maxLat,
+                minLon, maxLon, distance);
         ContentResolver resolver = context.getContentResolver();
         int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
                 selectionClause, selectionArgs);
@@ -155,6 +181,19 @@ public class Queries {
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         String[] selectionArgs = {segmentId.toString()};
         ContentValues updateValues = updateSegmentRecordFavoriteStatus(favoriteStatus);
+
+        ContentResolver resolver = context.getContentResolver();
+        int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
+                selectionClause, selectionArgs);
+
+
+        return rowsUpdated;
+    }
+
+    public static int updateSegmentDuration(Context context, String segmentId, long duration){
+        String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
+        String[] selectionArgs = {segmentId};
+        ContentValues updateValues = TrackerBaseHelper.updateSegmentDuration(duration);
 
         ContentResolver resolver = context.getContentResolver();
         int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,

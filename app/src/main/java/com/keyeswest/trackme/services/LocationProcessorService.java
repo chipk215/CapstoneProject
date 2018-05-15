@@ -54,6 +54,7 @@ public class LocationProcessorService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Double segmentDistance=0d;
+        Long elapsedTime =0L;
 
 
         Timber.d("Entering LocationProcessorService onHandleIntent");
@@ -93,7 +94,7 @@ public class LocationProcessorService extends IntentService {
 
                     bounds = adjustSegmentBounds(segment, bounds);
 
-                    // get the last location sample
+                    // get the last location sample in this sample batch
                     Location lastSample = locations.get(locations.size()-1);
                     // need the distance between lastSample and previousLocation
                     float[] results = new float[1];
@@ -114,10 +115,11 @@ public class LocationProcessorService extends IntentService {
 
                     segmentDistance = segment.getDistance() + incrementDistance;
 
+
                 }
 
                 //update segment with distance and bounding box data
-                Queries.updateSegmentBoundsAndDistance(this, segmentId,
+                Queries.updateSegmentBoundsDistance(this, segmentId,
                         bounds.getMinLat(), bounds.getMaxLat(),
                         bounds.getMinLon(), bounds.getMaxLon(),
                         segmentDistance);
