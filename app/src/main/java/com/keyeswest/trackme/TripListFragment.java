@@ -32,6 +32,8 @@ import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
+import com.keyeswest.trackme.utilities.FilterPreferences;
+import com.keyeswest.trackme.utilities.SortPreferences;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +51,8 @@ public class TripListFragment extends Fragment
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
 
     private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
-    private static final int REQUEST_FILTER_PREFERENCES = 10;
+    private static final int REQUEST_SORT_PREFERENCES = 10;
+    private static final int REQUEST_FILTER_PREFERENCES = 20;
 
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
@@ -82,8 +85,8 @@ public class TripListFragment extends Fragment
 
         setHasOptionsMenu(true);
 
-        FilterPreferences.saveDefaultPreferences(getContext(),false);
-
+        SortPreferences.saveDefaultSortPreferences(getContext(),false);
+        FilterPreferences.saveDefaultFilterPreferences(getContext(), false);
 
         if (savedInstanceState != null){
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
@@ -163,11 +166,15 @@ public class TripListFragment extends Fragment
                 intent = NewTripActivity.newIntent(getContext());
                 startActivity(intent);
                 return true;
+            case R.id.sort:
+
+                intent = SortActivity.newIntent(getContext());
+                startActivityForResult(intent, REQUEST_SORT_PREFERENCES);
+                return true;
             case R.id.filter:
-
                 intent = FilterActivity.newIntent(getContext());
-                startActivityForResult(intent,REQUEST_FILTER_PREFERENCES );
-
+                startActivityForResult(intent, REQUEST_FILTER_PREFERENCES);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -191,7 +198,7 @@ public class TripListFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         Timber.d("onCreateLoader invoked");
-        return SegmentLoader.newAllSegmentsSortedFilteredByPreferences(getContext());
+        return SegmentLoader.newAllSegmentsSortedByPreferences(getContext());
     }
 
     @Override
@@ -220,7 +227,6 @@ public class TripListFragment extends Fragment
 
         savedInstanceState.putParcelableArrayList(ARG_SELECTED_SEGMENTS,
                 (ArrayList<Segment>)mSelectedSegments);
-
 
         super.onSaveInstanceState(savedInstanceState);
 
@@ -280,10 +286,17 @@ public class TripListFragment extends Fragment
                 showSnackbar(mFragmentView, getString(R.string.trip_delete_cancel), Snackbar.LENGTH_SHORT);
             }
 
-        } else if (requestCode == REQUEST_FILTER_PREFERENCES){
-            boolean filtersChanged = FilterActivity.getFilterChangedResult(data);
+        } else if (requestCode == REQUEST_SORT_PREFERENCES){
+            boolean sortChanged = SortActivity.getSortChangedResult(data);
 
-            if (filtersChanged){
+            if (sortChanged){
+                Timber.d("Handling sort change, restarting segment loader");
+                getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+            }
+        } else if (requestCode == REQUEST_FILTER_PREFERENCES){
+            //TODO handle result
+            boolean filterChanged = FilterActivity.getFilterChangedResult(data);
+            if (filterChanged){
                 Timber.d("Handling filter change, restarting segment loader");
                 getActivity().getSupportLoaderManager().restartLoader(0, null, this);
             }

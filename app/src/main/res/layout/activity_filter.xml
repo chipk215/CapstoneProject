@@ -3,77 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-
-    <TextView
-        android:id="@+id/sort_heading_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/sort_trip_list"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <RadioGroup
-        android:id="@+id/radioFilterGroup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sort_heading_tv">
-
-        <RadioButton
-            android:id="@+id/date_newest_rb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/recent_trips_first" />
-
-        <RadioButton
-            android:id="@+id/date_oldest_rb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/oldest_trips_first" />
-
-        <RadioButton
-            android:id="@+id/dist_longest_rb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/longest_trips_first" />
-
-        <RadioButton
-            android:id="@+id/dist_shortest_rb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/shortest_trips_first" />
-
-
-    </RadioGroup>
-
+    android:layout_height="match_parent"
+    tools:context=".FilterActivity">
 
     <TextView
         android:id="@+id/filter_heading_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:text="@string/filter_trip_list"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/sort_heading_tv"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/radioFilterGroup" />
 
     <Switch
         android:id="@+id/favorite_sw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="@string/favorites_only"
         app:layout_constraintStart_toStartOf="@+id/filter_heading_tv"
@@ -90,29 +39,34 @@
 
     <Button
         android:id="@+id/submit_btn"
-        android:layout_width="132dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="228dp"
         android:text="@string/submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.48"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/clear_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/clear"
+        app:layout_constraintStart_toStartOf="@+id/date_btn"
+        app:layout_constraintTop_toBottomOf="@+id/date_btn" />
+
+    <Button
+        android:id="@+id/cancel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/cancel"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="338dp" />
-
-    <Button
-        android:id="@+id/default_btn"
-        android:layout_width="132dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="24dp"
-        android:text="@string/defaults"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/submit_btn" />
+
 </android.support.constraint.ConstraintLayout>

@@ -17,7 +17,7 @@
             android:label="@string/title_activity_maps" />
         <activity android:name=".TripListActivity" />
         <activity android:name=".NewTripActivity" />
-        <activity android:name=".FilterActivity"></activity>
+        <activity android:name=".SortActivity" />
         <activity android:name=".PermissionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,7 +39,7 @@
             android:name=".services.LocationProcessorService"
             android:exported="false" />
 
-
+        <activity android:name=".FilterActivity"></activity>
     </application>
 
 </manifest>

@@ -5,77 +5,74 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
-import com.keyeswest.trackme.FilterPreferences;
-import com.keyeswest.trackme.SortPreference;
+import com.keyeswest.trackme.utilities.SortPreferences;
+import com.keyeswest.trackme.SortPreferenceEnum;
 
 import java.util.List;
 
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.FilterPreferences.FILTER_PREFERENCES;
-import static com.keyeswest.trackme.FilterPreferences.SORT_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.SortPreferences.SORT_PREFERENCES;
+import static com.keyeswest.trackme.utilities.SortPreferences.SORT_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.FilterPreferences.FAVORITE_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.FilterPreferences.FILTER_PREFERENCES;
 
 
 public class SegmentLoader extends CursorLoader {
 
 
 
-    public static SegmentLoader newAllSegmentsSortedFilteredByPreferences(Context context){
+    public static SegmentLoader newAllSegmentsSortedByPreferences(Context context){
 
-        Timber.d("newAllSegmentsSortedFilteredByPreferences invoked");
+        Timber.d("newAllSegmentsSortedByPreferences invoked");
 
         SharedPreferences sharedPreferences =
-                context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
+                context.getSharedPreferences(SORT_PREFERENCES, context.MODE_PRIVATE);
 
         String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
-                FilterPreferences.DEFAULT_FILTER.getCode());
+                SortPreferences.DEFAULT_SORT.getCode());
 
-        SortPreference sortPreference = SortPreference.lookupByCode(sortByCode);
+        String orderByClause;
+
+        SortPreferenceEnum sortPreference = SortPreferenceEnum.lookupByCode(sortByCode);
 
         switch(sortPreference){
-            case NEWEST: return newAllSegmentsInstanceOrderByNewestDate(context);
+            case NEWEST:
+                orderByClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " DESC ";
+                break;
 
-            case OLDEST: return newAllSegmentsInstanceOrderByOldestDate(context);
+            case OLDEST:
+                orderByClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " ASC ";
+                break;
 
-            case LONGEST: return newAllSegmentsInstanceOrderByLongestDistance(context);
+            case LONGEST:
+                orderByClause = SegmentSchema.SegmentTable.COLUMN_DISTANCE + " DESC ";
+                break;
 
-            case SHORTEST: return newAllSegmentsInstanceOrderByShortestDistance(context);
+            case SHORTEST:
+                orderByClause = SegmentSchema.SegmentTable.COLUMN_DISTANCE + " ASC ";
+                break;
 
-            default: return newAllSegmentsInstanceOrderByNewestDate(context);
+            default: orderByClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " DESC ";
         }
 
-    }
 
+        // check filter preferences
+        String selectionClause = null;
+        String[] selectionArgs = null;
+        // check for favorite filter
+        sharedPreferences = context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
+        boolean filterFavorites = sharedPreferences.getBoolean(FAVORITE_PREFERENCES_KEY, false);
+        if (filterFavorites){
+            selectionClause = SegmentSchema.SegmentTable.COLUMN_FAVORITE + " = ?";
+            selectionArgs = new String[] {Integer.toString(1)};
+        }
 
-    public static SegmentLoader newAllSegmentsInstanceOrderByShortestDistance(Context context){
-        String orderByClause = SegmentSchema.SegmentTable.COLUMN_DISTANCE + " ASC ";
         return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, null,
-                null, null, orderByClause);
+                selectionClause, selectionArgs, orderByClause);
 
     }
 
-
-    public static SegmentLoader newAllSegmentsInstanceOrderByLongestDistance(Context context){
-        String orderByClause = SegmentSchema.SegmentTable.COLUMN_DISTANCE + " DESC ";
-        return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, null,
-                null, null, orderByClause);
-
-    }
-
-
-    public static SegmentLoader newAllSegmentsInstanceOrderByNewestDate(Context context){
-        String orderByClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " DESC ";
-        return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, null,
-                null, null, orderByClause);
-
-    }
-
-    public static SegmentLoader newAllSegmentsInstanceOrderByOldestDate(Context context){
-        String orderByClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " ASC ";
-        return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, null,
-                null, null, orderByClause);
-
-    }
 
 
     public static SegmentLoader newSegmentsFromUriList(Context context, List<Uri> segments){

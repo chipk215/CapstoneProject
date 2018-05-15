@@ -2,14 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/new_trip"
-        android:title="@string/new_trip"
-        app:showAsAction="ifRoom|withText"/>
+
 
     <item
         android:id="@+id/filter"
         android:title="@string/filter"
         app:showAsAction="ifRoom|withText"/>
+
+    <item
+        android:id="@+id/sort"
+        android:title="@string/sort"
+        />
+
+    <item
+        android:id="@+id/new_trip"
+        android:title="@string/new_trip"
+        />
 
 </menu>

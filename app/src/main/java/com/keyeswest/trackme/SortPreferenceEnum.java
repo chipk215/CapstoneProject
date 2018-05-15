@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 //Attribution:  https://stackoverflow.com/a/22951509/9128441
-public enum SortPreference {
+public enum SortPreferenceEnum {
 
     OLDEST("O"),
     NEWEST("N"),
@@ -13,20 +13,20 @@ public enum SortPreference {
     LONGEST("L");
 
     private final String code;
-    private static final Map<String,SortPreference> valuesByCode;
+    private static final Map<String,SortPreferenceEnum> valuesByCode;
 
     static {
         valuesByCode = new HashMap<>(values().length);
-        for(SortPreference value : values()) {
+        for(SortPreferenceEnum value : values()) {
             valuesByCode.put(value.code, value);
         }
     }
 
-    SortPreference(String code){
+    SortPreferenceEnum(String code){
         this.code = code;
     }
 
-    public static SortPreference lookupByCode(String code) {
+    public static SortPreferenceEnum lookupByCode(String code) {
         return valuesByCode.get(code);
     }
 
