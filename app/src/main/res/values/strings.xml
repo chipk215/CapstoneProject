@@ -78,5 +78,23 @@
     <string name="trips_ordered_longest">Trips ordered by longest distance.</string>
     <string name="trips_ordered_shortest">Trips ordered by shortest distance.</string>
 
+    <plurals name="seconds_plural">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
+
+    <plurals name="minutes_plural">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+
+    <plurals name="hours_plural">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+
+
+
+
 
 </resources>

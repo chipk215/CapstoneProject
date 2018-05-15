@@ -36,6 +36,7 @@ import com.keyeswest.trackme.data.Queries;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
+import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.ComputeSegmentDurationTask;
 import com.keyeswest.trackme.utilities.LatLonBounds;
@@ -210,7 +211,7 @@ public class MapsActivity extends FragmentActivity
                 // disable clicking on polylines while the pop up is being displayed
                 disablePolylineClicks();
 
-                Segment segment = (Segment)polyline.getTag();
+                final Segment segment = (Segment)polyline.getTag();
 
 
                 LayoutInflater layoutInflater =   MapsActivity.this.getLayoutInflater();
@@ -238,19 +239,27 @@ public class MapsActivity extends FragmentActivity
                 startTimeView.setText(segment.getTime());
 
                 final TextView durationView = customView.findViewById(R.id.duration_tv);
+                final TextView durationDimension =
+                        customView.findViewById(R.id.duration_dimension_tv);
 
                 if (segment.getElapsedTime() == 0){
-                    new ComputeSegmentDurationTask(MapsActivity.this, new ComputeSegmentDurationTask.ResultsCallback() {
+                    new ComputeSegmentDurationTask(MapsActivity.this,
+                            new ComputeSegmentDurationTask.ResultsCallback() {
                         @Override
                         public void onComplete(Long duration) {
-                            double deltaMinutes = (duration) /60000d;
-                            durationView.setText(Double.toString(deltaMinutes));
+                            segment.setElapsedTime(duration);
+                            DurationRecord record = segment.getSegmentDuration(MapsActivity.this);
+                            durationView.setText(record.getValue());
+                            durationDimension.setText(record.getDimension());
+
                         }
                     }).execute(segment.getId().toString());
                 }else{
-                    double deltaMinutes = (segment.getElapsedTime()) /60000d;
+
                     Timber.d("Segment duration retrieved from db.");
-                    durationView.setText(Double.toString(deltaMinutes));
+                    DurationRecord record = segment.getSegmentDuration(MapsActivity.this);
+                    durationView.setText(record.getValue());
+                    durationDimension.setText(record.getDimension());
                 }
 
 

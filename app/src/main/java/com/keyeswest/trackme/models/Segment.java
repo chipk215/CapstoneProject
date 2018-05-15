@@ -1,7 +1,10 @@
 package com.keyeswest.trackme.models;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.keyeswest.trackme.R;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -198,13 +201,9 @@ public class Segment implements Parcelable {
 
     }
 
-    public String getElapsedTimeString(){
-
-        String elapsedTime = Long.toString(mElapsedTime);
-        Timber.d("Elapsed Time: " + elapsedTime );;
-        return elapsedTime;
-
-
+    public DurationRecord getSegmentDuration(Context context){
+        DurationRecord record = new DurationRecord(context, mElapsedTime);
+        return record;
     }
 
     public long getRowId() {
@@ -230,6 +229,9 @@ public class Segment implements Parcelable {
     public void setMaximumSpeed(Double maximumSpeed) {
         mMaximumSpeed = maximumSpeed;
     }
+
+
+
 
 
 }
