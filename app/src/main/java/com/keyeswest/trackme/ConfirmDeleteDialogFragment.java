@@ -17,9 +17,11 @@ import java.util.UUID;
 
 public class ConfirmDeleteDialogFragment extends DialogFragment {
 
-    private static final String ARG_SEGMENT_ID = "argSegmentId";
+    private static final String ARG_SEGMENT_ID = "com.keyeswest.trackme.argSegmentId";
 
-    public static final String EXTRA_CONFIRM = "com.keyeswest.trackme.confirm";
+    private static final String EXTRA_CONFIRM = "com.keyeswest.trackme.confirm";
+
+    private UUID mSegmentId;
 
     public static ConfirmDeleteDialogFragment newInstance(UUID segmentId){
         Bundle args = new Bundle();
@@ -31,13 +33,21 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    public static UUID getSegmentId(Intent data){
+        return UUID.fromString(data.getStringExtra(ARG_SEGMENT_ID));
+    }
+
+    public static boolean getConfirmation(Intent data){
+        return data.getBooleanExtra(EXTRA_CONFIRM, false);
+    }
+
 
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        final UUID segmentId = UUID.fromString(getArguments().getString(ARG_SEGMENT_ID));
+        mSegmentId = UUID.fromString(getArguments().getString(ARG_SEGMENT_ID));
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
@@ -47,9 +57,8 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (segmentId != null){
-                            DeleteTripTask task = new DeleteTripTask(getContext());
-                            task.execute(segmentId);
+                        if (mSegmentId != null){
+
                             sendResult(Activity.RESULT_OK, true);
                         }
 
@@ -75,6 +84,7 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
 
         Intent intent = new Intent();
         intent.putExtra(EXTRA_CONFIRM, deleted);
+        intent.putExtra(ARG_SEGMENT_ID, mSegmentId.toString());
         getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, intent);
     }
 

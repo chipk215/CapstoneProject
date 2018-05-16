@@ -31,6 +31,7 @@ import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.tasks.DeleteTripTask;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
 import com.keyeswest.trackme.utilities.SortSharedPreferences;
@@ -38,6 +39,7 @@ import com.keyeswest.trackme.utilities.SortResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,13 +51,12 @@ public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
     public static final int MAX_TRIP_SELECTIONS = 4;
-    private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
+    public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
+    private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
     private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
     private static final int REQUEST_SORT_PREFERENCES = 10;
     private static final int REQUEST_FILTER_PREFERENCES = 20;
-
-    public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
 
     private Unbinder mUnbinder;
@@ -68,13 +69,12 @@ public class TripListFragment extends Fragment
     @BindView(R.id.display_btn)
     Button mDisplayButton;
 
+    // List of currently selected/checked trips
     private List<Segment> mSelectedSegments;
 
     private TrackLogAdapter mTrackLogAdapter;
 
-    public TripListFragment() {
-        // Required empty public constructor
-    }
+    public TripListFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,6 +106,13 @@ public class TripListFragment extends Fragment
         mUnbinder = ButterKnife.bind(this, view);
 
         Timber.d("onCreateView invoked");
+
+        if (mSelectedSegments.size() < 1){
+            // disable the display button until a segment is checked
+            mDisplayButton.setEnabled(false);
+        }else{
+            mDisplayButton.setEnabled(true);
+        }
 
         mDisplayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -238,7 +245,7 @@ public class TripListFragment extends Fragment
     public void onItemChecked(Segment segment) {
 
         mSelectedSegments.add(segment);
-
+        mDisplayButton.setEnabled(true);
         if (mSelectedSegments.size() >= MAX_TRIP_SELECTIONS){
             mTrackLogAdapter.setSelectionsFrozen(true);
             showSnackbar(mFragmentView, getString(R.string.max_select_snack), Snackbar.LENGTH_SHORT);
@@ -247,7 +254,12 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onItemUnchecked(Segment segment) {
+
         mSelectedSegments.remove(segment);
+
+        if (mSelectedSegments.size() < 1){
+            mDisplayButton.setEnabled(false);
+        }
 
         if (mSelectedSegments.size() == (MAX_TRIP_SELECTIONS-1)){
             mTrackLogAdapter.setSelectionsFrozen(false);
@@ -277,11 +289,29 @@ public class TripListFragment extends Fragment
         }
 
         if (requestCode == REQUEST_TRIP_DELETE_CONFIRM){
-            boolean deleted = data.getBooleanExtra(ConfirmDeleteDialogFragment.EXTRA_CONFIRM,
-                    false);
+            boolean confirmDelete = ConfirmDeleteDialogFragment.getConfirmation(data);
 
-            if (deleted){
+            if (confirmDelete){
+                UUID segmentId = ConfirmDeleteDialogFragment.getSegmentId(data);
                 showSnackbar(mFragmentView, getString(R.string.trip_deleted), Snackbar.LENGTH_SHORT);
+                Segment segmentMatch = null;
+                for (Segment segment : mSelectedSegments){
+                    if (segment.getId().equals(segmentId)){
+                        segmentMatch = segment;
+                        break;
+                    }
+                }
+
+                if (segmentMatch != null){
+                    mSelectedSegments.remove(segmentMatch);
+                    if (mSelectedSegments.size() < 1){
+                        mDisplayButton.setEnabled(false);
+                    }
+                }
+                DeleteTripTask task = new DeleteTripTask(getContext());
+
+                task.execute(segmentId);
+
             }else{
                 showSnackbar(mFragmentView, getString(R.string.trip_delete_cancel), Snackbar.LENGTH_SHORT);
             }
