@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
 
+import com.keyeswest.trackme.utilities.FilterSharedPreferences;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -18,8 +20,9 @@ import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FILTER_PRE
 
 public class FilterActivity extends AppCompatActivity {
 
-    public static Intent newIntent(Context packageContext){
+    public static Intent newIntent(Context packageContext, boolean clearFilter){
         Intent intent = new Intent(packageContext, FilterActivity.class);
+        intent.putExtra(EXTRA_CLEAR_FILTERS, clearFilter);
         return intent;
     }
 
@@ -29,7 +32,13 @@ public class FilterActivity extends AppCompatActivity {
         return sortChanged;
     }
 
+    public static boolean getFiltersClearedResult(Intent data){
+        boolean filtersCleared = data.getBooleanExtra(EXTRA_CLEAR_FILTERS,false);
+        return filtersCleared;
+    }
+
     private static final String EXTRA_CHANGE_FILTER_RESULT = "extraChangeFilterResult";
+    private static final String EXTRA_CLEAR_FILTERS = "extraClearFilters";
 
     private Unbinder mUnbinder;
 
@@ -42,8 +51,6 @@ public class FilterActivity extends AppCompatActivity {
     @BindView(R.id.cancel_btn)
     Button mCancelButton;
 
-    @BindView(R.id.clear_btn)
-    Button mClearButton;
 
 
     @Override
@@ -63,7 +70,7 @@ public class FilterActivity extends AppCompatActivity {
                 boolean isSelected = mFavoriteSwitch.isChecked();
                 setFavoriteFilter(isSelected);
 
-                setFilterResult(true);
+                setFilterResult(true, false);
                 finish();
 
             }
@@ -72,18 +79,22 @@ public class FilterActivity extends AppCompatActivity {
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFilterResult(false);
+                setFilterResult(false, false);
                 finish();
             }
         });
 
-        mClearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFavoriteSwitch.setChecked(false);
 
-            }
-        });
+
+        Intent intent = getIntent();
+        boolean clearFilters = intent.getBooleanExtra(EXTRA_CLEAR_FILTERS, false);
+        if (clearFilters){
+            // clear all filters
+            FilterSharedPreferences.clearFilters(this, true);
+            // set return result to include cleared result
+            setFilterResult(true, true);
+            finish();
+        }
     }
 
 
@@ -98,9 +109,10 @@ public class FilterActivity extends AppCompatActivity {
     }
 
 
-    private void setFilterResult(boolean filtersChanged){
+    private void setFilterResult(boolean filtersChanged, boolean cleared){
         Intent data = new Intent();
         data.putExtra(EXTRA_CHANGE_FILTER_RESULT, filtersChanged);
+        data.putExtra(EXTRA_CLEAR_FILTERS, cleared);
         setResult(RESULT_OK, data);
     }
 

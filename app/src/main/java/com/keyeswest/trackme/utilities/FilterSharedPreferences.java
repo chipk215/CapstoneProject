@@ -10,7 +10,7 @@ public class FilterSharedPreferences {
     public static final String FAVORITE_PREFERENCES_KEY = "favoritePreferencesKey";
     private static final boolean DEFAULT_FAVORITES_ONLY_FILTER = false;
 
-    public static void saveDefaultFilterPreferences(Context context, boolean force){
+    public static void clearFilters(Context context, boolean force){
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();

@@ -53,6 +53,7 @@ public class TripListFragment extends Fragment
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
 
+    private static final String FILTER_STATE_EXTRA = "filterStateExtra";
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
     private static final int REQUEST_TRIP_DELETE_CONFIRM = 0;
     private static final int REQUEST_SORT_PREFERENCES = 10;
@@ -74,7 +75,12 @@ public class TripListFragment extends Fragment
 
     private TrackLogAdapter mTrackLogAdapter;
 
+    private boolean mListFiltered= false;
+    private Menu mMainMenu;
+
     public TripListFragment() {}
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,10 +93,11 @@ public class TripListFragment extends Fragment
         setHasOptionsMenu(true);
 
         SortSharedPreferences.saveDefaultSortPreferences(getContext(),false);
-        FilterSharedPreferences.saveDefaultFilterPreferences(getContext(), false);
+        FilterSharedPreferences.clearFilters(getContext(), false);
 
         if (savedInstanceState != null){
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
+            mListFiltered = savedInstanceState.getByte(FILTER_STATE_EXTRA) != 0;
 
         }else {
             mSelectedSegments = new ArrayList<>();
@@ -180,7 +187,8 @@ public class TripListFragment extends Fragment
                 startActivityForResult(intent, REQUEST_SORT_PREFERENCES);
                 return true;
             case R.id.filter:
-                intent = FilterActivity.newIntent(getContext());
+                Timber.d("Filter request. mListFilter= " + Boolean.toString(mListFiltered));
+                intent = FilterActivity.newIntent(getContext(), mListFiltered);
                 startActivityForResult(intent, REQUEST_FILTER_PREFERENCES);
                 return true;
             default:
@@ -191,8 +199,9 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
+      //  super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_trip_list, menu);
+        mMainMenu = menu;
     }
 
     @Override
@@ -235,6 +244,8 @@ public class TripListFragment extends Fragment
 
         savedInstanceState.putParcelableArrayList(ARG_SELECTED_SEGMENTS,
                 (ArrayList<Segment>)mSelectedSegments);
+
+        savedInstanceState.putByte(FILTER_STATE_EXTRA, (byte)(mListFiltered ? 1 : 0));
 
         super.onSaveInstanceState(savedInstanceState);
 
@@ -332,7 +343,19 @@ public class TripListFragment extends Fragment
             //TODO handle result
             boolean filterChanged = FilterActivity.getFilterChangedResult(data);
             if (filterChanged){
-                Timber.d("Handling filter change, restarting segment loader");
+                MenuItem filterItem = mMainMenu.findItem(R.id.filter);
+                boolean filtersCleared = FilterActivity.getFiltersClearedResult(data);
+                if (filtersCleared){
+                    Timber.d("Filter result:  filters cleared");
+                    mListFiltered = false;
+                    filterItem.setIcon(R.drawable.filter_outline);
+
+                }else{
+                    Timber.d("Filter result:  filters set");
+                    filterItem.setIcon(R.drawable.filter_remove_outline);
+                    mListFiltered = true;
+                }
+
                 getActivity().getSupportLoaderManager().restartLoader(0, null, this);
             }
         }
