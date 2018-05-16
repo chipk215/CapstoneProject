@@ -1,5 +1,6 @@
 package com.keyeswest.trackme;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.location.Location;
@@ -191,10 +192,12 @@ public abstract class BaseTripFragment extends Fragment
         mUnbinder.unbind();
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMapReady = true;
+        mMap.setMyLocationEnabled(true);
         if (mLocationReady){
             displayMap();
         }
