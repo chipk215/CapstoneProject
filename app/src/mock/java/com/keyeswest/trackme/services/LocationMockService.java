@@ -1,6 +1,5 @@
 package com.keyeswest.trackme.services;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -14,20 +13,18 @@ import android.os.Process;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
 import com.keyeswest.trackme.LocationWrapper;
 import com.keyeswest.trackme.R;
-
+import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
 
 import java.io.InputStream;
 import java.util.Scanner;
-
 
 import timber.log.Timber;
 
 import static com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver.MOCK_LOCATION_EXTRA_KEY;
 
-public class LocationMockService extends Service {
+public class LocationMockService extends ForegroundServiceBase {
 
     private static final String UPDATE_EXTRA_KEY = "updateKey";
 
@@ -36,6 +33,8 @@ public class LocationMockService extends Service {
     private static final int WHAT_CODE = 3;
 
     private static final String MOCK_LOCATION_PROVIDER = LocationManager.NETWORK_PROVIDER;
+
+
 
     private Looper mServiceLooper;
     private ServiceHandler mServiceHandler;
@@ -140,6 +139,8 @@ public class LocationMockService extends Service {
         mStopped = false;
         Timber.d("Entering LocationMockService onCreate");
 
+
+
         mHandlerThread = new HandlerThread("LocationMockServiceHandler",
                 Process.THREAD_PRIORITY_BACKGROUND);
         mHandlerThread.start();
@@ -165,6 +166,7 @@ public class LocationMockService extends Service {
             }
             else{
                 Timber.d("Stopping the generation of mocked location samples");
+                stopForeground(true);
                 mStopped = true;
                 stopSelf();
             }
@@ -186,4 +188,6 @@ public class LocationMockService extends Service {
        mServiceHandler.removeCallbacks(mHandlerThread);
         super.onDestroy();
     }
+
+
 }

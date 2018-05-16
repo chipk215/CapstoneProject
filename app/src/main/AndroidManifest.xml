@@ -18,7 +18,8 @@
         <activity android:name=".TripListActivity" />
         <activity android:name=".NewTripActivity" />
         <activity android:name=".SortActivity" />
-        <activity android:name=".PermissionActivity">
+        <activity android:name=".PermissionActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

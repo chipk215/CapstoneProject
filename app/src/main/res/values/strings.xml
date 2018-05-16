@@ -77,6 +77,9 @@
     <string name="trips_ordered_oldest">Trips ordered by oldest trip.</string>
     <string name="trips_ordered_longest">Trips ordered by longest distance.</string>
     <string name="trips_ordered_shortest">Trips ordered by shortest distance.</string>
+    <string name="channel_name">Notification Channel Name</string>
+    <string name="channel_description">Channel Description</string>
+    <string name="sampling_service_notice">Location Sampling Service</string>
 
     <plurals name="seconds_plural">
         <item quantity="one">second</item>

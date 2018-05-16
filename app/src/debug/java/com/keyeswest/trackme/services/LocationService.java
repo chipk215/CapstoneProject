@@ -2,10 +2,14 @@ package com.keyeswest.trackme.services;
 
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -13,15 +17,17 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
 
 import timber.log.Timber;
 
-public class LocationService extends Service {
+public class LocationService  extends ForegroundServiceBase {
 
 
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
@@ -29,10 +35,8 @@ public class LocationService extends Service {
 
     private static final String UPDATE_EXTRA_KEY = "updateKey";
 
-
     private static final int START_CODE = 1;
     private static final int STOP_CODE = 0;
-
 
     /**
      * The max time before batched results are delivered by location services. Results may be
@@ -89,8 +93,12 @@ public class LocationService extends Service {
 
                 mFusedLocationClient.removeLocationUpdates(getPendingIntent());
                 mFusedLocationClient = null;
+
+                stopForeground(true);
                 // notify location manager to stop updates
                 stopSelf();
+
+
                 return;
             }
 
@@ -118,7 +126,7 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.d("Entering LocationService onCreate");
+        Timber.d("Entering LocationService (debug) onCreate");
 
         HandlerThread thread = new HandlerThread("LocationServiceHandler",
                 Process.THREAD_PRIORITY_BACKGROUND);
@@ -131,7 +139,7 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.d("Entering LocationService onCreate");
+        Timber.d("Entering LocationService onStartCommand");
 
         Message message = mServiceHandler.obtainMessage();
         message.arg1 = startId;
@@ -192,4 +200,6 @@ public class LocationService extends Service {
 
         return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
+
+
 }

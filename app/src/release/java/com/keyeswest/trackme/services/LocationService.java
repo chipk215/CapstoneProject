@@ -120,7 +120,7 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.d("Entering LocationService onCreate");
+        Timber.d("Entering LocationService (Release) onCreate");
 
         HandlerThread thread = new HandlerThread("LocationServiceHandler",
                 Process.THREAD_PRIORITY_BACKGROUND);
