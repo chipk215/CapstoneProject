@@ -12,13 +12,13 @@ import com.keyeswest.trackme.models.Segment;
  * Creates a new segment record in the database, retrieves segment and saves segment id in
  * shared preferences for later access.
  */
-public class StartSegmentTask extends AsyncTask<Void, Void, String> {
+public class StartSegmentTask extends AsyncTask<Void, Void, Segment> {
 
     public static final String SEGMENT_ID_KEY = "com.keyeswest.fleetracker.com.segmentId";
 
 
     public interface ResultsCallback{
-        void onComplete(String segmentId);
+        void onComplete(Segment segment);
     }
 
     private Context mContext;
@@ -31,7 +31,7 @@ public class StartSegmentTask extends AsyncTask<Void, Void, String> {
 
 
     @Override
-    protected String doInBackground(Void... voids) {
+    protected Segment doInBackground(Void... voids) {
 
         Uri segmentUri = Queries.createNewSegment(mContext);
         Segment segment = Queries.getSegmentFromUri(mContext, segmentUri);
@@ -44,7 +44,7 @@ public class StartSegmentTask extends AsyncTask<Void, Void, String> {
             editor.putString(SEGMENT_ID_KEY, segmentId);
             editor.commit();
 
-            return segmentId;
+            return segment;
 
         }
 
@@ -53,8 +53,8 @@ public class StartSegmentTask extends AsyncTask<Void, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String segmentId) {
-        mCallback.onComplete(segmentId);
+    protected void onPostExecute(Segment segment) {
+        mCallback.onComplete(segment);
     }
 
 

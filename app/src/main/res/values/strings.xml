@@ -81,6 +81,11 @@
     <string name="channel_description">Channel Description</string>
     <string name="sampling_service_notice">Location Sampling Service</string>
 
+    <string name="launch_activity">Launch activity</string>
+    <string name="remove_location_updates">Stop location updates</string>
+
+    <string name="location_updated">Location Updated: %1$s</string>
+
     <plurals name="seconds_plural">
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>

@@ -21,7 +21,7 @@ import static com.keyeswest.trackme.tasks.StartSegmentTask.SEGMENT_ID_KEY;
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
     public static final String ACTION_PROCESS_UPDATES =
-            "com.keyeswest.trackme.locationupdatespendingintent.action.PROCESS_UPDATES";
+            "com.keyeswest.trackme.LocationUpdatesBroadcastReceiver.action.PROCESS_UPDATES";
 
     public static final String ACTION_PROCESS_MOCK_UPDATES =
             "com.keyeswest.trackme.locationupdatespendingintent.action.PROCESS_MOCK_UPDATES";

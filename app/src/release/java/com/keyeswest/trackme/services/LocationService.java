@@ -72,7 +72,7 @@ public class LocationService extends Service {
         @SuppressLint("MissingPermission")
         @Override
         public void handleMessage(Message msg) {
-            Timber.d("LocationService handle message...");
+            Timber.d("FusedLocationService handle message...");
 
             if ((msg.arg2 == START_CODE) && (mFusedLocationClient == null)){
 
@@ -120,7 +120,7 @@ public class LocationService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Timber.d("Entering LocationService (Release) onCreate");
+        Timber.d("Entering FusedLocationService (Release) onCreate");
 
         HandlerThread thread = new HandlerThread("LocationServiceHandler",
                 Process.THREAD_PRIORITY_BACKGROUND);
@@ -133,7 +133,7 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.d("Entering LocationService onCreate");
+        Timber.d("Entering FusedLocationService onCreate");
 
         Message message = mServiceHandler.obtainMessage();
         message.arg1 = startId;
@@ -143,7 +143,7 @@ public class LocationService extends Service {
         }else{
 
             // an unexpected error state, just log and stop the service
-            Timber.e("Unexpected or missing intent data in LocationService onStartCommand");
+            Timber.e("Unexpected or missing intent data in FusedLocationService onStartCommand");
             message.arg2 = STOP_CODE;
         }
 

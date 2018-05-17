@@ -15,7 +15,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.keyeswest.trackme.services.LocationService"
+        <service android:name="com.keyeswest.trackme.services.FusedLocationService"
             android:exported="false" />
 
     </application>

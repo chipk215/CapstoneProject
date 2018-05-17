@@ -3,11 +3,15 @@ package com.keyeswest.trackme;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +29,11 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.keyeswest.trackme.data.LocationCursor;
+import com.keyeswest.trackme.data.LocationLoader;
+import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
+import com.keyeswest.trackme.services.LocationService;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
 import java.util.ArrayList;
@@ -39,10 +47,16 @@ import timber.log.Timber;
 import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
 
 public abstract class BaseTripFragment extends Fragment
-        implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback {
+        implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
+        LoaderManager.LoaderCallbacks<Cursor>{
 
     private static String IS_TRACKING_EXTRA = "isTrackingExtra";
     private static String PLOTTED_POINTS_EXTRA = "plottedPointsExtra";
+    private static String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
+
+
+    private static final int LOCATION_LOADER = 1;
+
 
     private Unbinder mUnbinder;
 
@@ -50,10 +64,10 @@ public abstract class BaseTripFragment extends Fragment
 
     private Location mLastLocation;
 
-    private FusedLocationProviderClient mFusedLocationClient;
 
     private boolean mMapReady = false;
-    private boolean mLocationReady = false;
+    private boolean mCurrentLocationReady = false;
+    private boolean mResumeReady = false;
 
     private PolylineOptions mPolylineOptions;
     private Polyline mPlot;
@@ -66,20 +80,47 @@ public abstract class BaseTripFragment extends Fragment
     @BindView(R.id.remove_updates_button)
     Button mStopUpdatesButton;
 
-    boolean mResumePlot;
+   // boolean mResumePlot;
 
-    List<LatLng> mPlottedPoints;
+    List<LatLng> mPlottedPoints = new ArrayList<>();
 
+    protected LocationService mService = null;
+
+    // Tracks the bound state of the service.
+    protected boolean mBound = false;
+
+    private Segment mTrackingSegment;
+
+    protected abstract void startUpdates();
+    protected abstract void stopUpdates();
+    protected abstract ServiceConnection getServiceConnection();
+
+    // Monitors the state of the connection to the service.
+    final protected ServiceConnection mServiceConnection = getServiceConnection();
+
+    private FusedLocationProviderClient mFusedLocationClient;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+
+        Timber.d("onCreate Trip Fragment");
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
+        Timber.d("onCreateView Trip Fragment");
+
         View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        mResumePlot = false;
+      //  mResumePlot = false;
+        mResumeReady = false;
 
         mStartUpdatesButton.setEnabled(true);
         mStopUpdatesButton.setEnabled(false);
@@ -88,9 +129,12 @@ public abstract class BaseTripFragment extends Fragment
             if (isTracking) {
                 mStartUpdatesButton.setEnabled(false);
                 mStopUpdatesButton.setEnabled(true);
-
-                mPlottedPoints = savedInstanceState.getParcelableArrayList(PLOTTED_POINTS_EXTRA);
-                mResumePlot = true;
+                mTrackingSegment = savedInstanceState.getParcelable(TRACKED_SEGMENT_EXTRA);
+                //get the points from the database for the tracking segment
+               // getActivity().getSupportLoaderManager().initLoader(LOCATION_LOADER ,null, this);
+               // mPlottedPoints = savedInstanceState.getParcelableArrayList(PLOTTED_POINTS_EXTRA);
+                //mResumeReady = false;
+               // mResumePlot = true;
             }
         }
 
@@ -107,9 +151,13 @@ public abstract class BaseTripFragment extends Fragment
                     // create a segment record in the db to hold the location samples
                     StartSegmentTask task = new StartSegmentTask(context,
                             new StartSegmentTask.ResultsCallback() {
+
+
                         @Override
-                        public void onComplete(String segmentId) {
-                            Timber.d("Starting track segment id: " + segmentId);
+                        public void onComplete(Segment segment) {
+
+                            Timber.d("Starting track segment id: %s", segment.getId().toString());
+                            mTrackingSegment = segment;
                             // jumping off point to location service
                             startUpdates();
                         }
@@ -134,6 +182,8 @@ public abstract class BaseTripFragment extends Fragment
             }
         });
 
+
+        // In all cases put the current location on the map
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
         getLastLocation();
 
@@ -151,9 +201,60 @@ public abstract class BaseTripFragment extends Fragment
         return view;
     }
 
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState){
+        super.onViewStateRestored(savedInstanceState);
 
-    protected abstract void startUpdates();
-    protected abstract void stopUpdates();
+        Timber.d("onViewStateRestored Trip Fragment");
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        Timber.d("onActivityCreated Trip Fragment");
+    }
+
+    @Override
+    public void onPause() {
+        Timber.d("Trip tracking paused, unregistering plot receiver");
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
+
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        Timber.d("Trip tracking resumed, re-registering plot receiver");
+        super.onResume();
+
+        if (mTrackingSegment != null){
+            getActivity().getSupportLoaderManager().initLoader(LOCATION_LOADER ,null, this);
+        }else{
+            mResumeReady = true;
+        }
+
+
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
+                new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
+    }
+
+    @Override
+    public void onStop() {
+        Timber.d("Trip tracking stopped, unbinding service");
+        if (mBound) {
+            // Unbind from the service. This signals to the service that this activity is no longer
+            // in the foreground, and the service can respond by promoting itself to a foreground
+            // service.
+            getContext().unbindService(mServiceConnection);
+            mBound = false;
+        }
+
+       // PreferenceManager.getDefaultSharedPreferences(getContext())
+       //         .unregisterOnSharedPreferenceChangeListener(this);
+        super.onStop();
+    }
 
 
     @Override
@@ -163,10 +264,12 @@ public abstract class BaseTripFragment extends Fragment
         if (mPolylineOptions == null){
             mPolylineOptions = new PolylineOptions();
             mPlot = mMap.addPolyline(mPolylineOptions);
-            if (mResumePlot){
-                mPlot.setPoints(mPlottedPoints);
-                mResumePlot = false;
-            }
+
+        }
+
+        if (mPlottedPoints.size() > 0) {
+            mPlot.setPoints(mPlottedPoints);
+            mPlottedPoints.clear();
         }
 
         List<LatLng> points = mPlot.getPoints();
@@ -194,10 +297,7 @@ public abstract class BaseTripFragment extends Fragment
         mMap = googleMap;
         mMapReady = true;
         mMap.setMyLocationEnabled(true);
-        if (mLocationReady){
-            displayMap();
-        }
-
+        displayMap();
 
     }
 
@@ -210,8 +310,8 @@ public abstract class BaseTripFragment extends Fragment
         savedInstanceState.putByte(IS_TRACKING_EXTRA, (byte)(isTracking ? 1 : 0));
 
         if (isTracking){
-            // save the points in the track
-            savedInstanceState.putParcelableArrayList(PLOTTED_POINTS_EXTRA, (ArrayList<LatLng>)mPlot.getPoints());
+
+            savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
         }
 
         super.onSaveInstanceState(savedInstanceState);
@@ -220,8 +320,10 @@ public abstract class BaseTripFragment extends Fragment
 
 
     private void displayMap(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),
-                mLastLocation.getLongitude() ), 15));
+        if (mMapReady && mResumeReady && mCurrentLocationReady) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude()), 15));
+        }
     }
 
 
@@ -233,10 +335,9 @@ public abstract class BaseTripFragment extends Fragment
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null){
                             mLastLocation = task.getResult();
-                            mLocationReady = true;
-                            if (mMapReady){
-                                displayMap();
-                            }
+                            mCurrentLocationReady = true;
+                            displayMap();
+
                         }else{
                             // handle error case where location not known
                         }
@@ -244,4 +345,39 @@ public abstract class BaseTripFragment extends Fragment
                     }
                 });
     }
+
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        return LocationLoader.getLocationsForSegmentByRowId(getContext(), mTrackingSegment.getRowId());
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        Timber.d("Resumed locations loaded from db");
+        if (data.getCount() > 0){
+            mPlottedPoints = new ArrayList<>();
+            LocationCursor cursor = new LocationCursor(data);
+            cursor.moveToPosition(-1);
+            while(cursor.moveToNext()){
+                com.keyeswest.trackme.models.Location location = cursor.getLocation();
+                LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+                mPlottedPoints.add(point);
+            }
+            Timber.d("Resumed point count= %s", Long.toString(mPlottedPoints.size()));
+            cursor.close();
+            getActivity().getSupportLoaderManager().destroyLoader(LOCATION_LOADER);
+            mResumeReady = true;
+            displayMap();
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
+    }
+
+
+
 }

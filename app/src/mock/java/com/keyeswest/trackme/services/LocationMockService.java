@@ -24,13 +24,15 @@ import timber.log.Timber;
 
 import static com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver.MOCK_LOCATION_EXTRA_KEY;
 
-public class LocationMockService extends ForegroundServiceBase {
+public class LocationMockService extends LocationService {
 
     private static final String UPDATE_EXTRA_KEY = "updateKey";
 
     private static final int START_CODE = 1;
     private static final int STOP_CODE = 0;
     private static final int WHAT_CODE = 3;
+
+    private static int sRequestId = 1;
 
     private static final String MOCK_LOCATION_PROVIDER = LocationManager.NETWORK_PROVIDER;
 
@@ -40,6 +42,7 @@ public class LocationMockService extends ForegroundServiceBase {
 
     private boolean mStopped;
 
+    private Looper mServiceLooper;
 
 
     public LocationMockService(){
@@ -118,17 +121,6 @@ public class LocationMockService extends ForegroundServiceBase {
     }
 
 
-    public static Intent getStartUpdatesIntent(Context context){
-        Intent intent = new Intent(context, LocationMockService.class);
-        intent.putExtra(UPDATE_EXTRA_KEY, START_CODE);
-        return intent;
-    }
-
-    public static Intent getStopUpdatesIntent(Context context){
-        Intent intent = new Intent(context, LocationMockService.class);
-        intent.putExtra(UPDATE_EXTRA_KEY, STOP_CODE);
-        return intent;
-    }
 
 
     @Override
@@ -137,36 +129,10 @@ public class LocationMockService extends ForegroundServiceBase {
 
         Timber.d("Entering LocationMockService onCreate");
 
-
+        mServiceLooper = mHandlerThread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
         mStopped = false;
 
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.d("Entering LocationMockService onStartCommand");
-
-        if (intent != null){
-            int updateCode = intent.getIntExtra(UPDATE_EXTRA_KEY, STOP_CODE);
-            if (updateCode == START_CODE){
-                Timber.d("Generate mocked location samples");
-                mStopped = false;
-                Message message = mServiceHandler.obtainMessage();
-                message.arg1 = startId;
-                message.arg2 = START_CODE;
-                mServiceHandler.sendMessage(message);
-                message.what = WHAT_CODE;
-            }
-            else{
-                Timber.d("Stopping the generation of mocked location samples");
-                stopForeground(true);
-                mStopped = true;
-                stopSelf();
-            }
-        }
-
-        return START_STICKY;
     }
 
 
@@ -175,8 +141,27 @@ public class LocationMockService extends ForegroundServiceBase {
     public void onDestroy() {
         Timber.d("onDestroy invoked");
         mServiceHandler.removeMessages(WHAT_CODE);
-       mServiceHandler.removeCallbacks(mHandlerThread);
+        mServiceHandler.removeCallbacks(mHandlerThread);
         super.onDestroy();
+    }
+
+    @Override
+    public void removeLocationUpdates() {
+        mStopped = true;
+        stopSelf();
+    }
+
+    @Override
+    public void requestLocationUpdates() {
+        Timber.d("Requesting locations");
+        startService(new Intent(getApplicationContext(), LocationMockService.class));
+        mStopped = false;
+        Message message = mServiceHandler.obtainMessage();
+        message.arg1 = sRequestId++;
+        message.arg2 = START_CODE;
+        mServiceHandler.sendMessage(message);
+        message.what = WHAT_CODE;
+
     }
 
 

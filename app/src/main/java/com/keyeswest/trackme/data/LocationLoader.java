@@ -20,6 +20,14 @@ public class LocationLoader extends CursorLoader {
         return new LocationLoader(context, requestUri);
     }
 
+    public static LocationLoader getLocationsForSegmentByRowId(Context context, long rowId){
+        String segmentRowId = Long.toString(rowId);
+        Uri requestUri = CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
+        requestUri = requestUri.buildUpon().appendPath(segmentRowId).build();
+
+        return new LocationLoader(context, requestUri);
+    }
+
     private LocationLoader(Context context, Uri uri){
         super(context, uri, null, null, null, null);
     }

@@ -34,6 +34,9 @@ public class LocationProcessorService extends IntentService {
     public final static String PLOT_SAMPLES_EXTRA_KEY = "sampleData";
 
 
+    public static long debugSampleCount =0;
+
+
 
     public LocationProcessorService() {
         super(NAME);
@@ -54,7 +57,6 @@ public class LocationProcessorService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Double segmentDistance=0d;
-        Long elapsedTime =0L;
 
 
         Timber.d("Entering LocationProcessorService onHandleIntent");
@@ -127,6 +129,8 @@ public class LocationProcessorService extends IntentService {
             }
         }
 
+        Timber.d("Sample Count = %s", Long.toString(debugSampleCount));
+
     }
 
 
@@ -172,6 +176,7 @@ public class LocationProcessorService extends IntentService {
             Timber.d("++++++++++++++++");
 
             // save location sample to db
+            debugSampleCount++;
             createNewLocationFromSample(this, l, segmentId);
 
             bounds.update(latitude, longitude);

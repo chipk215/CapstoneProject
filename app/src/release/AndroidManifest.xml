@@ -15,7 +15,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".services.LocationService"
+        <service android:name=".services.FusedLocationService"
             android:exported="false" />
 
     </application>
