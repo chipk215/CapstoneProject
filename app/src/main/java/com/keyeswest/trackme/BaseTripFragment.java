@@ -91,12 +91,8 @@ public abstract class BaseTripFragment extends Fragment
 
                 mPlottedPoints = savedInstanceState.getParcelableArrayList(PLOTTED_POINTS_EXTRA);
                 mResumePlot = true;
-
             }
-
-
         }
-
 
         mStartUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override

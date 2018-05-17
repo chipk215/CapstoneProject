@@ -34,15 +34,13 @@ public class LocationMockService extends ForegroundServiceBase {
 
     private static final String MOCK_LOCATION_PROVIDER = LocationManager.NETWORK_PROVIDER;
 
+    private LocationMockService.ServiceHandler mServiceHandler;
 
-
-    private Looper mServiceLooper;
-    private ServiceHandler mServiceHandler;
     private Context mContext;
 
     private boolean mStopped;
 
-    private HandlerThread mHandlerThread;
+
 
     public LocationMockService(){
         mContext = this;
@@ -136,16 +134,12 @@ public class LocationMockService extends ForegroundServiceBase {
     @Override
     public void onCreate() {
         super.onCreate();
-        mStopped = false;
+
         Timber.d("Entering LocationMockService onCreate");
 
 
-
-        mHandlerThread = new HandlerThread("LocationMockServiceHandler",
-                Process.THREAD_PRIORITY_BACKGROUND);
-        mHandlerThread.start();
-        mServiceLooper = mHandlerThread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
+        mStopped = false;
 
     }
 
@@ -175,11 +169,7 @@ public class LocationMockService extends ForegroundServiceBase {
         return START_STICKY;
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+
 
     @Override
     public void onDestroy() {

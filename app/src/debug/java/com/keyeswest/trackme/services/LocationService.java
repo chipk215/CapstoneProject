@@ -38,6 +38,8 @@ public class LocationService  extends ForegroundServiceBase {
     private static final int START_CODE = 1;
     private static final int STOP_CODE = 0;
 
+    private HandlerThread mHandlerThread;
+
     /**
      * The max time before batched results are delivered by location services. Results may be
      * delivered sooner than this interval.
@@ -56,7 +58,7 @@ public class LocationService  extends ForegroundServiceBase {
 
     private LocationRequest mLocationRequest;
 
-    private Looper mServiceLooper;
+
     private ServiceHandler mServiceHandler;
     private Context mContext;
 
@@ -79,6 +81,7 @@ public class LocationService  extends ForegroundServiceBase {
             if ((msg.arg2 == START_CODE) && (mFusedLocationClient == null)){
 
                 Timber.d("Starting location updates.");
+
 
                 mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
                 createLocationRequest();
@@ -128,11 +131,6 @@ public class LocationService  extends ForegroundServiceBase {
         super.onCreate();
         Timber.d("Entering LocationService (debug) onCreate");
 
-        HandlerThread thread = new HandlerThread("LocationServiceHandler",
-                Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-
-        mServiceLooper = thread.getLooper();
         mServiceHandler = new ServiceHandler(mServiceLooper);
 
     }
@@ -160,12 +158,6 @@ public class LocationService  extends ForegroundServiceBase {
     }
 
 
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
 
     private void createLocationRequest() {
