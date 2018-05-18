@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -144,7 +145,31 @@ public class LocationMockService extends LocationService {
     }
 
     @Override
+    public boolean onUnbind(Intent intent) {
+        Timber.d( "Last client unbound from service ");
+
+        // Called when the last client unbinds from this
+        // service. If this method is called due to a configuration change, we
+        // do nothing. Otherwise, we make this service a foreground service.
+        if (!mChangingConfiguration && LocationPreferences.requestingLocationUpdates(this)) {
+            Timber.d( "Starting foreground service");
+
+
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+                this.startForegroundService(new Intent(this, LocationMockService.class));
+
+            }
+
+            startForeground(NOTIFICATION_ID, getNotification());
+
+
+        }
+        return true; // Ensures onRebind() is called when a client re-binds.
+    }
+
+    @Override
     public void removeLocationUpdates() {
+        Timber.d("Stopping mocked location service");
         LocationPreferences.setRequestingLocationUpdates(this, false);
         mStopped = true;
         stopSelf();
@@ -159,8 +184,9 @@ public class LocationMockService extends LocationService {
         Message message = mServiceHandler.obtainMessage();
         message.arg1 = sRequestId++;
         message.arg2 = START_CODE;
-        mServiceHandler.sendMessage(message);
+
         message.what = WHAT_CODE;
+        mServiceHandler.sendMessage(message);
 
     }
 

@@ -4,6 +4,7 @@ package com.keyeswest.trackme.services;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -75,6 +76,29 @@ public class FusedLocationService extends LocationService {
 
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Timber.d( "Last client unbound from service ");
+
+        // Called when the last client unbinds from this
+        // service. If this method is called due to a configuration change, we
+        // do nothing. Otherwise, we make this service a foreground service.
+        if (!mChangingConfiguration && LocationPreferences.requestingLocationUpdates(this)) {
+            Timber.d( "Starting foreground service");
+
+
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+                this.startForegroundService(new Intent(this, FusedLocationService.class));
+
+            }
+
+            startForeground(NOTIFICATION_ID, getNotification());
+
+
+        }
+        return true; // Ensures onRebind() is called when a client re-binds.
+    }
+
 
 
     /**
@@ -107,7 +131,7 @@ public class FusedLocationService extends LocationService {
     public void requestLocationUpdates() {
         Timber.d("Requesting location updates");
         LocationPreferences.setRequestingLocationUpdates(this, true);
-        startService(new Intent(getApplicationContext(), LocationService.class));
+        startService(new Intent(getApplicationContext(), FusedLocationService.class));
         try {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
                     mLocationCallback, Looper.myLooper());

@@ -229,6 +229,10 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("Trip tracking resumed, re-registering plot receiver");
         super.onResume();
 
+
+        // Check the database and load any locations associated with the segment being plotted.
+        // This ensures that the plotted trip always begins at the start even if this activity
+        // is paused.
         if (mTrackingSegment != null){
             getActivity().getSupportLoaderManager().initLoader(LOCATION_LOADER ,null, this);
         }else{

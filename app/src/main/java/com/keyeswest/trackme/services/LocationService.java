@@ -44,7 +44,7 @@ public abstract class LocationService extends Service {
      * orientation change. We create a foreground service notification only if the former takes
      * place.
      */
-    private boolean mChangingConfiguration = false;
+    protected boolean mChangingConfiguration = false;
 
 
     protected NotificationManager mNotificationManager;
@@ -78,7 +78,7 @@ public abstract class LocationService extends Service {
         // Called when a client  comes to the foreground
         // and binds with this service. The service should cease to be a foreground service
         // when that happens.
-        Timber.d("in onBind()");
+        Timber.d("client is binding to location service.");
         stopForeground(true);
         mChangingConfiguration = false;
         return mBinder;
@@ -89,34 +89,13 @@ public abstract class LocationService extends Service {
         // Called when a client  returns to the foreground
         // and binds once again with this service. The service should cease to be a foreground
         // service when that happens.
-        Timber.d( "in onRebind()");
+        Timber.d( "client is rebinding to location service.");
         stopForeground(true);
         mChangingConfiguration = false;
-        super.onRebind(intent);
+
     }
 
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Timber.d( "Last client unbound from service d");
 
-        // Called when the last client unbinds from this
-        // service. If this method is called due to a configuration change, we
-        // do nothing. Otherwise, we make this service a foreground service.
-        if (!mChangingConfiguration && LocationPreferences.requestingLocationUpdates(this)) {
-            Timber.d( "Starting foreground service");
-            /*
-            // TODO(developer). If targeting O, use the following code.
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
-                mNotificationManager.startServiceInForeground(new Intent(this,
-                        LocationUpdatesService.class), NOTIFICATION_ID, getNotification());
-            } else {
-                startForeground(NOTIFICATION_ID, getNotification());
-            }
-             */
-            startForeground(NOTIFICATION_ID, getNotification());
-        }
-        return true; // Ensures onRebind() is called when a client re-binds.
-    }
 
 
 
@@ -137,7 +116,7 @@ public abstract class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.d( "Location Service started");
+        Timber.d( "Location Service started via onStartCommand");
         boolean startedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION,
                 false);
 
