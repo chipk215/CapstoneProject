@@ -117,9 +117,7 @@ public class LocationMockService extends LocationService {
                 }
             }
         }
-
     }
-
 
 
 
@@ -134,7 +132,6 @@ public class LocationMockService extends LocationService {
         mStopped = false;
 
     }
-
 
 
     @Override

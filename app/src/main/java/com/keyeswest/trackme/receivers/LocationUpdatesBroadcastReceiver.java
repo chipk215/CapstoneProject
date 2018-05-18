@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Bundle;
 
 import com.google.android.gms.location.LocationResult;
 import com.keyeswest.trackme.services.LocationProcessorService;
@@ -16,6 +17,7 @@ import timber.log.Timber;
 
 import static com.keyeswest.trackme.services.LocationProcessorService.LOCATIONS_EXTRA_KEY;
 import static com.keyeswest.trackme.services.LocationProcessorService.SEGMENT_ID_EXTRA_KEY;
+import static com.keyeswest.trackme.services.LocationService.EXTRA_LOCATION;
 import static com.keyeswest.trackme.tasks.StartSegmentTask.SEGMENT_ID_KEY;
 
 public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
@@ -43,12 +45,20 @@ public class LocationUpdatesBroadcastReceiver extends BroadcastReceiver {
 
             final String action = intent.getAction();
             if (ACTION_PROCESS_UPDATES.equals(action)) {
-                LocationResult result = LocationResult.extractResult(intent);
-                if (result != null) {
+
+                Bundle bundle = intent.getExtras();
+                Location location = bundle.getParcelable(EXTRA_LOCATION);
+
+               // LocationResult result = LocationResult.extractResult(intent);
+                if (location != null) {
 
                     Timber.d("Sending locations to LocationProcessorService");
+                    List<Location> locations = new ArrayList<>();
+                    locations.add(location);
+                    LocationResult locationResult = LocationResult.create(locations);
                     Intent locationIntent = new Intent(context, LocationProcessorService.class);
-                    locationIntent.putExtra(LOCATIONS_EXTRA_KEY, result);
+                   // Intent locationIntent = new Intent(context, LocationProcessorService.class);
+                    locationIntent.putExtra(LOCATIONS_EXTRA_KEY, locationResult);
                     locationIntent.putExtra(SEGMENT_ID_EXTRA_KEY, segmentId);
 
                     context.startService(locationIntent);

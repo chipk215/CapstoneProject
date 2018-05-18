@@ -10,7 +10,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.keyeswest.trackme.locationupdatespendingintent.action.PROCESS_UPDATES" />
+                <action android:name="com.keyeswest.trackme.LocationUpdatesBroadcastReceiver.action.PROCESS_UPDATES" />
 
             </intent-filter>
         </receiver>

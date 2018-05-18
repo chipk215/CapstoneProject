@@ -10,6 +10,8 @@ import android.support.v4.app.Fragment;
 
 import com.keyeswest.trackme.services.FusedLocationService;
 
+import timber.log.Timber;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -26,6 +28,7 @@ public class NewTripFragment extends BaseTripFragment {
 
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
+                Timber.d("onServiceConnected");
                 FusedLocationService.LocalBinder binder = (FusedLocationService.LocalBinder) service;
                 mService = binder.getService();
                 mBound = true;

@@ -31,10 +31,9 @@ public abstract class LocationService extends Service {
     private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
             ".started_from_notification";
 
-    static final String EXTRA_LOCATION = PACKAGE_NAME + ".location";
+    static public final String EXTRA_LOCATION = PACKAGE_NAME + ".location";
 
     public static final String NOTIFICATION_CHANNEL_ID = "channel_01";
-
 
     protected static final int NOTIFICATION_ID = 14;
 
@@ -64,10 +63,8 @@ public abstract class LocationService extends Service {
         super.onCreate();
         Timber.d("Entering LocationService onCreate");
 
-
         mHandlerThread = new HandlerThread("LocationServiceHandler");
         mHandlerThread.start();
-
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         createNotificationChannel();

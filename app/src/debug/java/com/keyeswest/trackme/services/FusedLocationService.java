@@ -62,7 +62,6 @@ public class FusedLocationService extends LocationService {
 
         super.onCreate();
 
-        mServiceHandler = new Handler(mHandlerThread.getLooper());
 
         Timber.d("Entering FusedLocationService (debug) onCreate");
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -154,12 +153,12 @@ public class FusedLocationService extends LocationService {
         // Notify anyone listening for broadcasts about the new location.
         Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
         intent.putExtra(EXTRA_LOCATION, location);
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        sendBroadcast(intent);
 
         // Update notification content if running as a foreground service.
-        if (serviceIsRunningInForeground(this)) {
-            mNotificationManager.notify(NOTIFICATION_ID, getNotification());
-        }
+       // if (serviceIsRunningInForeground(this)) {
+       //     mNotificationManager.notify(NOTIFICATION_ID, getNotification());
+       // }
     }
 
     private void getLastLocation() {
