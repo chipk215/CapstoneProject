@@ -36,6 +36,7 @@ public class NewTripFragment extends BaseTripFragment {
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
+                Timber.d("onServiceDisconnected");
                 mService = null;
                 mBound = false;
             }

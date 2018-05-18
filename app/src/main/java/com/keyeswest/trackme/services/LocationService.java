@@ -75,7 +75,7 @@ public abstract class LocationService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        // Called when a client (MainActivity in case of this sample) comes to the foreground
+        // Called when a client  comes to the foreground
         // and binds with this service. The service should cease to be a foreground service
         // when that happens.
         Timber.d("in onBind()");
@@ -86,7 +86,7 @@ public abstract class LocationService extends Service {
 
     @Override
     public void onRebind(Intent intent) {
-        // Called when a client (MainActivity in case of this sample) returns to the foreground
+        // Called when a client  returns to the foreground
         // and binds once again with this service. The service should cease to be a foreground
         // service when that happens.
         Timber.d( "in onRebind()");
@@ -99,8 +99,8 @@ public abstract class LocationService extends Service {
     public boolean onUnbind(Intent intent) {
         Timber.d( "Last client unbound from service d");
 
-        // Called when the last client (NewTrip Activity in case of this sample) unbinds from this
-        // service. If this method is called due to a configuration change in MainActivity, we
+        // Called when the last client unbinds from this
+        // service. If this method is called due to a configuration change, we
         // do nothing. Otherwise, we make this service a foreground service.
         if (!mChangingConfiguration && LocationPreferences.requestingLocationUpdates(this)) {
             Timber.d( "Starting foreground service");
@@ -158,7 +158,7 @@ public abstract class LocationService extends Service {
 
     @Override
     public void onDestroy() {
-       // mServiceHandler.removeCallbacksAndMessages(null);
+        //mServiceHandler.removeCallbacksAndMessages(null);
     }
 
     /**

@@ -7,7 +7,7 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
+
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -29,6 +29,8 @@ public class FusedLocationService extends LocationService {
 
     private LocationCallback mLocationCallback;
 
+    private Handler mServiceHandler;
+
     /**
      * The max time before batched results are delivered by location services. Results may be
      * delivered sooner than this interval.
@@ -48,12 +50,6 @@ public class FusedLocationService extends LocationService {
     private LocationRequest mLocationRequest;
 
 
-    /**
-     * The current location.
-     */
-    private Location mLocation;
-
-
     public FusedLocationService(){}
 
 
@@ -61,9 +57,9 @@ public class FusedLocationService extends LocationService {
     public void onCreate() {
 
         super.onCreate();
-
-
         Timber.d("Entering FusedLocationService (debug) onCreate");
+
+        mServiceHandler = new Handler(mHandlerThread.getLooper());
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mLocationCallback = new LocationCallback() {
@@ -75,7 +71,7 @@ public class FusedLocationService extends LocationService {
         };
 
         createLocationRequest();
-        getLastLocation();
+
 
     }
 
@@ -89,7 +85,16 @@ public class FusedLocationService extends LocationService {
     public void removeLocationUpdates() {
         Timber.d( "Removing location updates");
         try {
-            mFusedLocationClient.removeLocationUpdates(mLocationCallback);
+            mFusedLocationClient.removeLocationUpdates(mLocationCallback).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        Timber.d("Locations updates successfully stopped.");
+                    }else{
+                        Timber.d("Locations updates failed to stop.");
+                    }
+                }
+            });
             LocationPreferences.setRequestingLocationUpdates(this, false);
             stopSelf();
         } catch (SecurityException unlikely) {
@@ -111,6 +116,14 @@ public class FusedLocationService extends LocationService {
             Timber.e( unlikely,"Lost location permission. Could not request updates." );
         }
     }
+
+    @Override
+    public void onDestroy() {
+        mServiceHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
+
+
 
     private void createLocationRequest() {
         mLocationRequest = new LocationRequest();
@@ -148,8 +161,6 @@ public class FusedLocationService extends LocationService {
     private void onNewLocation(Location location) {
         Timber.d("New location: " + location);
 
-        mLocation = location;
-
         // Notify anyone listening for broadcasts about the new location.
         Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
         intent.putExtra(EXTRA_LOCATION, location);
@@ -161,23 +172,7 @@ public class FusedLocationService extends LocationService {
        // }
     }
 
-    private void getLastLocation() {
-        try {
-            mFusedLocationClient.getLastLocation()
-                    .addOnCompleteListener(new OnCompleteListener<Location>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Location> task) {
-                            if (task.isSuccessful() && task.getResult() != null) {
-                                mLocation = task.getResult();
-                            } else {
-                                Timber.w( "Failed to get location.");
-                            }
-                        }
-                    });
-        } catch (SecurityException unlikely) {
-            Timber.e(unlikely, "Lost location permission."  );
-        }
-    }
+
 
 
 }
