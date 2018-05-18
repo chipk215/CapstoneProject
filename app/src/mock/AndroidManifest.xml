@@ -4,16 +4,6 @@
 
     <application>
 
-        <receiver
-            android:name=".receivers.LocationUpdatesBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.keyeswest.trackme.locationupdatespendingintent.action.PROCESS_MOCK_UPDATES" />
-            </intent-filter>
-        </receiver>
-
-
         <service android:name="com.keyeswest.trackme.services.LocationMockService"
             android:exported="false" />
 

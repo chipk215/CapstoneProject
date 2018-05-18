@@ -2,7 +2,9 @@ package com.keyeswest.trackme.services;
 
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
@@ -17,10 +19,14 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
+
 import com.keyeswest.trackme.utilities.LocationPreferences;
 
 import timber.log.Timber;
+
+import static com.keyeswest.trackme.services.LocationProcessorService.LOCATIONS_EXTRA_KEY;
+import static com.keyeswest.trackme.services.LocationProcessorService.SEGMENT_ID_EXTRA_KEY;
+import static com.keyeswest.trackme.tasks.StartSegmentTask.SEGMENT_ID_KEY;
 
 public class FusedLocationService extends LocationService {
 
@@ -170,25 +176,25 @@ public class FusedLocationService extends LocationService {
     }
 
 
-    // Android defect with adding extras to pending intent requesting location updates
-    // https://tinyurl.com/y9gpvcoe
-    // As a workaround put the segment id in a shared preferences file
 
-    private PendingIntent getPendingIntent() {
-
-        Intent intent = new Intent(this, LocationUpdatesBroadcastReceiver.class);
-        intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
-
-        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
 
     private void onNewLocation(Location location) {
         Timber.d("New location: " + location);
 
+        SharedPreferences prefs = this.getSharedPreferences(SEGMENT_ID_KEY,
+                Context.MODE_PRIVATE);
+        String segmentId = prefs.getString(SEGMENT_ID_KEY,null);
+
+
+        Intent locationIntent = new Intent(this, LocationProcessorService.class);
+        locationIntent.putExtra(LOCATIONS_EXTRA_KEY, location);
+        locationIntent.putExtra(SEGMENT_ID_EXTRA_KEY, segmentId);
+        this.startService(locationIntent);
+
         // Notify anyone listening for broadcasts about the new location.
-        Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
-        intent.putExtra(EXTRA_LOCATION, location);
-        sendBroadcast(intent);
+      //  Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
+      //  intent.putExtra(EXTRA_LOCATION, location);
+      //  sendBroadcast(intent);
 
         // Update notification content if running as a foreground service.
        // if (serviceIsRunningInForeground(this)) {

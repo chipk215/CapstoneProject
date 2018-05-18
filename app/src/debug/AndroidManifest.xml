@@ -5,16 +5,6 @@
 
     <application>
 
-        <receiver
-            android:name=".receivers.LocationUpdatesBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.keyeswest.trackme.LocationUpdatesBroadcastReceiver.action.PROCESS_UPDATES" />
-
-            </intent-filter>
-        </receiver>
-
         <service android:name="com.keyeswest.trackme.services.FusedLocationService"
             android:exported="false" />
 
