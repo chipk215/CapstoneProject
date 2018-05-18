@@ -13,8 +13,31 @@ public class NewTripActivity extends SingleFragmentActivity{
         return intent;
     }
 
+    public interface NotifyBackPressed{
+        void backPressed();
+    }
+
+    Fragment mFragment;
+
     @Override
     protected Fragment createFragment() {
-        return new NewTripFragment();
+        mFragment =  new NewTripFragment();
+        return mFragment;
+    }
+
+    @Override
+    public void onBackPressed(){
+
+        // Allow the fragment to stop location service
+        // We only want to stop the background service on a back press otherwise keep
+        // the service running.
+        //
+        // This handles the case where the user does not stop tracking before hitting the back button
+        if (mFragment instanceof NotifyBackPressed) {
+            ((NotifyBackPressed) mFragment).backPressed();
+        }
+
+        super.onBackPressed();
+
     }
 }

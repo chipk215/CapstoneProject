@@ -86,6 +86,7 @@
 
     <string name="location_updated">Location Updated: %1$s</string>
 
+
     <plurals name="seconds_plural">
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>

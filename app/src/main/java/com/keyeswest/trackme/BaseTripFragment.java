@@ -48,7 +48,7 @@ import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_B
 
 public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
-        LoaderManager.LoaderCallbacks<Cursor>{
+        LoaderManager.LoaderCallbacks<Cursor>, NewTripActivity.NotifyBackPressed{
 
     private static String IS_TRACKING_EXTRA = "isTrackingExtra";
     private static String PLOTTED_POINTS_EXTRA = "plottedPointsExtra";
@@ -200,6 +200,8 @@ public abstract class BaseTripFragment extends Fragment
 
         return view;
     }
+
+
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState){
@@ -379,5 +381,10 @@ public abstract class BaseTripFragment extends Fragment
     }
 
 
-
+    // This handles the case where the user does not stop tracking before hitting the back button
+    @Override
+    public void backPressed() {
+        Timber.i( "Stopping location updates");
+        stopUpdates();
+    }
 }
