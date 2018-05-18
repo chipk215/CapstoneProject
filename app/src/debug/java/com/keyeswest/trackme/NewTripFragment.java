@@ -54,6 +54,9 @@ public class NewTripFragment extends BaseTripFragment {
     }
 
 
+
+    //TODO these can be moved to the base class since we are not using different intents to start
+    // the service
     @Override
     protected void startUpdates() {
         mService.requestLocationUpdates();

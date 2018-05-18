@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -19,7 +18,6 @@ import android.support.v4.app.NotificationCompat;
 
 import com.keyeswest.trackme.PermissionActivity;
 import com.keyeswest.trackme.R;
-import com.keyeswest.trackme.utilities.LocationPreferences;
 
 import timber.log.Timber;
 

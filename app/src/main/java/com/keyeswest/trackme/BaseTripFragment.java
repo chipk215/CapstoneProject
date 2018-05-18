@@ -51,12 +51,9 @@ public abstract class BaseTripFragment extends Fragment
         LoaderManager.LoaderCallbacks<Cursor>, NewTripActivity.NotifyBackPressed{
 
     private static String IS_TRACKING_EXTRA = "isTrackingExtra";
-    private static String PLOTTED_POINTS_EXTRA = "plottedPointsExtra";
     private static String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
 
-
     private static final int LOCATION_LOADER = 1;
-
 
     private Unbinder mUnbinder;
 
@@ -64,9 +61,14 @@ public abstract class BaseTripFragment extends Fragment
 
     private Location mLastLocation;
 
-
+    // Indicates when google map is initialized and ready to use (async initialization)
     private boolean mMapReady = false;
+
+    // Indicates when current location has been returned
     private boolean mCurrentLocationReady = false;
+
+    // When fragment is resumed, a call to the database is made to retrieve location samples
+    // that were delivered while the fragment was paused.
     private boolean mResumeReady = false;
 
     private PolylineOptions mPolylineOptions;
