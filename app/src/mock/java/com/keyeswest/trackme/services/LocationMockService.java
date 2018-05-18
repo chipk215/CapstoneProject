@@ -108,11 +108,11 @@ public class LocationMockService extends LocationService {
 
                     //Yes,  in order to use LocationResult we have to put the single location sample
                     // in a list
-                    List<Location> locations = new ArrayList<>();
-                    locations.add(location);
-                    LocationResult locationResult = LocationResult.create(locations);
+                   // List<Location> locations = new ArrayList<>();
+                  //  locations.add(location);
+                  //  LocationResult locationResult = LocationResult.create(locations);
                     Intent locationIntent = new Intent(mContext, LocationProcessorService.class);
-                    locationIntent.putExtra(LOCATIONS_EXTRA_KEY, locationResult);
+                    locationIntent.putExtra(LOCATIONS_EXTRA_KEY, location);
                     locationIntent.putExtra(SEGMENT_ID_EXTRA_KEY, segmentId);
                     mContext.startService(locationIntent);
 
@@ -127,11 +127,9 @@ public class LocationMockService extends LocationService {
                         return;
                     }
                 }
-
             }
         }
     }
-
 
 
     @Override
@@ -172,7 +170,6 @@ public class LocationMockService extends LocationService {
             }
 
             startForeground(NOTIFICATION_ID, getNotification());
-
 
         }
         return true; // Ensures onRebind() is called when a client re-binds.

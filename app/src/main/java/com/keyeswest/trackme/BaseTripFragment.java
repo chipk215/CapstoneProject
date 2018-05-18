@@ -264,7 +264,7 @@ public abstract class BaseTripFragment extends Fragment
 
 
     @Override
-    public void updatePlot(List<Location> locations) {
+    public void updatePlot(Location location) {
         Timber.d("Received Sample Broadcast message in updatePlot");
 
         if (mPolylineOptions == null){
@@ -281,12 +281,11 @@ public abstract class BaseTripFragment extends Fragment
         List<LatLng> points = mPlot.getPoints();
 
 
-        for (Location location : locations){
-            Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
-                    Double.toString(location.getLongitude()));
-            points.add(new LatLng(location.getLatitude(), location.getLongitude()));
 
-        }
+        Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
+                    Double.toString(location.getLongitude()));
+
+        points.add(new LatLng(location.getLatitude(), location.getLongitude()));
 
         mPlot.setPoints(points);
     }

@@ -18,7 +18,7 @@ import static com.keyeswest.trackme.services.LocationProcessorService.PLOT_SAMPL
 public class ProcessedLocationSampleReceiver extends BroadcastReceiver {
 
     public interface OnSamplesReceived{
-        void updatePlot(List<Location> locations);
+        void updatePlot(Location location);
     }
 
 
@@ -37,9 +37,9 @@ public class ProcessedLocationSampleReceiver extends BroadcastReceiver {
             final String action = intent.getAction();
             if (LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE.equals(action)){
                 Timber.d("Extracting locations from broadcast intent");
-                ArrayList<Location> locations = intent.getParcelableArrayListExtra(PLOT_SAMPLES_EXTRA_KEY);
-                List<Location> list = locations;
-                mCallback.updatePlot(list);
+                Location location = intent.getParcelableExtra(PLOT_SAMPLES_EXTRA_KEY);
+
+                mCallback.updatePlot(location);
 
             }
         }

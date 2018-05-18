@@ -74,12 +74,10 @@ public class LocationProcessorService extends IntentService {
 
         if (intent != null) {
             // retrieve the LocationResult data from intent
-            LocationResult result = intent.getParcelableExtra(LOCATIONS_EXTRA_KEY);
+            Location location = intent.getParcelableExtra(LOCATIONS_EXTRA_KEY);
 
-            //get the location samples
-            List<Location> locations = result.getLocations();
 
-            if ((locations != null) && (locations.size() > 0)) {
+            if (location != null)  {
 
                 String segmentId = intent.getStringExtra(SEGMENT_ID_EXTRA_KEY);
                 Timber.d("SegmentId= " + segmentId);
@@ -90,7 +88,7 @@ public class LocationProcessorService extends IntentService {
                         this, segmentId);
 
                 // save the location samples to the db and compute the bounding box
-                LatLonBounds bounds = saveLocationSamples(locations, segmentId);
+                LatLonBounds bounds = saveLocationSamples(location, segmentId);
 
                 if (previousLocationCursor.getCount() == 1){
                     // a previous location exists for the segment, this is not hte first location
@@ -111,20 +109,20 @@ public class LocationProcessorService extends IntentService {
                     // Also - opportunity to throw samples out (do not write to db) if their
                     // incremental distance is less tan some threshold. Eliminate saving samples
                     // where the user is at rest.
-                    Location lastSample = locations.get(locations.size()-1);
+
                     // need the distance between lastSample and previousLocation
                     float[] results = new float[1];
                     Location.distanceBetween(previousLocation.getLatitude(),
                             previousLocation.getLongitude(),
-                            lastSample.getLatitude(),
-                            lastSample.getLongitude(),
+                            location.getLatitude(),
+                            location.getLongitude(),
                             results);
                     double incrementDistance = results[0];
                     Timber.d("Distance measured between: %s %s %s %s ",
                             Double.toString(previousLocation.getLatitude()),
                             Double.toString(previousLocation.getLongitude()),
-                            Double.toString(lastSample.getLatitude()),
-                            Double.toString(lastSample.getLongitude()));
+                            Double.toString(location.getLatitude()),
+                            Double.toString(location.getLongitude()));
 
                     Timber.d("Segment increment distance = %s",
                             Double.toString(incrementDistance));
@@ -141,7 +139,7 @@ public class LocationProcessorService extends IntentService {
                         segmentDistance);
 
                 // broadcast the location samples for plotting
-                broadcastLocationSamples(locations);
+                broadcastLocationSamples(location);
             }
         }
         Timber.d("Sample Count = %s", Long.toString(debugSampleCount));
@@ -176,47 +174,45 @@ public class LocationProcessorService extends IntentService {
      * Write the location samples to the database.
      *
      * Compute the bounding box which encapsulates the locations.
-     * @param locations
+     * @param location
      * @param segmentId
      * @return
      */
-    private LatLonBounds saveLocationSamples(List<Location> locations, String segmentId){
+    private LatLonBounds saveLocationSamples(Location location, String segmentId){
 
         LatLonBounds bounds = new LatLonBounds();
 
         // save the new location samples
         Timber.d("Displaying locations from Service");
         Timber.d("++++++++++++++++");
-        for (Location l : locations) {
 
-            double latitude = l.getLatitude();
-            double longitude = l.getLongitude();
 
-            Date d = new Date(l.getTime());
-            Timber.d("Date: " + d.toString());
-            Timber.d("Lat: " + Double.toString(latitude));
-            Timber.d("Lon: " + Double.toString(longitude));
-            Timber.d("++++++++++++++++");
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
 
-            // save location sample to db
-            debugSampleCount++;
-            createNewLocationFromSample(this, l, segmentId);
+        Date d = new Date(location.getTime());
+        Timber.d("Date: " + d.toString());
+        Timber.d("Lat: " + Double.toString(latitude));
+        Timber.d("Lon: " + Double.toString(longitude));
+        Timber.d("++++++++++++++++");
 
-            bounds.update(latitude, longitude);
-        }
+        // save location sample to db
+        debugSampleCount++;
+        createNewLocationFromSample(this, location, segmentId);
+
+        bounds.update(latitude, longitude);
+
 
         return bounds;
     }
 
 
     // Send the samples back to NewTrip activity to be plotted.
-    private void broadcastLocationSamples(List<Location> locations){
+    private void broadcastLocationSamples(Location location){
         Intent intent = new Intent();
         intent.setAction(LOCATION_BROADCAST_PLOT_SAMPLE);
 
-        ArrayList<Location> arrayList = new ArrayList<>(locations);
-
-        intent.putParcelableArrayListExtra(PLOT_SAMPLES_EXTRA_KEY, arrayList);
+        intent.putExtra(PLOT_SAMPLES_EXTRA_KEY, location);
 
         Timber.d("Broadcasting locations samples for plotting");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
