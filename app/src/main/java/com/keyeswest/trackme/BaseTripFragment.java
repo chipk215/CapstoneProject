@@ -80,7 +80,6 @@ public abstract class BaseTripFragment extends Fragment
     @BindView(R.id.remove_updates_button)
     Button mStopUpdatesButton;
 
-   // boolean mResumePlot;
 
     List<LatLng> mPlottedPoints = new ArrayList<>();
 
@@ -119,7 +118,7 @@ public abstract class BaseTripFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-      //  mResumePlot = false;
+
         mResumeReady = false;
 
         mStartUpdatesButton.setEnabled(true);
@@ -130,11 +129,7 @@ public abstract class BaseTripFragment extends Fragment
                 mStartUpdatesButton.setEnabled(false);
                 mStopUpdatesButton.setEnabled(true);
                 mTrackingSegment = savedInstanceState.getParcelable(TRACKED_SEGMENT_EXTRA);
-                //get the points from the database for the tracking segment
-               // getActivity().getSupportLoaderManager().initLoader(LOCATION_LOADER ,null, this);
-               // mPlottedPoints = savedInstanceState.getParcelableArrayList(PLOTTED_POINTS_EXTRA);
-                //mResumeReady = false;
-               // mResumePlot = true;
+
             }
         }
 
@@ -144,7 +139,10 @@ public abstract class BaseTripFragment extends Fragment
                 final Context context = view.getContext();
                 try {
                     Timber.i( "Starting location updates");
-
+                    if ((mMap!= null ) && (mPlot != null)){
+                        mPlot.remove();
+                        mPolylineOptions = null;
+                    }
                     mStartUpdatesButton.setEnabled(false);
                     mStopUpdatesButton.setEnabled(true);
 
