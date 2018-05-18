@@ -2,36 +2,36 @@ package com.keyeswest.trackme.services;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.os.Process;
-import android.support.annotation.Nullable;
 
+import com.google.android.gms.location.LocationResult;
 import com.google.gson.Gson;
 import com.keyeswest.trackme.LocationWrapper;
 import com.keyeswest.trackme.R;
-import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
 import com.keyeswest.trackme.utilities.LocationPreferences;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver.MOCK_LOCATION_EXTRA_KEY;
+import static com.keyeswest.trackme.services.LocationProcessorService.LOCATIONS_EXTRA_KEY;
+import static com.keyeswest.trackme.services.LocationProcessorService.SEGMENT_ID_EXTRA_KEY;
+import static com.keyeswest.trackme.tasks.StartSegmentTask.SEGMENT_ID_KEY;
 
 public class LocationMockService extends LocationService {
 
     private static final String UPDATE_EXTRA_KEY = "updateKey";
 
     private static final int START_CODE = 1;
-    private static final int STOP_CODE = 0;
     private static final int WHAT_CODE = 3;
 
     private static int sRequestId = 1;
@@ -62,6 +62,10 @@ public class LocationMockService extends LocationService {
 
             Timber.d("Starting mock location updates.");
 
+            SharedPreferences prefs = mContext.getSharedPreferences(SEGMENT_ID_KEY,
+                    Context.MODE_PRIVATE);
+            String segmentId = prefs.getString(SEGMENT_ID_KEY,null);
+
             // read the raw resource json file
             InputStream inputStream = getResources().openRawResource(R.raw.track1);
             String jsonString = null;
@@ -73,17 +77,17 @@ public class LocationMockService extends LocationService {
                 scanner.close();
             }
 
-            LocationWrapper[] locations=null;
+            LocationWrapper[] locationsWrapped=null;
 
             if (jsonString != null) {
                 Gson gson = new Gson();
-                locations = gson.fromJson(jsonString, LocationWrapper[].class);
+                locationsWrapped = gson.fromJson(jsonString, LocationWrapper[].class);
             }
 
-            if (locations != null) {
-                Timber.d("Mock Location Count= " + Integer.toString(locations.length));
+            if (locationsWrapped != null) {
+                Timber.d("Mock Location Count= " + Integer.toString(locationsWrapped.length));
 
-                for (LocationWrapper mockSample : locations) {
+                for (LocationWrapper mockSample : locationsWrapped) {
 
                     double altitude = 100d;
                     float bearing = 0f;
@@ -100,15 +104,21 @@ public class LocationMockService extends LocationService {
                     location.setAccuracy(accuracy);
                     location.setTime(mockSample.getTimeStamp() * 1000);
 
-                    Intent intent = new Intent(mContext, LocationUpdatesBroadcastReceiver.class);
-                    intent.setAction(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_MOCK_UPDATES);
+                    //put the location in a LocationResult container
 
-                    intent.putExtra(MOCK_LOCATION_EXTRA_KEY, location);
-                    Timber.d("Sending location intent to LocationUpdatesBroadcastReceiver");
-                    sendBroadcast(intent);
+                    //Yes,  in order to use LocationResult we have to put the single location sample
+                    // in a list
+                    List<Location> locations = new ArrayList<>();
+                    locations.add(location);
+                    LocationResult locationResult = LocationResult.create(locations);
+                    Intent locationIntent = new Intent(mContext, LocationProcessorService.class);
+                    locationIntent.putExtra(LOCATIONS_EXTRA_KEY, locationResult);
+                    locationIntent.putExtra(SEGMENT_ID_EXTRA_KEY, segmentId);
+                    mContext.startService(locationIntent);
+
 
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(800);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -117,6 +127,7 @@ public class LocationMockService extends LocationService {
                         return;
                     }
                 }
+
             }
         }
     }
@@ -189,6 +200,5 @@ public class LocationMockService extends LocationService {
         mServiceHandler.sendMessage(message);
 
     }
-
 
 }
