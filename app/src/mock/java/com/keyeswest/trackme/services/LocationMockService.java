@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.keyeswest.trackme.LocationWrapper;
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.receivers.LocationUpdatesBroadcastReceiver;
+import com.keyeswest.trackme.utilities.LocationPreferences;
 
 import java.io.InputStream;
 import java.util.Scanner;
@@ -79,7 +80,7 @@ public class LocationMockService extends LocationService {
             }
 
             if (locations != null) {
-                Timber.d("Moc Location Count= " + Integer.toString(locations.length));
+                Timber.d("Mock Location Count= " + Integer.toString(locations.length));
 
                 for (LocationWrapper mockSample : locations) {
 
@@ -144,6 +145,7 @@ public class LocationMockService extends LocationService {
 
     @Override
     public void removeLocationUpdates() {
+        LocationPreferences.setRequestingLocationUpdates(this, false);
         mStopped = true;
         stopSelf();
     }
@@ -151,6 +153,7 @@ public class LocationMockService extends LocationService {
     @Override
     public void requestLocationUpdates() {
         Timber.d("Requesting locations");
+        LocationPreferences.setRequestingLocationUpdates(this, true);
         startService(new Intent(getApplicationContext(), LocationMockService.class));
         mStopped = false;
         Message message = mServiceHandler.obtainMessage();

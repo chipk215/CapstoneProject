@@ -49,7 +49,6 @@ public abstract class LocationService extends Service {
 
     protected NotificationManager mNotificationManager;
 
-    protected  Handler mServiceHandler;
 
     public abstract void removeLocationUpdates();
 
