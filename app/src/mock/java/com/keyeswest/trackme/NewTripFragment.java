@@ -56,15 +56,7 @@ public class NewTripFragment extends BaseTripFragment {
     }
 
 
-    @Override
-    protected void startUpdates() {
-        mService.requestLocationUpdates();
-    }
 
-    @Override
-    protected void stopUpdates() {
-        mService.removeLocationUpdates();
-    }
 
 
 

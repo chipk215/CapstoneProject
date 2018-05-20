@@ -92,8 +92,6 @@ public abstract class BaseTripFragment extends Fragment
 
     private Segment mTrackingSegment;
 
-    protected abstract void startUpdates();
-    protected abstract void stopUpdates();
     protected abstract ServiceConnection getServiceConnection();
 
     // Monitors the state of the connection to the service.
@@ -389,5 +387,15 @@ public abstract class BaseTripFragment extends Fragment
     public void backPressed() {
         Timber.i( "Stopping location updates");
         stopUpdates();
+    }
+
+
+    private void startUpdates() {
+        mService.requestLocationUpdates();
+    }
+
+
+    private void stopUpdates() {
+        mService.removeLocationUpdates();
     }
 }
