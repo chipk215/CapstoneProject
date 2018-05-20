@@ -10,6 +10,7 @@ import com.keyeswest.trackme.models.Segment;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import timber.log.Timber;
 
@@ -48,6 +49,28 @@ public class Queries {
         }
 
         return null;
+
+    }
+
+
+    public static SegmentCursor getSegmentsForDateRange(Context context, long startTime,
+                                                        long endTime){
+        String[] selectionArgs = {Long.toString(startTime), Long.toString(endTime)};
+        String selectionClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " BETWEEN ? AND ? ";
+        Uri queryUri = SegmentSchema.SegmentTable.CONTENT_URI;
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(
+                queryUri,
+                /* Columns; leaving this null returns every column in the table */
+                null,
+                /* Optional specification for columns in the "where" clause above */
+                selectionClause,
+                /* Values for "where" clause */
+                selectionArgs,
+                /* Sort order to return in Cursor */
+                null);
+
+        return new SegmentCursor(cursor);
 
     }
 

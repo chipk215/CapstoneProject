@@ -12,10 +12,9 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getFavoriteFilterSetting;
 import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES;
 import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES_KEY;
-import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FAVORITE_PREFERENCES_KEY;
-import static com.keyeswest.trackme.utilities.FilterSharedPreferences.FILTER_PREFERENCES;
 
 
 public class SegmentLoader extends CursorLoader {
@@ -61,8 +60,7 @@ public class SegmentLoader extends CursorLoader {
         String selectionClause = null;
         String[] selectionArgs = null;
         // check for favorite filter
-        sharedPreferences = context.getSharedPreferences(FILTER_PREFERENCES, context.MODE_PRIVATE);
-        boolean filterFavorites = sharedPreferences.getBoolean(FAVORITE_PREFERENCES_KEY, false);
+        boolean filterFavorites = getFavoriteFilterSetting(context);
         if (filterFavorites){
             selectionClause = SegmentSchema.SegmentTable.COLUMN_FAVORITE + " = ?";
             selectionArgs = new String[] {Integer.toString(1)};
