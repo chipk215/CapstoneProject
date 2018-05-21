@@ -71,7 +71,8 @@ public class FilterSharedPreferences {
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putBoolean(DATE_RANGE_PREFERENCES_KEY, DEFAULT_USE_DATE_RANGE);
+        editor.putBoolean(DATE_RANGE_PREFERENCES_KEY, true);
+
         editor.putLong(START_DATE_KEY, startDate);
         editor.putLong(END_DATE_KEY, endDate);
         editor.commit();

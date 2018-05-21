@@ -37,9 +37,9 @@ public class FilterActivity extends AppCompatActivity {
     }
 
     public static boolean getFilterChangedResult(Intent data){
-        boolean sortChanged = data.getBooleanExtra(EXTRA_CHANGE_FILTER_RESULT,
+        boolean filterChanged = data.getBooleanExtra(EXTRA_CHANGE_FILTER_RESULT,
                 true);
-        return sortChanged;
+        return filterChanged;
     }
 
     public static boolean getFiltersClearedResult(Intent data){
@@ -96,6 +96,7 @@ public class FilterActivity extends AppCompatActivity {
 
                 // save the date range to shared preferences if the user set a date range
                 if (mDateRangeUpdatedByUser){
+
                     saveDateRangeFilter(FilterActivity.this, mStartDate, mEndDate);
                 }
 
@@ -145,10 +146,10 @@ public class FilterActivity extends AppCompatActivity {
 
 
                                 mStartDate = new GregorianCalendar(year, monthOfYear,
-                                        dayOfMonth).getTime().getTime();
+                                        dayOfMonth).getTime().getTime() / 1000;
 
                                 mEndDate =  new GregorianCalendar(yearEnd, monthOfYearEnd,
-                                        dayOfMonthEnd).getTime().getTime();
+                                        dayOfMonthEnd).getTime().getTime() / 1000;
 
                                 mDateRangeUpdatedByUser = true;
                             }
@@ -182,7 +183,6 @@ public class FilterActivity extends AppCompatActivity {
             finish();
         }
     }
-
 
 
 

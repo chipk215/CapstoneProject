@@ -12,7 +12,10 @@ import java.util.List;
 
 import timber.log.Timber;
 
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getEndDate;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getFavoriteFilterSetting;
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getStartDate;
+import static com.keyeswest.trackme.utilities.FilterSharedPreferences.isDateRangeSet;
 import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES;
 import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES_KEY;
 
@@ -57,13 +60,54 @@ public class SegmentLoader extends CursorLoader {
 
 
         // check filter preferences
-        String selectionClause = null;
-        String[] selectionArgs = null;
-        // check for favorite filter
+
+
+
+        String dateRangeSelectionClause=null;
+        String [] dateRangeArgs= null;
+        boolean dateRangeSelected = isDateRangeSet(context);
+        long startDate;
+        long endDate;
+        if (dateRangeSelected){
+            startDate = getStartDate(context);
+            endDate = getEndDate(context);
+
+            dateRangeSelectionClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP +
+                    " BETWEEN ? AND ? ";
+            dateRangeArgs = new String[] {Long.toString(startDate), Long.toString(endDate)};
+        }
+
+
+        String favoriteSelectionClause = null;
+        String[] favoriteSelectionArgs = null;
         boolean filterFavorites = getFavoriteFilterSetting(context);
         if (filterFavorites){
-            selectionClause = SegmentSchema.SegmentTable.COLUMN_FAVORITE + " = ?";
-            selectionArgs = new String[] {Integer.toString(1)};
+            favoriteSelectionClause = SegmentSchema.SegmentTable.COLUMN_FAVORITE + " = ?";
+            favoriteSelectionArgs = new String[] {Integer.toString(1)};
+        }
+
+
+        String selectionClause;
+        String[] selectionArgs;
+        if (dateRangeSelected && filterFavorites){
+            // both date range and favorite filter
+            selectionClause = dateRangeSelectionClause + " AND " + favoriteSelectionClause;
+            selectionArgs = new String[] {dateRangeArgs[0], dateRangeArgs[1],
+                    favoriteSelectionArgs[0]};
+
+        }else if (dateRangeSelected && ! filterFavorites){
+            // date range and no favorite filter
+            selectionClause = dateRangeSelectionClause;
+            selectionArgs = dateRangeArgs;
+
+        }else if(filterFavorites && ! dateRangeSelected){
+            // favorites only no date range
+            selectionClause = favoriteSelectionClause;
+            selectionArgs = favoriteSelectionArgs;
+        }else{
+            // no filter just sort
+            selectionClause = null;
+            selectionArgs = null;
         }
 
         return new SegmentLoader(context, SegmentSchema.SegmentTable.CONTENT_URI, null,
