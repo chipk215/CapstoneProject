@@ -340,7 +340,6 @@ public class TripListFragment extends Fragment
 
             }
         } else if (requestCode == REQUEST_FILTER_PREFERENCES){
-            //TODO handle result
             boolean filterChanged = FilterActivity.getFilterChangedResult(data);
             if (filterChanged){
                 MenuItem filterItem = mMainMenu.findItem(R.id.filter);

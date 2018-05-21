@@ -1,25 +1,26 @@
 package com.keyeswest.trackme;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.borax12.materialdaterangepicker.date.DatePickerDialog;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
 
-
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import timber.log.Timber;
-
 
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getEndDate;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getFavoriteFilterSetting;
@@ -67,6 +68,18 @@ public class FilterActivity extends AppCompatActivity {
     @BindView(R.id.date_btn)
     Button mDateButton;
 
+    @BindView(R.id.start_lbl_tv)
+    TextView mStartDateLabelTextView;
+
+    @BindView(R.id.start_date_tv)
+    TextView mStartDateTextView;
+
+    @BindView(R.id.end_lbl_tv)
+    TextView mEndDateLabelTextView;
+
+    @BindView(R.id.end_date_tv)
+    TextView mEndDateTextView;
+
     private boolean mDateRangeUpdatedByUser;
 
     // filter date range
@@ -82,6 +95,8 @@ public class FilterActivity extends AppCompatActivity {
         mUnbinder = ButterKnife.bind( this);
 
         mDateRangeUpdatedByUser = false;
+
+        showDateRangeDates(false);
 
         setCurrentFavoriteFilterSelection();
 
@@ -118,13 +133,15 @@ public class FilterActivity extends AppCompatActivity {
 
                     //read the date range from shared preferences
                     mStartDate = getStartDate(FilterActivity.this);
-                    //TODO figure out the
+
                     long endDate = getEndDate(FilterActivity.this);
 
                 }else if (mStartDate == null){
                     // use today's date to initialize picker
                     mStartDate = Calendar.getInstance().getTime().getTime();
 
+                }else{
+                    mStartDate*=1000;  // convert back to milliseconds
                 }
 
                 // note if mStartDate not null and not read from Shared preferences we are using the
@@ -133,6 +150,9 @@ public class FilterActivity extends AppCompatActivity {
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+                //TODO reconstruct the end date for the range
+                // use DatePickerDialog setHighlightedDays method to show the duration of the range
 
 
                 // https://github.com/borax12/MaterialDateRangePicker
@@ -151,17 +171,31 @@ public class FilterActivity extends AppCompatActivity {
                                 mEndDate =  new GregorianCalendar(yearEnd, monthOfYearEnd,
                                         dayOfMonthEnd).getTime().getTime() / 1000;
 
+                                mStartDateTextView.setText(getDateString(mStartDate));
+
+                                mEndDateTextView.setText(getDateString(mEndDate));
+
+                                showDateRangeDates(true);
                                 mDateRangeUpdatedByUser = true;
+
                             }
                         },
                         year,month, day);
 
                 dpd.setAutoHighlight(true);
-                dpd.show(getFragmentManager(), "Datepickerdialog");
+                dpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        showDateRangeDates(false);
+                        mDateRangeUpdatedByUser = false;
+                    }
+                });
 
+                dpd.show(getFragmentManager(), "Datepickerdialog");
 
             }
         });
+
 
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -186,6 +220,21 @@ public class FilterActivity extends AppCompatActivity {
 
 
 
+    private void showDateRangeDates(boolean show){
+        if (show){
+            mStartDateLabelTextView.setVisibility(View.VISIBLE);
+            mStartDateTextView.setVisibility(View.VISIBLE);
+            mEndDateLabelTextView.setVisibility(View.VISIBLE);
+            mEndDateTextView.setVisibility(View.VISIBLE);
+
+        }else{
+            mStartDateLabelTextView.setVisibility(View.INVISIBLE);
+            mStartDateTextView.setVisibility(View.INVISIBLE);
+            mEndDateLabelTextView.setVisibility(View.INVISIBLE);
+            mEndDateTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
     // set the filter results in the return intent
     private void setFilterResult(boolean filtersChanged, boolean cleared){
         Intent data = new Intent();
@@ -206,5 +255,12 @@ public class FilterActivity extends AppCompatActivity {
 
         mFavoriteSwitch.setChecked(getFavoriteFilterSetting(FilterActivity.this));
 
+    }
+
+
+    private static String getDateString(long timeStamp){
+        Date date = new Date(timeStamp * 1000);
+        String dateString = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
+        return dateString;
     }
 }

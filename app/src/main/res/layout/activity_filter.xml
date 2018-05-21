@@ -60,4 +60,44 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/submit_btn" />
 
+    <TextView
+        android:id="@+id/start_lbl_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/start_date"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="@+id/date_btn"
+        app:layout_constraintTop_toBottomOf="@+id/date_btn" />
+
+    <TextView
+        android:id="@+id/start_date_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:visibility="visible"
+        tools:text="Start Date Range"
+        app:layout_constraintStart_toEndOf="@+id/start_lbl_tv"
+        app:layout_constraintTop_toTopOf="@+id/start_lbl_tv" />
+
+    <TextView
+        android:id="@+id/end_lbl_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        android:text="@string/end_date"
+        app:layout_constraintStart_toStartOf="@+id/start_lbl_tv"
+        app:layout_constraintTop_toBottomOf="@+id/start_date_tv" />
+
+    <TextView
+        android:id="@+id/end_date_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:visibility="visible"
+        tools:text="End Date Range"
+        app:layout_constraintStart_toEndOf="@+id/end_lbl_tv"
+        app:layout_constraintTop_toTopOf="@+id/end_lbl_tv" />
+
 </android.support.constraint.ConstraintLayout>
