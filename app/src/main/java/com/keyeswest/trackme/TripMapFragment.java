@@ -1,6 +1,8 @@
 package com.keyeswest.trackme;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,8 @@ import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -26,6 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
 import com.keyeswest.trackme.data.SegmentCursor;
@@ -46,6 +52,8 @@ import butterknife.Unbinder;
 import timber.log.Timber;
 
 import static com.keyeswest.trackme.TripMapActivity.EXTRA_URI;
+import static com.keyeswest.trackme.utilities.ZoomLevels.CITY_ZOOM;
+import static com.keyeswest.trackme.utilities.ZoomLevels.STREET_ZOOM;
 
 public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -124,6 +132,10 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     private View mRootView;
 
+    // Indicates when current location has been returned
+    private boolean mCurrentLocationReady = false;
+    private Location mLastLocation;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -187,7 +199,20 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         // Initialize the loader that will retrieve the segments corresponding to the
         // list of segment URIs provided to the Activity. Segments will be retrieved
         // and then the corresponding location data will be loaded.
-        getActivity().getSupportLoaderManager().initLoader(SEGMENT_LOADER,null, this);
+        if (mSegmentUriList.size() > 0) {
+            getActivity().getSupportLoaderManager().initLoader(SEGMENT_LOADER, null, this);
+        }else{
+            //Initially, when on a tablet in landscape mode an empty map with just the user's position
+            // is displayed until the user selects a trip to plot
+
+            // no need to load segments or location data
+            mSegmentList = new ArrayList<>();
+            setSegmentDataReady(true);
+            mLocationLoadsFinishedCount = 0;
+            if (getDataReady() && getMapReady()){
+                displayMap();
+            }
+        }
 
         mRootView = view;
         return view;
@@ -462,46 +487,107 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     private void displayMap(){
 
         LatLngBounds bounds = computeBoundingBoxForSegments();
-        Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
-        Timber.d("Bounds: maxLon= %s", Double.toString(bounds.northeast.longitude));
-        Timber.d("Bounds: minLat= %s", Double.toString(bounds.southwest.latitude));
-        Timber.d("Bounds: minLon= %s", Double.toString(bounds.southwest.longitude));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 16));
+        if (bounds != null) {
+            Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
+            Timber.d("Bounds: maxLon= %s", Double.toString(bounds.northeast.longitude));
+            Timber.d("Bounds: minLat= %s", Double.toString(bounds.southwest.latitude));
+            Timber.d("Bounds: minLon= %s", Double.toString(bounds.southwest.longitude));
 
-        int plotLineCounter =0;
-        for(Segment segment : mSegmentList){
+            int zoomLevel;
 
-            Uri segmentUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
-            LocationCursor locationCursor = mSegmentToLocationsMap.get(segmentUri);
+            // On a table in landscape mode a map with the user's current position is shown on the
+            // right side of the screen until a trip is selected for viewing.
+            if (mSegmentList.size() == 0){
+                zoomLevel = CITY_ZOOM;
+            }else{
+                // zoom in a bit more if we are displaying trip tracts
+                zoomLevel = STREET_ZOOM;
+            }
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, zoomLevel));
+
+            int plotLineCounter = 0;
+            for (Segment segment : mSegmentList) {
+
+                Uri segmentUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
+                LocationCursor locationCursor = mSegmentToLocationsMap.get(segmentUri);
 
 
-            PolylineOptions options = new PolylineOptions()
-                    .color(getResources().getColor(plotLineColorResources[plotLineCounter++]))
-                    .clickable(true);
+                PolylineOptions options = new PolylineOptions()
+                        .color(getResources().getColor(plotLineColorResources[plotLineCounter++]))
+                        .clickable(true);
 
-            Polyline plotLine = mMap.addPolyline(options);
-            plotLine.setTag(segment);
-            mPolyLines.add(plotLine);
+                Polyline plotLine = mMap.addPolyline(options);
+                plotLine.setTag(segment);
+                mPolyLines.add(plotLine);
 
-            locationCursor.moveToPosition(-1);
-            mSegmentPlotter.queueSegment(plotLine, locationCursor);
+                locationCursor.moveToPosition(-1);
+                mSegmentPlotter.queueSegment(plotLine, locationCursor);
 
+            }
         }
     }
 
+    @SuppressLint("MissingPermission")
     private LatLngBounds computeBoundingBoxForSegments(){
-        LatLonBounds boundingBox = new LatLonBounds();
+        LatLngBounds bounds = null;
+        if (mSegmentList.size() == 0){
 
-        for(Segment segment : mSegmentList){
-            boundingBox.update(segment.getMinLatitude(), segment.getMinLongitude());
-            boundingBox.update(segment.getMaxLatitude(), segment.getMaxLongitude());
+            // Obtain the current position of the user so an empty map with their
+            // position is shown until a trip is selected for viewing
+            if (mCurrentLocationReady){
+                // the user's position has been obtained (asynch method)
+                bounds = new LatLngBounds(new LatLng(mLastLocation.getLatitude(),
+                        mLastLocation.getLongitude()), new LatLng(mLastLocation.getLatitude(),
+                        mLastLocation.getLongitude()));
+                mMap.setMyLocationEnabled(true);
+            }else{
+
+                // get the user's position
+                getLastLocation();
+            }
+
+
+        }else {
+
+            // the bounding box for teh map is determined by the trip plot data
+            LatLonBounds boundingBox = new LatLonBounds();
+
+            for (Segment segment : mSegmentList) {
+                boundingBox.update(segment.getMinLatitude(), segment.getMinLongitude());
+                boundingBox.update(segment.getMaxLatitude(), segment.getMaxLongitude());
+            }
+
+            bounds = new LatLngBounds(new LatLng(boundingBox.getMinLat(),
+                    boundingBox.getMinLon()), new LatLng(boundingBox.getMaxLat(),
+                    boundingBox.getMaxLon()));
         }
 
-        LatLngBounds bounds = new LatLngBounds(new LatLng(boundingBox.getMinLat(),
-                boundingBox.getMinLon()), new LatLng(boundingBox.getMaxLat(),
-                boundingBox.getMaxLon()));
-
         return bounds;
+    }
+
+
+    @SuppressWarnings("MissingPermission")
+    private void getLastLocation(){
+
+        FusedLocationProviderClient fusedLocationClient;
+        fusedLocationClient =LocationServices.getFusedLocationProviderClient(getContext());
+        fusedLocationClient.getLastLocation()
+                .addOnCompleteListener(getActivity(),new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null){
+                            mLastLocation = task.getResult();
+                            Timber.d("Current Location lat= %s", Double.toString(mLastLocation.getLatitude()));
+                            Timber.d("Current Location lon= %s", Double.toString(mLastLocation.getLongitude()));
+
+                            mCurrentLocationReady = true;
+                            displayMap();
+
+                        }else{
+                            // handle error case where location not known
+                        }
+                    }
+                });
     }
 
     private  void setMapReady(boolean value){
