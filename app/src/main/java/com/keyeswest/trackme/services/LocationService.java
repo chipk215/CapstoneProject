@@ -16,6 +16,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
+import com.keyeswest.trackme.NewTripActivity;
 import com.keyeswest.trackme.PermissionActivity;
 import com.keyeswest.trackme.R;
 
@@ -155,8 +156,10 @@ public abstract class LocationService extends Service {
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // The PendingIntent to launch activity.
+        Intent activityIntent = new Intent(this, NewTripActivity.class);
+        activityIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, PermissionActivity.class), 0);
+                activityIntent, 0);
 
         //TODO change text to contain last location update info
         CharSequence text = getResources().getString(R.string.sampling_service_notice);

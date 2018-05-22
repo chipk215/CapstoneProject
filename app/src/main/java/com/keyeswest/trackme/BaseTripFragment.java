@@ -119,13 +119,17 @@ public abstract class BaseTripFragment extends Fragment
         if ((! mStartUpdatesButton.isEnabled()) && (! requestingLocationUpdates(getContext())) ) {
             if (getActivity() != null) {
 
-                Timber.d("Ending NewTrip Activity due to user terminating location service");
-                //getActivity().finish();
+                Timber.d("Entering NewTrip Activity due to user terminating location service");
+
                 mStartUpdatesButton.setEnabled(true);
                 mStopUpdatesButton.setEnabled(false);
 
-
             }
+        } else if ((! mStartUpdatesButton.isEnabled()) &&
+                ( requestingLocationUpdates(getContext())) ) {
+            Timber.d("Rentering NewTrip Activity due to user invoking start activity via notification");
+            mStartUpdatesButton.setEnabled(false);
+            mStopUpdatesButton.setEnabled(true);
         }
 
     }
