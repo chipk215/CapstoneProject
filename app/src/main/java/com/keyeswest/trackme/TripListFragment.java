@@ -57,8 +57,11 @@ public class TripListFragment extends Fragment
         void plotSelectedTrips();
     }
 
-    public static TripListFragment newInstance(){
+    public static TripListFragment newInstance(Boolean hideDisplayButton){
         TripListFragment fragment = new TripListFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(HIDE_DISPLAY_EXTRA, hideDisplayButton);
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -66,6 +69,7 @@ public class TripListFragment extends Fragment
 
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
+    public static final String HIDE_DISPLAY_EXTRA = "hideDisplayExtra";
 
     private static final String FILTER_STATE_EXTRA = "filterStateExtra";
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
@@ -79,6 +83,8 @@ public class TripListFragment extends Fragment
     private Unbinder mUnbinder;
 
     private View mFragmentView;
+
+    private boolean mHideDisplayButton;
 
     @BindView(R.id.track_log_recycler_view)
     RecyclerView mTrackLogListView;
@@ -117,6 +123,8 @@ public class TripListFragment extends Fragment
 
         Timber.d("onCreate invoked");
 
+        mHideDisplayButton = getArguments().getBoolean(HIDE_DISPLAY_EXTRA);
+
         setHasOptionsMenu(true);
 
         SortSharedPreferences.saveDefaultSortPreferences(getContext(),false);
@@ -141,6 +149,9 @@ public class TripListFragment extends Fragment
 
         Timber.d("onCreateView invoked");
 
+        if (mHideDisplayButton){
+            mDisplayButton.setVisibility(View.GONE);
+        }
         if (mSelectedSegments.size() < 1){
             // disable the display button until a segment is checked
             mDisplayButton.setEnabled(false);
@@ -151,22 +162,7 @@ public class TripListFragment extends Fragment
         mDisplayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 mCallback.plotSelectedTrips();
-
-                /*
-                List<Uri> selectedTrips = new ArrayList<>();
-                for (Segment segment : mSelectedSegments){
-                    Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
-                    selectedTrips.add(itemUri);
-                }
-
-                if (selectedTrips.size() > 0){
-                    // plot them
-                    Intent intent = TripMapActivity.newIntent(getContext(), selectedTrips);
-                    startActivity(intent);
-                }
-                */
             }
 
         });
@@ -434,6 +430,5 @@ public class TripListFragment extends Fragment
 
         return result;
     }
-
 
 }

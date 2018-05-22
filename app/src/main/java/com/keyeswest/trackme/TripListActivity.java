@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+
 import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
@@ -35,6 +36,8 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     // List of currently selected/checked trips
     private List<Segment> mSelectedSegments;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -45,10 +48,10 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         ButterKnife.bind(this);
 
         mSelectedSegments = new ArrayList<>();
-
+        mTwoPane = (mTwoPaneDivider != null);
 
         // Add fragment for displaying list of trips
-        TripListFragment tripListFragment = TripListFragment.newInstance();
+        TripListFragment tripListFragment = TripListFragment.newInstance(mTwoPane);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.trip_list_container, tripListFragment)
@@ -56,7 +59,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
 
 
 
-        mTwoPane = (mTwoPaneDivider != null);
         if (mTwoPane){
             // Add fragment for displaying selected trips
             ArrayList<Uri> tripList = new ArrayList<>();
@@ -71,28 +73,57 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     }
 
     @Override
-    public void onTripSelected(Segment segment) {
-        mSelectedSegments.add(segment);
+    public void onTripSelected(Segment selectedSegment) {
+        mSelectedSegments.add(selectedSegment);
+
+        if (mTwoPane){
+            configureMapFragment();
+        }
     }
 
     @Override
-    public void onTripUnselected(Segment segment) {
-        mSelectedSegments.remove(segment);
+    public void onTripUnselected(Segment unSelectedSegment) {
+        mSelectedSegments.remove(unSelectedSegment);
+
+        if (mTwoPane){
+           configureMapFragment();
+        }
     }
+
+
 
     @Override
     public void plotSelectedTrips() {
-        List<Uri> selectedTrips = new ArrayList<>();
-        for (Segment segment : mSelectedSegments){
+
+        // Only needed if in single pane mode
+        if (! mTwoPane) {
+            List<Uri> selectedTrips = new ArrayList<>();
+            for (Segment segment : mSelectedSegments) {
+                Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
+                selectedTrips.add(itemUri);
+            }
+
+            if (selectedTrips.size() > 0) {
+                // plot them
+                Intent intent = TripMapActivity.newIntent(this, selectedTrips);
+                startActivity(intent);
+            }
+        }
+
+    }
+
+
+    private void configureMapFragment(){
+        ArrayList<Uri> selectedTrips = new ArrayList<>();
+        for (Segment segment : mSelectedSegments) {
             Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
             selectedTrips.add(itemUri);
         }
 
-        if (selectedTrips.size() > 0){
-            // plot them
-            Intent intent = TripMapActivity.newIntent(this, selectedTrips);
-            startActivity(intent);
-        }
-
+        TripMapFragment mapFragment = TripMapFragment.newInstance(selectedTrips);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.trip_map_container, mapFragment)
+                .commit();
     }
 }
