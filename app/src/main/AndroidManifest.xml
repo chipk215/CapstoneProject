@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MapsActivity"
+            android:name=".TripMapActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".TripListActivity" />
         <activity android:name=".NewTripActivity" android:launchMode="singleTop" />

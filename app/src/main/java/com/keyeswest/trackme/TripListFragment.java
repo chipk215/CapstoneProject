@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
@@ -49,6 +48,14 @@ import timber.log.Timber;
 
 public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
+
+
+    public static TripListFragment newInstance(){
+        TripListFragment fragment = new TripListFragment();
+        return fragment;
+    }
+
+    public TripListFragment() {}
 
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
@@ -78,17 +85,12 @@ public class TripListFragment extends Fragment
     private boolean mListFiltered= false;
     private Menu mMainMenu;
 
-    public TripListFragment() {}
-
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Timber.d("onCreate invoked");
-
-        Stetho.initializeWithDefaults(getContext());
 
         setHasOptionsMenu(true);
 
@@ -132,7 +134,7 @@ public class TripListFragment extends Fragment
 
                 if (selectedTrips.size() > 0){
                     // plot them
-                    Intent intent = MapsActivity.newIntent(getContext(), selectedTrips);
+                    Intent intent = TripMapActivity.newIntent(getContext(), selectedTrips);
                     startActivity(intent);
                 }
             }

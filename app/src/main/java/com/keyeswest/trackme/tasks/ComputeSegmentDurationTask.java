@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 
-import com.keyeswest.trackme.MapsActivity;
 import com.keyeswest.trackme.data.Queries;
 
 import static com.keyeswest.trackme.data.Queries.updateSegmentDuration;
