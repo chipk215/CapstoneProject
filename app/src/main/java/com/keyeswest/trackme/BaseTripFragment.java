@@ -2,7 +2,6 @@ package com.keyeswest.trackme;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
@@ -34,7 +33,6 @@ import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
-
 import com.keyeswest.trackme.services.LocationService;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
@@ -48,6 +46,49 @@ import timber.log.Timber;
 
 import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
 import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLocationUpdates;
+
+
+/**
+ * Usage Notes
+ *
+ *  1) NewTripActivity started from TripListActivity in response to user selecting "New Trip" menu
+ *     item.
+ *
+ *     - normal usage with a new trip/segment created, normal fragment lifecycle progression.
+ *
+ *
+ *  2) User selects app using the Overview button (https://support.google.com/nexus/answer/6073614)
+ *     when the app is Stopped and the location service is in the foreground.
+ *
+ *     - in onResume the database is checked to read any location samples collected while the
+ *       activity is Stopped so that the corresponding trip plot depict all the the locations
+ *       collected since the trip was started.
+ *
+ *  3) User stops the location service via the notification posted when the location service is
+ *     in the foreground.
+ *
+ *     - in onStart this state is detected by looking at the start tracking button state in
+ *       conjunction with the requesting location state item saved in shared preferences. If
+ *       the start button state is disabled (indicating tracking has been started) but the
+ *       shared preference requesting location state is false then the location service has
+ *       been stopped and the button states need to be corrected.
+ *
+ *  4) User open the app via the notification posted when the location service is in the foreground.
+ *
+ *     - if the user opens the app via the notification posted when the location service is in
+ *     the foreground, the intent flag "FLAG_ACTIVITY_REORDER_TO_FRONT" in combination with the
+ *     activity "singleTop" launch mode brings the NewTripActivity back into view.
+ *
+ *  -------------------------
+ *
+ *  Why is NotifyBackPressed implemented in this fragment as a method invoked from the
+ *  TripListActivity?
+ *
+ *  If the user hits the back button on the screen while tracking a new trip, without first stopping
+ *  the tracking update, the NotifyBackPressed method provided an opportunity to shut down the
+ *  location service.
+ */
+
 
 public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
@@ -85,7 +126,6 @@ public abstract class BaseTripFragment extends Fragment
     @BindView(R.id.remove_updates_button)
     Button mStopUpdatesButton;
 
-
     List<LatLng> mPlottedPoints = new ArrayList<>();
 
     protected LocationService mService = null;
@@ -118,20 +158,11 @@ public abstract class BaseTripFragment extends Fragment
 
         if ((! mStartUpdatesButton.isEnabled()) && (! requestingLocationUpdates(getContext())) ) {
             if (getActivity() != null) {
-
                 Timber.d("Entering NewTrip Activity due to user terminating location service");
-
                 mStartUpdatesButton.setEnabled(true);
                 mStopUpdatesButton.setEnabled(false);
-
             }
-        } else if ((! mStartUpdatesButton.isEnabled()) &&
-                ( requestingLocationUpdates(getContext())) ) {
-            Timber.d("Rentering NewTrip Activity due to user invoking start activity via notification");
-            mStartUpdatesButton.setEnabled(false);
-            mStopUpdatesButton.setEnabled(true);
         }
-
     }
 
 
@@ -144,7 +175,6 @@ public abstract class BaseTripFragment extends Fragment
 
         View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-
 
         mResumeReady = false;
 
@@ -266,7 +296,6 @@ public abstract class BaseTripFragment extends Fragment
             mResumeReady = true;
         }
 
-
         LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
                 new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
     }
@@ -282,8 +311,6 @@ public abstract class BaseTripFragment extends Fragment
             mBound = false;
         }
 
-       // PreferenceManager.getDefaultSharedPreferences(getContext())
-       //         .unregisterOnSharedPreferenceChangeListener(this);
         super.onStop();
     }
 
@@ -295,9 +322,7 @@ public abstract class BaseTripFragment extends Fragment
         if (mPolylineOptions == null){
             mPolylineOptions = new PolylineOptions();
             mPlot = mMap.addPolyline(mPolylineOptions);
-
         }
-
 
         List<LatLng> points = mPlot.getPoints();
 
@@ -309,11 +334,13 @@ public abstract class BaseTripFragment extends Fragment
         mPlot.setPoints(points);
     }
 
+
     @Override
     public void onDestroyView(){
         super.onDestroyView();
         mUnbinder.unbind();
     }
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -322,8 +349,8 @@ public abstract class BaseTripFragment extends Fragment
         mMapReady = true;
         mMap.setMyLocationEnabled(true);
         displayMap();
-
     }
+
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
@@ -334,13 +361,12 @@ public abstract class BaseTripFragment extends Fragment
         savedInstanceState.putByte(IS_TRACKING_EXTRA, (byte)(isTracking ? 1 : 0));
 
         if (isTracking){
-
             savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
         }
 
         super.onSaveInstanceState(savedInstanceState);
-
     }
+
 
 
     private void displayMap(){
@@ -365,7 +391,6 @@ public abstract class BaseTripFragment extends Fragment
                         }else{
                             // handle error case where location not known
                         }
-
                     }
                 });
     }

@@ -47,7 +47,6 @@ public abstract class LocationService extends Service {
 
     protected NotificationManager mNotificationManager;
 
-
     public abstract void removeLocationUpdates();
 
     public abstract void requestLocationUpdates();
@@ -69,7 +68,6 @@ public abstract class LocationService extends Service {
         createNotificationChannel();
 
     }
-
 
 
     @Nullable
