@@ -191,18 +191,13 @@ public class FusedLocationService extends LocationService {
         locationIntent.putExtra(SEGMENT_ID_EXTRA_KEY, segmentId);
         this.startService(locationIntent);
 
-        // Notify anyone listening for broadcasts about the new location.
-      //  Intent intent = new Intent(LocationUpdatesBroadcastReceiver.ACTION_PROCESS_UPDATES);
-      //  intent.putExtra(EXTRA_LOCATION, location);
-      //  sendBroadcast(intent);
 
-        // Update notification content if running as a foreground service.
-       // if (serviceIsRunningInForeground(this)) {
-       //     mNotificationManager.notify(NOTIFICATION_ID, getNotification());
-       // }
     }
 
 
-
+    @Override
+    protected Intent getNotificationIntent(){
+        return  new Intent(this, FusedLocationService.class);
+    }
 
 }

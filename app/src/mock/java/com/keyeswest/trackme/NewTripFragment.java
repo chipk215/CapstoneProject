@@ -45,19 +45,16 @@ public class NewTripFragment extends BaseTripFragment {
 
     @Override
     public void onStart(){
-        super.onStart();
 
         Timber.d("onStart invoked");
+        super.onStart();
+
 
         // Bind to the service. If the service is in foreground mode, this signals to the service
         // that since this activity is in the foreground, the service can exit foreground mode.
         getContext().bindService(new Intent(getContext(), LocationMockService.class), mServiceConnection,
                 Context.BIND_AUTO_CREATE);
     }
-
-
-
-
 
 
 }

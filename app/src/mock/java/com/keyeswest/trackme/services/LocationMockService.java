@@ -104,13 +104,6 @@ public class LocationMockService extends LocationService {
                     location.setAccuracy(accuracy);
                     location.setTime(mockSample.getTimeStamp() * 1000);
 
-                    //put the location in a LocationResult container
-
-                    //Yes,  in order to use LocationResult we have to put the single location sample
-                    // in a list
-                   // List<Location> locations = new ArrayList<>();
-                  //  locations.add(location);
-                  //  LocationResult locationResult = LocationResult.create(locations);
                     Intent locationIntent = new Intent(mContext, LocationProcessorService.class);
                     locationIntent.putExtra(LOCATIONS_EXTRA_KEY, location);
                     locationIntent.putExtra(SEGMENT_ID_EXTRA_KEY, segmentId);
@@ -196,6 +189,11 @@ public class LocationMockService extends LocationService {
         message.what = WHAT_CODE;
         mServiceHandler.sendMessage(message);
 
+    }
+
+    @Override
+    protected Intent getNotificationIntent(){
+        return  new Intent(this, LocationMockService.class);
     }
 
 }

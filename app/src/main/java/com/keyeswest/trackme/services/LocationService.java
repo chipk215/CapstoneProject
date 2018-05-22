@@ -29,7 +29,6 @@ public abstract class LocationService extends Service {
     private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
             ".started_from_notification";
 
-    static public final String EXTRA_LOCATION = PACKAGE_NAME + ".location";
 
     public static final String NOTIFICATION_CHANNEL_ID = "channel_01";
 
@@ -51,6 +50,8 @@ public abstract class LocationService extends Service {
     public abstract void removeLocationUpdates();
 
     public abstract void requestLocationUpdates();
+
+    protected abstract Intent getNotificationIntent();
 
     protected HandlerThread mHandlerThread;
 
@@ -120,8 +121,10 @@ public abstract class LocationService extends Service {
 
         // We got here because the user decided to remove location updates from the notification.
         if (startedFromNotification) {
+            Timber.d("User stopped tracking from notification");
             removeLocationUpdates();
-            stopSelf();
+
+            // how will
         }
         // Tells the system to not try to recreate the service after it has been killed.
         return START_NOT_STICKY;
@@ -142,13 +145,14 @@ public abstract class LocationService extends Service {
      * Returns the {@link NotificationCompat} used as part of the foreground service.
      */
     protected Notification getNotification(){
-        Intent intent = new Intent(this, LocationService.class);
+        Intent intent = getNotificationIntent();
+
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
         intent.putExtra(EXTRA_STARTED_FROM_NOTIFICATION, true);
 
         // The PendingIntent that leads to a call to onStartCommand() in this service.
-        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent servicePendingIntent = PendingIntent.getService(this, 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // The PendingIntent to launch activity.
         PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,

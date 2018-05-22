@@ -2,6 +2,7 @@ package com.keyeswest.trackme;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
@@ -33,6 +34,7 @@ import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
+
 import com.keyeswest.trackme.services.LocationService;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 
@@ -45,6 +47,7 @@ import butterknife.Unbinder;
 import timber.log.Timber;
 
 import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
+import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLocationUpdates;
 
 public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
@@ -107,6 +110,26 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("onCreate Trip Fragment");
 
     }
+
+    @Override
+    public void onStart(){
+        Timber.d("onStart invoked");
+        super.onStart();
+
+        if ((! mStartUpdatesButton.isEnabled()) && (! requestingLocationUpdates(getContext())) ) {
+            if (getActivity() != null) {
+
+                Timber.d("Ending NewTrip Activity due to user terminating location service");
+                //getActivity().finish();
+                mStartUpdatesButton.setEnabled(true);
+                mStopUpdatesButton.setEnabled(false);
+
+
+            }
+        }
+
+    }
+
 
     @Nullable
     @Override
@@ -271,14 +294,8 @@ public abstract class BaseTripFragment extends Fragment
 
         }
 
-        if (mPlottedPoints.size() > 0) {
-            mPlot.setPoints(mPlottedPoints);
-            mPlottedPoints.clear();
-        }
 
         List<LatLng> points = mPlot.getPoints();
-
-
 
         Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
                     Double.toString(location.getLongitude()));
@@ -371,6 +388,9 @@ public abstract class BaseTripFragment extends Fragment
             cursor.close();
             getActivity().getSupportLoaderManager().destroyLoader(LOCATION_LOADER);
             mResumeReady = true;
+            if (mPlot != null){
+                mPlot.setPoints(mPlottedPoints);
+            }
             displayMap();
 
         }
