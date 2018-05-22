@@ -1,6 +1,7 @@
 package com.keyeswest.trackme;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 import android.database.Cursor;
@@ -50,6 +51,12 @@ public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
 
 
+    public interface TripListListener{
+        void onTripSelected(Segment segment);
+        void onTripUnselected(Segment segment);
+        void plotSelectedTrips();
+    }
+
     public static TripListFragment newInstance(){
         TripListFragment fragment = new TripListFragment();
         return fragment;
@@ -66,6 +73,8 @@ public class TripListFragment extends Fragment
     private static final int REQUEST_SORT_PREFERENCES = 10;
     private static final int REQUEST_FILTER_PREFERENCES = 20;
 
+
+    private TripListListener mCallback;
 
     private Unbinder mUnbinder;
 
@@ -84,6 +93,22 @@ public class TripListFragment extends Fragment
 
     private boolean mListFiltered= false;
     private Menu mMainMenu;
+
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not throw an exception
+        try {
+            mCallback = (TripListListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement TripListListener");
+        }
+    }
 
 
     @Override
@@ -126,6 +151,10 @@ public class TripListFragment extends Fragment
         mDisplayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                mCallback.plotSelectedTrips();
+
+                /*
                 List<Uri> selectedTrips = new ArrayList<>();
                 for (Segment segment : mSelectedSegments){
                     Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
@@ -137,6 +166,7 @@ public class TripListFragment extends Fragment
                     Intent intent = TripMapActivity.newIntent(getContext(), selectedTrips);
                     startActivity(intent);
                 }
+                */
             }
 
         });
@@ -256,7 +286,7 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onItemChecked(Segment segment) {
-
+        mCallback.onTripSelected(segment);
         mSelectedSegments.add(segment);
         mDisplayButton.setEnabled(true);
         if (mSelectedSegments.size() >= MAX_TRIP_SELECTIONS){
@@ -267,7 +297,7 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onItemUnchecked(Segment segment) {
-
+        mCallback.onTripUnselected(segment);
         mSelectedSegments.remove(segment);
 
         if (mSelectedSegments.size() < 1){
