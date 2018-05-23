@@ -109,7 +109,14 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     // these views are just the colored line segments in the legend
     private View[] mTripViews;
 
-    private List<Uri> mSegmentUriList;
+
+    // List of all segments plotted on map
+    private List<Uri> mMasterSegmentUriList;
+
+    // List of segments to load from database (supports tablet mode where trips can be added after
+    // map is drawn)
+    private List<Uri> mLoadSegmentUriList;
+
 
     private List<Polyline> mPolyLines = new ArrayList<>();
 
@@ -146,7 +153,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         Timber.d("onCreate invoked");
 
-        mSegmentUriList = getArguments().getParcelableArrayList(EXTRA_URI);
+        mMasterSegmentUriList = getArguments().getParcelableArrayList(EXTRA_URI);
         mIsTwoPane = getArguments().getBoolean(TWO_PANE_EXTRA);
 
         // Handles plotting a batch of location points
@@ -202,11 +209,14 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
         mapFragment.getMapAsync(this);
 
+        mLoadSegmentUriList = mMasterSegmentUriList;
+
         // Initialize the loader that will retrieve the segments corresponding to the
         // list of segment URIs provided to the Activity. Segments will be retrieved
         // and then the corresponding location data will be loaded.
-        if (mSegmentUriList.size() > 0) {
+        if ( mLoadSegmentUriList.size() > 0) {
             Timber.d("Initializing Segment Loader");
+
             getLoaderManager().initLoader(SEGMENT_LOADER, null, this);
         }else{
             //Initially, when on a tablet in landscape mode an empty map with just the user's position
@@ -250,7 +260,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     private void displayLegend(){
 
         if (! mIsTwoPane) {
-            int segmentsToShow = mSegmentUriList.size();
+            int segmentsToShow = mMasterSegmentUriList.size();
 
             if (segmentsToShow < 2) {
                 // no need to show if only 1 plot is being displayed
@@ -276,17 +286,23 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         Timber.d("Create Loader id= %s", Integer.toString(id));
+
+
         if (id == SEGMENT_LOADER) {
             // All the segments in the segment list will be loaded with a single database query
             Timber.d("Loading segments");
-            return SegmentLoader.newSegmentsFromUriList(getContext(), mSegmentUriList);
+
+
+            return SegmentLoader.newSegmentsFromUriList(getContext(), mLoadSegmentUriList);
+
         } else if (id >= LOCATION_LOADER) {
             //See notes on id for location loader in onLoadFinished method below.
 
             Timber.d("Loading locations. Location Loader id= %s", Integer.toString(id));
-            Timber.d("Request load of segment uri = "+ mSegmentUriList.get(id - LOCATION_LOADER).toString());
+            Timber.d("Request load of segment uri = "+ mLoadSegmentUriList.get(id - LOCATION_LOADER).toString());
+
             return LocationLoader.newLocationsForSegment(getContext(),
-                    mSegmentUriList.get(id - LOCATION_LOADER));
+                    mLoadSegmentUriList.get(id - LOCATION_LOADER));
         }
 
         return null;
@@ -321,7 +337,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 // successive location load will increase the LOCATION_LOADER value by one
                 int loaderId = LOCATION_LOADER + i;
                 Timber.d("Creating Location Loader with id= %s",loaderId );
-                getActivity().getSupportLoaderManager().initLoader(loaderId,null, this);
+
+                getLoaderManager().initLoader(loaderId,null, this);
             }
 
         } else if(loader.getId() >= LOCATION_LOADER){
@@ -329,7 +346,9 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             // handle the completed location data loads
             LocationCursor locationCursor = new LocationCursor(data);
             Timber.d("Number locations loaded = %s", Integer.toString(locationCursor.getCount()));
-            Uri segmentUri = mSegmentUriList.get(loader.getId() - LOCATION_LOADER);
+
+
+            Uri segmentUri = mLoadSegmentUriList.get(loader.getId() - LOCATION_LOADER);
 
             Timber.d("adding segment and location cursor to hash table");
             mSegmentToLocationsMap.put(segmentUri, locationCursor);
@@ -500,7 +519,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     }
 
     private  boolean getLocationDataReady(){
-        return (mLocationLoadsFinishedCount == mSegmentUriList.size());
+        return (mLocationLoadsFinishedCount == mLoadSegmentUriList.size());
     }
 
 
@@ -552,6 +571,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                         .clickable(true);
 
                 Polyline plotLine = mMap.addPolyline(options);
+                // setting the tag create association between polyline and the segment it corresponds to
                 plotLine.setTag(segment);
                 mPolyLines.add(plotLine);
 
