@@ -50,8 +50,8 @@ public class TripListFragment extends Fragment
 
 
     public interface TripListListener{
-        void onTripSelected(Segment segment);
-        void onTripUnselected(Segment segment);
+        void onTripsSelected(List<Segment> segments);
+       // void onTripUnselected(Segment segment);
         void plotSelectedTrips();
     }
 
@@ -67,7 +67,7 @@ public class TripListFragment extends Fragment
 
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
-    public static final String TWO_PANE_EXTRA = "twoPaneExtra";
+    private static final String TWO_PANE_EXTRA = "twoPaneExtra";
 
     private static final String FILTER_STATE_EXTRA = "filterStateExtra";
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
@@ -170,7 +170,7 @@ public class TripListFragment extends Fragment
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
 
-        getActivity().getSupportLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(0, null, this);
 
         return view;
     }
@@ -280,8 +280,11 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onItemChecked(Segment segment) {
-        mCallback.onTripSelected(segment);
+
         mSelectedSegments.add(segment);
+        Timber.d("Adding segment to selected trips: " + segment.getId().toString());
+
+        mCallback.onTripsSelected(mSelectedSegments);
         mDisplayButton.setEnabled(true);
         if (mSelectedSegments.size() >= MAX_TRIP_SELECTIONS){
             mTrackLogAdapter.setSelectionsFrozen(true);
@@ -291,8 +294,10 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onItemUnchecked(Segment segment) {
-        mCallback.onTripUnselected(segment);
+
         mSelectedSegments.remove(segment);
+        Timber.d("Removing segment to selected trips: " + segment.getId().toString());
+        mCallback.onTripsSelected(mSelectedSegments);
 
         if (mSelectedSegments.size() < 1){
             mDisplayButton.setEnabled(false);

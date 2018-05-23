@@ -42,10 +42,9 @@ public class TripMapActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_map);
 
-
         // get a list of segment Uris corresponding to the trips to plot
         ArrayList<Uri> tripList = getIntent().getParcelableArrayListExtra(EXTRA_URI);
-        TripMapFragment mapFragment = TripMapFragment.newInstance(tripList);
+        TripMapFragment mapFragment = TripMapFragment.newInstance(false,tripList);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
