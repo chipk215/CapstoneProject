@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,7 +28,6 @@ import android.widget.Button;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
-import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.DeleteTripTask;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
@@ -57,10 +55,10 @@ public class TripListFragment extends Fragment
         void plotSelectedTrips();
     }
 
-    public static TripListFragment newInstance(Boolean hideDisplayButton){
+    public static TripListFragment newInstance(Boolean isTwoPane){
         TripListFragment fragment = new TripListFragment();
         Bundle args = new Bundle();
-        args.putBoolean(HIDE_DISPLAY_EXTRA, hideDisplayButton);
+        args.putBoolean(TWO_PANE_EXTRA, isTwoPane);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,7 +67,7 @@ public class TripListFragment extends Fragment
 
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
-    public static final String HIDE_DISPLAY_EXTRA = "hideDisplayExtra";
+    public static final String TWO_PANE_EXTRA = "twoPaneExtra";
 
     private static final String FILTER_STATE_EXTRA = "filterStateExtra";
     private static final String DIALOG_DELETE_CONFIRM = "dialogDeleteConfirm";
@@ -123,7 +121,7 @@ public class TripListFragment extends Fragment
 
         Timber.d("onCreate invoked");
 
-        mHideDisplayButton = getArguments().getBoolean(HIDE_DISPLAY_EXTRA);
+        mHideDisplayButton = getArguments().getBoolean(TWO_PANE_EXTRA);
 
         setHasOptionsMenu(true);
 
