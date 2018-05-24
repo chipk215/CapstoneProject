@@ -171,8 +171,6 @@ public class TripListFragment extends Fragment
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
 
-
-
         return view;
     }
 
@@ -267,19 +265,11 @@ public class TripListFragment extends Fragment
             mTrackLogListView.setAdapter(mTrackLogAdapter);
 
             // Determine whether Display button should be disabled
-            segmentCursor.moveToPosition(-1);
-            Segment selectedSegment = null;
-            while(segmentCursor.moveToNext()){
-                Segment listSegment = segmentCursor.getSegment();
-                if (mSelectedSegments.contains(listSegment)){
-                    selectedSegment = listSegment;
-                    break;
-                }
-            }
-            mDisplayButton.setEnabled(selectedSegment != null);
-           // segmentCursor.close();
+            updateDisplayButtonState(segmentCursor);
+
         }
     }
+
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
@@ -458,6 +448,19 @@ public class TripListFragment extends Fragment
         }
 
         return result;
+    }
+
+    private void updateDisplayButtonState(SegmentCursor segmentCursor){
+        segmentCursor.moveToPosition(-1);
+        Segment selectedSegment = null;
+        while(segmentCursor.moveToNext()){
+            Segment listSegment = segmentCursor.getSegment();
+            if (mSelectedSegments.contains(listSegment)){
+                selectedSegment = listSegment;
+                break;
+            }
+        }
+        mDisplayButton.setEnabled(selectedSegment != null);
     }
 
 }
