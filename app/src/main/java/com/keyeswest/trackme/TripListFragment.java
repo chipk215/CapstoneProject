@@ -99,7 +99,6 @@ public class TripListFragment extends Fragment
     private Menu mMainMenu;
 
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -259,12 +258,26 @@ public class TripListFragment extends Fragment
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         Timber.d("onLoadFinished invoked");
         if (cursor != null) {
-            Timber.d("Number of records = %s", cursor.getCount());
-            mTrackLogAdapter = new TrackLogAdapter(new SegmentCursor(cursor),
+            SegmentCursor segmentCursor = new SegmentCursor(cursor);
+            Timber.d("Number of records = %s", segmentCursor.getCount());
+            mTrackLogAdapter = new TrackLogAdapter(segmentCursor,
                     mSelectedSegments, this);
 
             mTrackLogAdapter.setHasStableIds(true);
             mTrackLogListView.setAdapter(mTrackLogAdapter);
+
+            // Determine whether Display button should be disabled
+            segmentCursor.moveToPosition(-1);
+            Segment selectedSegment = null;
+            while(segmentCursor.moveToNext()){
+                Segment listSegment = segmentCursor.getSegment();
+                if (mSelectedSegments.contains(listSegment)){
+                    selectedSegment = listSegment;
+                    break;
+                }
+            }
+            mDisplayButton.setEnabled(selectedSegment != null);
+           // segmentCursor.close();
         }
     }
 
