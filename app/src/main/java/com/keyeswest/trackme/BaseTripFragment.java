@@ -25,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -94,8 +95,9 @@ public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<Cursor>, NewTripActivity.NotifyBackPressed{
 
-    private static String IS_TRACKING_EXTRA = "isTrackingExtra";
-    private static String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
+    private static final String IS_TRACKING_EXTRA = "isTrackingExtra";
+    private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
+    private static final int MAP_PADDING = 24;
 
     private static final int LOCATION_LOADER = 1;
 
@@ -141,6 +143,7 @@ public abstract class BaseTripFragment extends Fragment
     final protected ServiceConnection mServiceConnection = getServiceConnection();
 
     private FusedLocationProviderClient mFusedLocationClient;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -291,7 +294,7 @@ public abstract class BaseTripFragment extends Fragment
         // This ensures that the plotted trip always begins at the start even if this activity
         // is paused.
         if (mTrackingSegment != null){
-            getActivity().getSupportLoaderManager().initLoader(LOCATION_LOADER ,null, this);
+            getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
         }else{
             mResumeReady = true;
         }
@@ -329,7 +332,10 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
                     Double.toString(location.getLongitude()));
 
-        points.add(new LatLng(location.getLatitude(), location.getLongitude()));
+        LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
+        points.add(point);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(point));
 
         mPlot.setPoints(points);
     }
@@ -415,7 +421,7 @@ public abstract class BaseTripFragment extends Fragment
             }
             Timber.d("Resumed point count= %s", Long.toString(mPlottedPoints.size()));
             cursor.close();
-            getActivity().getSupportLoaderManager().destroyLoader(LOCATION_LOADER);
+            getLoaderManager().destroyLoader(LOCATION_LOADER);
             mResumeReady = true;
             if (mPlot != null){
                 mPlot.setPoints(mPlottedPoints);
@@ -447,4 +453,6 @@ public abstract class BaseTripFragment extends Fragment
     private void stopUpdates() {
         mService.removeLocationUpdates();
     }
+
+
 }
