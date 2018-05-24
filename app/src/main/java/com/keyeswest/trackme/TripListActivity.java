@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-
 import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
@@ -20,7 +19,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
+
 
 public class TripListActivity extends AppCompatActivity implements TripListFragment.TripListListener {
 
@@ -38,7 +37,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     private List<Segment> mSelectedSegments;
 
     private TripMapFragment mTripMapFragment;
-
 
 
     @Override
@@ -60,8 +58,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                 .add(R.id.trip_list_container, tripListFragment)
                 .commit();
 
-
-
         if (mTwoPane){
             // Add fragment for displaying selected trips
             ArrayList<Uri> tripList = new ArrayList<>();
@@ -80,11 +76,9 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
        mSelectedSegments.add(selectedSegment);
 
         if (mTwoPane){
-            //configureMapFragment();
             if ((mTripMapFragment != null) && (mTripMapFragment.isVisible())){
                 mTripMapFragment.addSegment(selectedSegment);
             }
-
         }
     }
 
@@ -94,7 +88,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         mSelectedSegments.remove(segment);
 
         if (mTwoPane){
-            //configureMapFragment();
             if ((mTripMapFragment != null) && (mTripMapFragment.isVisible())){
                 mTripMapFragment.removeSegment(segment);
             }
@@ -118,24 +111,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                 startActivity(intent);
             }
         }
-
     }
 
-
-    private void configureMapFragment(){
-        ArrayList<Uri> selectedTrips = new ArrayList<>();
-        for (Segment segment : mSelectedSegments) {
-            Uri itemUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
-            Timber.d("Configure map fragment, uuid= " + segment.getId().toString());
-            Timber.d("Configure map fragment, rowid= " + Long.toString(segment.getRowId()));
-
-            selectedTrips.add(itemUri);
-        }
-
-        TripMapFragment mapFragment = TripMapFragment.newInstance(mTwoPane,selectedTrips);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.trip_map_container, mapFragment)
-                .commit();
-    }
 }

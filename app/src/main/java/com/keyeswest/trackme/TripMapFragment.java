@@ -2,7 +2,6 @@ package com.keyeswest.trackme;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -77,13 +76,10 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     public TripMapFragment(){}
 
-
     private static final String TWO_PANE_EXTRA = "twoPaneExtra";
     private static final String LOADER_TYPE_EXTRA = "loaderTypeExtra";
-    private static final String SEGMENT_URI_EXTRA = "segmentUriExtra";
-    private static final int SEGMENT_LOADER  = 10;
-    //private static final int LOCATION_LOADER = 20;
 
+    //available colors for up to 4 plotted segments
     private static final int[] plotLineColorResources = {R.color.plotOne,
             R.color.plotTwo, R.color.plotThree, R.color.plotFour};
 
@@ -117,25 +113,28 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     // these views are just the colored line segments in the legend
     private View[] mTripViews;
 
-
-    // List of all segments plotted on map
+    // List of all segment Uris to be plotted on map
     private List<Uri> mMasterSegmentUriList;
 
     // List of segments to load from database (supports tablet mode where trips can be added after
     // map is drawn)
     private List<Uri> mLoadSegmentUriList;
 
-
+    // list of polylines currently plotted on the map
     private List<Polyline> mPolyLines = new ArrayList<>();
 
+    // generates plot data on a background thread
     private SegmentPlotter<Polyline> mSegmentPlotter;
 
     private SegmentCursor mSegmentCursor;
 
+    // list of retrieved segments from the database
     private List<Segment> mSegmentList;
 
     private boolean mSegmentDataReady=false;
 
+    // a separate load is used to load locations for each segment, this tracks the location loads
+    // that have completed.
     private int mLocationLoadsFinishedCount;
 
     private boolean mMapReady=false;
@@ -143,6 +142,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     // Look up segments by URI
     private Hashtable<Uri, LocationCursor> mSegmentToLocationsMap = new Hashtable<>();
 
+    // Look up segment associated with locations being loaded by location loader
     private Hashtable<Integer, Uri> mLocationLoaderToSegmentUri = new Hashtable<>();
 
     private GoogleMap mMap;
@@ -157,10 +157,13 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     private Boolean mIsTwoPane;
 
+    // serves as a queue for plot line line colors
     LinkedList<Integer> mPlotLineColors = new LinkedList<>();
 
+    //used to generate loader ids
     private Random mRandom = new Random();
 
+    // Set of ids associated with segment loaders
     private Set<Integer> mSegmentLoaderIds = new HashSet<>();
 
 
@@ -306,7 +309,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     }
 
 
-
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
@@ -372,17 +374,15 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         } else {
             Timber.d("Location Loader finished");
 
-
             // handle the completed location data loads
             LocationCursor locationCursor = new LocationCursor(data);
             Timber.d("Number locations loaded = %s", Integer.toString(locationCursor.getCount()));
 
-
             Uri segmentUri =  mLocationLoaderToSegmentUri.get(loader.getId());
 
-            Timber.d("adding segment and location cursor to hash table");
+            //Timber.d("adding segment and location cursor to hash table");
             mSegmentToLocationsMap.put(segmentUri, locationCursor);
-            debugSegmentToLocationsMap();
+            //debugSegmentToLocationsMap();
 
             // increment the count of location loaders that have completed - one load for each segment
             mLocationLoadsFinishedCount++;
@@ -392,8 +392,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         if (getDataReady() && getMapReady()){
             displayMap();
         }
-
-
 
     }
 
@@ -431,7 +429,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 disablePolylineClicks();
 
                 final Segment segment = (Segment)polyline.getTag();
-
 
                 View customView = mInflater.inflate(R.layout.trip_popup,null);
                 final PopupWindow popup = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -479,7 +476,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                     durationView.setText(record.getValue());
                     durationDimension.setText(record.getDimension());
                 }
-
 
                 popup.showAtLocation(mRootView.findViewById(R.id.map), Gravity.CENTER, 0, 0);
 
@@ -619,13 +615,12 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             }
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, zoomLevel));
 
-            int plotLineCounter = 0;
-            debugSegmentToLocationsMap();
+            //debugSegmentToLocationsMap();
             for (Segment segment : mSegmentList) {
 
-                Timber.d("Constructing segment uri, segment rowid= " + Long.toString(segment.getRowId()));
+                //Timber.d("Constructing segment uri, segment rowid= " + Long.toString(segment.getRowId()));
                 Uri segmentUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
-                Timber.d("Constructed segment uri= " + segmentUri.toString());
+                //Timber.d("Constructed segment uri= " + segmentUri.toString());
 
                 LocationCursor locationCursor = mSegmentToLocationsMap.get(segmentUri);
                 if (locationCursor == null){
@@ -649,7 +644,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         }
     }
 
-
+/*
     private void debugSegmentToLocationsMap(){
         Timber.d("Size of SegmentToLocationsMap= " + Integer.toString(mSegmentToLocationsMap.size()));
         int index = 0;
@@ -659,6 +654,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             Timber.d("Value = "  + entry.getValue().getCount());
         }
     }
+    */
 
     @SuppressLint("MissingPermission")
     private LatLngBounds computeBoundingBoxForSegments(){
@@ -739,9 +735,4 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         }
     }
 
-    private Bundle createLoaderArgument(Boolean isSegmentLoader){
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(LOADER_TYPE_EXTRA, isSegmentLoader);
-        return bundle;
-    }
 }
