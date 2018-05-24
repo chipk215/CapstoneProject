@@ -15,8 +15,7 @@
         android:text="@string/filter_trip_list"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-         />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Switch
         android:id="@+id/favorite_sw"
@@ -41,24 +40,24 @@
         android:id="@+id/submit_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="228dp"
+        android:layout_marginStart="8dp"
         android:text="@string/submit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.48"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/cancel_btn"
+        app:layout_constraintTop_toTopOf="@+id/cancel_btn" />
 
 
     <Button
         android:id="@+id/cancel_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:text="@string/cancel"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/submit_btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/submit_btn" />
+        app:layout_constraintTop_toBottomOf="@+id/end_lbl_tv" />
 
     <TextView
         android:id="@+id/start_lbl_tv"
@@ -76,17 +75,17 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:visibility="visible"
-        tools:text="Start Date Range"
         app:layout_constraintStart_toEndOf="@+id/start_lbl_tv"
-        app:layout_constraintTop_toTopOf="@+id/start_lbl_tv" />
+        app:layout_constraintTop_toTopOf="@+id/start_lbl_tv"
+        tools:text="Start Date Range" />
 
     <TextView
         android:id="@+id/end_lbl_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:visibility="visible"
         android:text="@string/end_date"
+        android:visibility="visible"
         app:layout_constraintStart_toStartOf="@+id/start_lbl_tv"
         app:layout_constraintTop_toBottomOf="@+id/start_date_tv" />
 
@@ -96,8 +95,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:visibility="visible"
-        tools:text="End Date Range"
         app:layout_constraintStart_toEndOf="@+id/end_lbl_tv"
-        app:layout_constraintTop_toTopOf="@+id/end_lbl_tv" />
+        app:layout_constraintTop_toTopOf="@+id/end_lbl_tv"
+        tools:text="End Date Range" />
 
 </android.support.constraint.ConstraintLayout>

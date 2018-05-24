@@ -3,6 +3,7 @@ package com.keyeswest.trackme;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +22,7 @@ import java.util.GregorianCalendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import timber.log.Timber;
 
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getEndDate;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getFavoriteFilterSetting;
@@ -50,6 +52,9 @@ public class FilterActivity extends AppCompatActivity {
 
     private static final String EXTRA_CHANGE_FILTER_RESULT = "extraChangeFilterResult";
     private static final String EXTRA_CLEAR_FILTERS = "extraClearFilters";
+    private static final String EXTRA_SHOW_DATE_RANGE =  "extraShowDateRange";
+    private static final String EXTRA_START_DATE = "extraStartDate";
+    private static final String EXTRA_END_DATE = "extraEndDate";
 
     private Unbinder mUnbinder;
 
@@ -86,6 +91,8 @@ public class FilterActivity extends AppCompatActivity {
     private Long mStartDate= null;
     private long mEndDate;
 
+    boolean mShowingDateRange = false;
+
 
 
     @Override
@@ -96,7 +103,22 @@ public class FilterActivity extends AppCompatActivity {
 
         mDateRangeUpdatedByUser = false;
 
-        showDateRangeDates(false);
+        if (savedInstanceState != null){
+            mShowingDateRange = savedInstanceState.getBoolean(EXTRA_SHOW_DATE_RANGE);
+            if (mShowingDateRange){
+                mStartDate = savedInstanceState.getLong(EXTRA_START_DATE);
+                mEndDate = savedInstanceState.getLong(EXTRA_END_DATE);
+                mStartDateTextView.setText(getDateString(mStartDate));
+                mEndDateTextView.setText(getDateString(mEndDate));
+
+                showDateRangeDates(true);
+            }else{
+                showDateRangeDates(false);
+            }
+        }else{
+            showDateRangeDates(false);
+        }
+
 
         setCurrentFavoriteFilterSelection();
 
@@ -221,6 +243,7 @@ public class FilterActivity extends AppCompatActivity {
 
 
     private void showDateRangeDates(boolean show){
+        mShowingDateRange = show;
         if (show){
             mStartDateLabelTextView.setVisibility(View.VISIBLE);
             mStartDateTextView.setVisibility(View.VISIBLE);
@@ -250,11 +273,25 @@ public class FilterActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
+        Timber.d("onSaveInstanceState invoked");
+
+        // save the set of selected trips
+        savedInstanceState.putBoolean(EXTRA_SHOW_DATE_RANGE, mShowingDateRange);
+        if (mShowingDateRange){
+            savedInstanceState.putLong(EXTRA_START_DATE, mStartDate);
+            savedInstanceState.putLong(EXTRA_END_DATE, mEndDate);
+
+        }
+
+        super.onSaveInstanceState(savedInstanceState);
+
+    }
+
 
     private void setCurrentFavoriteFilterSelection(){
-
         mFavoriteSwitch.setChecked(getFavoriteFilterSetting(FilterActivity.this));
-
     }
 
 

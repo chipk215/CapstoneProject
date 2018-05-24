@@ -132,7 +132,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         savedInstanceState.putParcelableArrayList(ARG_SELECTED_TRIPS,
                 (ArrayList<Segment>)mSelectedSegments);
 
-
         super.onSaveInstanceState(savedInstanceState);
 
     }
