@@ -50,8 +50,8 @@ public class TripListFragment extends Fragment
 
 
     public interface TripListListener{
-        void onTripsSelected(List<Segment> segments);
-       // void onTripUnselected(Segment segment);
+        void onTripSelected(Segment segment);
+        void onTripUnselected(Segment segment);
         void plotSelectedTrips();
     }
 
@@ -284,7 +284,7 @@ public class TripListFragment extends Fragment
         mSelectedSegments.add(segment);
         Timber.d("Adding segment to selected trips: " + segment.getId().toString());
 
-        mCallback.onTripsSelected(mSelectedSegments);
+        mCallback.onTripSelected(segment);
         mDisplayButton.setEnabled(true);
         if (mSelectedSegments.size() >= MAX_TRIP_SELECTIONS){
             mTrackLogAdapter.setSelectionsFrozen(true);
@@ -297,7 +297,7 @@ public class TripListFragment extends Fragment
 
         mSelectedSegments.remove(segment);
         Timber.d("Removing segment to selected trips: " + segment.getId().toString());
-        mCallback.onTripsSelected(mSelectedSegments);
+        mCallback.onTripUnselected(segment);
 
         if (mSelectedSegments.size() < 1){
             mDisplayButton.setEnabled(false);

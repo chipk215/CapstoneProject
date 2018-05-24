@@ -1,10 +1,12 @@
 package com.keyeswest.trackme.models;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.keyeswest.trackme.R;
+import com.keyeswest.trackme.data.SegmentSchema;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -231,6 +233,9 @@ public class Segment implements Parcelable {
     }
 
 
+    public Uri getSegmentUri(){
+        return SegmentSchema.SegmentTable.buildItemUri(mRowId);
+    }
 
 
 

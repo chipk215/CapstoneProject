@@ -32,10 +32,10 @@ public class LatLonBounds {
             mMaxLon = max(mMaxLon, longitude);
         }
 
-        Timber.d("Updated Bounds: maxLat= "+  Double.toString(mMaxLat));
-        Timber.d("Updated Bounds: maxLon= "+  Double.toString(mMaxLon));
-        Timber.d("Updated Bounds: minLat= "+  Double.toString(mMinLat));
-        Timber.d("UpdatedBounds: minLon= "+  Double.toString(mMinLon));
+      //  Timber.d("Updated Bounds: maxLat= "+  Double.toString(mMaxLat));
+      //  Timber.d("Updated Bounds: maxLon= "+  Double.toString(mMaxLon));
+      //  Timber.d("Updated Bounds: minLat= "+  Double.toString(mMinLat));
+      //  Timber.d("UpdatedBounds: minLon= "+  Double.toString(mMinLon));
     }
 
     public Double getMinLat() {

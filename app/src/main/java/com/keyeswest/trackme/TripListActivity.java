@@ -37,6 +37,8 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     // List of currently selected/checked trips
     private List<Segment> mSelectedSegments;
 
+    private TripMapFragment mTripMapFragment;
+
 
 
     @Override
@@ -63,27 +65,41 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         if (mTwoPane){
             // Add fragment for displaying selected trips
             ArrayList<Uri> tripList = new ArrayList<>();
-            TripMapFragment mapFragment = TripMapFragment.newInstance(mTwoPane,tripList);
+            mTripMapFragment = TripMapFragment.newInstance(mTwoPane,tripList);
 
             fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.trip_map_container, mapFragment)
+                    .add(R.id.trip_map_container, mTripMapFragment)
                     .commit();
 
         }
     }
 
     @Override
-    public void onTripsSelected(List<Segment> selectedSegments) {
-       mSelectedSegments = selectedSegments;
+    public void onTripSelected(Segment selectedSegment) {
+       mSelectedSegments.add(selectedSegment);
 
         if (mTwoPane){
-            configureMapFragment();
+            //configureMapFragment();
+            if ((mTripMapFragment != null) && (mTripMapFragment.isVisible())){
+                mTripMapFragment.addSegment(selectedSegment);
+            }
+
         }
     }
 
 
+    @Override
+    public void onTripUnselected(Segment segment) {
+        mSelectedSegments.remove(segment);
 
+        if (mTwoPane){
+            //configureMapFragment();
+            if ((mTripMapFragment != null) && (mTripMapFragment.isVisible())){
+                mTripMapFragment.removeSegment(segment);
+            }
+        }
+    }
 
     @Override
     public void plotSelectedTrips() {
