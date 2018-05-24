@@ -129,8 +129,10 @@ public class TripListFragment extends Fragment
         FilterSharedPreferences.clearFilters(getContext(), false);
 
         if (savedInstanceState != null){
+            Timber.d("Restoring mSelectedSegments and filter state after config change");
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
             mListFiltered = savedInstanceState.getByte(FILTER_STATE_EXTRA) != 0;
+
 
         }else {
             mSelectedSegments = new ArrayList<>();
@@ -140,12 +142,12 @@ public class TripListFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Timber.d("onCreateView invoked");
         // Inflate the layout for this fragment
         View view =inflater.inflate(R.layout.fragmemt_trip_list, container, false);
         mFragmentView = view;
         mUnbinder = ButterKnife.bind(this, view);
 
-        Timber.d("onCreateView invoked");
 
         if (mHideDisplayButton){
             mDisplayButton.setVisibility(View.GONE);
@@ -170,7 +172,7 @@ public class TripListFragment extends Fragment
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
 
-        getLoaderManager().initLoader(0, null, this);
+
 
         return view;
     }
@@ -180,6 +182,7 @@ public class TripListFragment extends Fragment
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
         Timber.d("onActivityCreated invoked");
+        getLoaderManager().initLoader(0, null, this);
 
     }
 
@@ -225,9 +228,17 @@ public class TripListFragment extends Fragment
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-      //  super.onCreateOptionsMenu(menu, inflater);
+
         inflater.inflate(R.menu.fragment_trip_list, menu);
         mMainMenu = menu;
+
+        // Restore filter icon on configuration change
+        if (mListFiltered){
+            Timber.d("Restoring filter icon on config change");
+            MenuItem filterItem = mMainMenu.findItem(R.id.filter);
+            filterItem.setIcon(R.drawable.filter_remove_outline);
+            getLoaderManager().restartLoader(0, null, this);
+        }
     }
 
     @Override
@@ -268,9 +279,11 @@ public class TripListFragment extends Fragment
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
         Timber.d("onSaveInstanceState invoked");
 
+        // save the set of selected trips
         savedInstanceState.putParcelableArrayList(ARG_SELECTED_SEGMENTS,
                 (ArrayList<Segment>)mSelectedSegments);
 
+        // save the filter state of the list
         savedInstanceState.putByte(FILTER_STATE_EXTRA, (byte)(mListFiltered ? 1 : 0));
 
         super.onSaveInstanceState(savedInstanceState);
@@ -364,7 +377,7 @@ public class TripListFragment extends Fragment
             if (sortResult.isSortChanged()){
 
                 Timber.d("Handling sort change, restarting segment loader");
-                getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+                getLoaderManager().restartLoader(0, null, this);
 
                 showSnackbar(mFragmentView,getSortMessage(sortResult.getSelectedSort()),
                         Snackbar.LENGTH_SHORT);
@@ -386,7 +399,7 @@ public class TripListFragment extends Fragment
                     mListFiltered = true;
                 }
 
-                getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+               getLoaderManager().restartLoader(0, null, this);
             }
         }
     }

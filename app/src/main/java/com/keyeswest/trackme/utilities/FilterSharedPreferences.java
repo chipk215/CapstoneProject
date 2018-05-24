@@ -3,6 +3,8 @@ package com.keyeswest.trackme.utilities;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import timber.log.Timber;
+
 import static android.content.Context.MODE_PRIVATE;
 
 
@@ -55,6 +57,7 @@ public class FilterSharedPreferences {
     }
 
     public static void saveFavoriteFilter(Context context, boolean isSelected){
+        Timber.d("Saving favorite filter setting to shared prefs: %s", Boolean.toString(isSelected));
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, MODE_PRIVATE);
 
@@ -82,8 +85,9 @@ public class FilterSharedPreferences {
     public static boolean getFavoriteFilterSetting(Context context){
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, MODE_PRIVATE);
-
-        return sharedPreferences.getBoolean(FAVORITE_PREFERENCES_KEY, false);
+        boolean isSet = sharedPreferences.getBoolean(FAVORITE_PREFERENCES_KEY, false);
+        Timber.d("Retrieving favorite filter setting from shared prefs:  %s", Boolean.toString(isSet));
+        return isSet;
     }
 
     public static boolean isDateRangeSet(Context context){

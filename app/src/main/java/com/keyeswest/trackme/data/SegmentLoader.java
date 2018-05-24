@@ -61,8 +61,6 @@ public class SegmentLoader extends CursorLoader {
 
         // check filter preferences
 
-
-
         String dateRangeSelectionClause=null;
         String [] dateRangeArgs= null;
         boolean dateRangeSelected = isDateRangeSet(context);

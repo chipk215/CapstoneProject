@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 
 public class TripListActivity extends AppCompatActivity implements TripListFragment.TripListListener {
@@ -27,6 +29,8 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         Intent intent = new Intent(packageContext, TripListActivity.class);
         return intent;
     }
+
+    public static final String ARG_SELECTED_TRIPS = "argSelectedTrips";
 
     @Nullable
     @BindView(R.id.map_divider_view)
@@ -41,33 +45,39 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Timber.d("onCreate TripListActivity");
 
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_triplist);
-        Stetho.initializeWithDefaults(this);
+       // Stetho.initializeWithDefaults(this);
         ButterKnife.bind(this);
 
         mSelectedSegments = new ArrayList<>();
         mTwoPane = (mTwoPaneDivider != null);
 
-        // Add fragment for displaying list of trips
-        TripListFragment tripListFragment = TripListFragment.newInstance(mTwoPane);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .add(R.id.trip_list_container, tripListFragment)
-                .commit();
-
-        if (mTwoPane){
-            // Add fragment for displaying selected trips
-            ArrayList<Uri> tripList = new ArrayList<>();
-            mTripMapFragment = TripMapFragment.newInstance(mTwoPane,tripList);
-
-            fragmentManager = getSupportFragmentManager();
+        if (savedInstanceState == null) {
+            // Add fragment for displaying list of trips
+            TripListFragment tripListFragment = TripListFragment.newInstance(mTwoPane);
+            FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
-                    .add(R.id.trip_map_container, mTripMapFragment)
+                    .add(R.id.trip_list_container, tripListFragment)
                     .commit();
 
+            if (mTwoPane) {
+                // Add fragment for displaying selected trips
+                ArrayList<Uri> tripList = new ArrayList<>();
+                mTripMapFragment = TripMapFragment.newInstance(mTwoPane, tripList);
+
+                fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .add(R.id.trip_map_container, mTripMapFragment)
+                        .commit();
+
+            }
+        }else{
+            Timber.d("Restoring mSelectedSegments (Activity) and filter state after config change");
+            mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_TRIPS);
         }
     }
 
@@ -111,6 +121,20 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                 startActivity(intent);
             }
         }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
+        Timber.d("onSaveInstanceState invoked");
+
+        // save the set of selected trips
+        savedInstanceState.putParcelableArrayList(ARG_SELECTED_TRIPS,
+                (ArrayList<Segment>)mSelectedSegments);
+
+
+        super.onSaveInstanceState(savedInstanceState);
+
     }
 
 }
