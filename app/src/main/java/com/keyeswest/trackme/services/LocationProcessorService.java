@@ -40,6 +40,9 @@ public class LocationProcessorService extends IntentService {
 
     private final static String NAME="LocationProcessorService";
 
+    // Location sample must be at least 9 meters from last location in order to save the sample
+    private final static int DISTANCE_THRESHOLD = 9;
+
     // Extra keys for accessing the location and segment data
     public final static String LOCATIONS_EXTRA_KEY = "locationsKey";
     public final static String SEGMENT_ID_EXTRA_KEY = "segmentIdKey";
@@ -51,7 +54,6 @@ public class LocationProcessorService extends IntentService {
 
     // Debug counter  TODO remove from release
     public static long debugSampleCount =0;
-
 
     public LocationProcessorService() {
         super(NAME);
@@ -76,7 +78,6 @@ public class LocationProcessorService extends IntentService {
             // retrieve the LocationResult data from intent
             Location location = intent.getParcelableExtra(LOCATIONS_EXTRA_KEY);
 
-
             if (location != null)  {
 
                 String segmentId = intent.getStringExtra(SEGMENT_ID_EXTRA_KEY);
@@ -87,28 +88,20 @@ public class LocationProcessorService extends IntentService {
                 LocationCursor previousLocationCursor = Queries.getLatestLocationBySegmentId(
                         this, segmentId);
 
-                // save the location samples to the db and compute the bounding box
-                LatLonBounds bounds = saveLocationSamples(location, segmentId);
+                LatLonBounds bounds=null;
+
+                // We are going to need to read the segment record
+                Segment segment = Queries.getSegmentFromSegmentId(this,segmentId);
+                if (segment == null){
+                    Timber.d("Failed to get segment from database");
+                    return;
+                }
 
                 if (previousLocationCursor.getCount() == 1){
-                    // a previous location exists for the segment, this is not hte first location
+                    // a previous location exists for the segment, this is not the first location
                     previousLocationCursor.moveToFirst();
                     previousLocation = previousLocationCursor.getLocation();
 
-                    //Date previousLocationData = new Date(previousLocation.getTimeStamp());
-                    //Timber.d("Previous timestamp: " + previousLocationData.toString() );
-
-                    // We are going to need to read the segment record
-                    Segment segment = Queries.getSegmentFromSegmentId(this,segmentId);
-
-                    bounds = adjustSegmentBounds(segment, bounds);
-
-                    // Get the last location sample in this sample batch
-                    // this is a shortcut - revisit and loop through all the samples for a more
-                    // accurate calculation.
-                    // Also - opportunity to throw samples out (do not write to db) if their
-                    // incremental distance is less tan some threshold. Eliminate saving samples
-                    // where the user is at rest.
 
                     // need the distance between lastSample and previousLocation
                     float[] results = new float[1];
@@ -127,19 +120,39 @@ public class LocationProcessorService extends IntentService {
                     Timber.d("Segment increment distance = %s",
                             Double.toString(incrementDistance));
 
-                    segmentDistance = segment.getDistance() + incrementDistance;
+                    if (incrementDistance > DISTANCE_THRESHOLD  ){
 
+                        // save the location samples to the db and compute the bounding box
+                        saveLocationSamples(location, segmentId);
+                        bounds = adjustSegmentBounds(segment, location);
+
+                        segmentDistance = segment.getDistance() + incrementDistance;
+
+                    }else{
+                        Timber.d("Discarding location sample. Location change not greater than threshold");
+                    }
+
+
+                }else{
+                    // first sample so save it
+                    // save the location samples to the db and compute the bounding box
+                    saveLocationSamples(location, segmentId);
+                    // the database is returning 0's for uninitialized segment max,min coordinates
+                    bounds = adjustSegmentBounds(segment, location);
 
                 }
 
-                //update segment with distance and bounding box data
-                Queries.updateSegmentBoundsDistance(this, segmentId,
-                        bounds.getMinLat(), bounds.getMaxLat(),
-                        bounds.getMinLon(), bounds.getMaxLon(),
-                        segmentDistance);
 
-                // broadcast the location samples for plotting
-                broadcastLocationSamples(location);
+                //update segment with distance and bounding box data
+                if (bounds != null) {
+                    Queries.updateSegmentBoundsDistance(this, segmentId,
+                            bounds.getMinLat(), bounds.getMaxLat(),
+                            bounds.getMinLon(), bounds.getMaxLon(),
+                            segmentDistance);
+
+                    // broadcast the location samples for plotting
+                    broadcastLocationSamples(location);
+                }
             }
         }
         Timber.d("Sample Count = %s", Long.toString(debugSampleCount));
@@ -147,22 +160,31 @@ public class LocationProcessorService extends IntentService {
 
 
 
-    private LatLonBounds adjustSegmentBounds(Segment segment, LatLonBounds bounds){
+    private LatLonBounds adjustSegmentBounds(Segment segment, Location location){
 
+        LatLonBounds bounds = new LatLonBounds();
         if (segment.getMinLatitude() != null) {
-            bounds.setMinLat(min(bounds.getMinLat(), segment.getMinLatitude()));
+            bounds.setMinLat(min(location.getLatitude(), segment.getMinLatitude()));
+        }else{
+            bounds.setMinLat(location.getLatitude());
         }
 
         if (segment.getMinLongitude() != null) {
-            bounds.setMinLon(min(bounds.getMinLon(), segment.getMinLongitude()));
+            bounds.setMinLon(min(location.getLongitude(), segment.getMinLongitude()));
+        }else{
+            bounds.setMinLon(location.getLongitude());
         }
 
         if (segment.getMaxLatitude() != null) {
-            bounds.setMaxLat(max(bounds.getMaxLat(), segment.getMaxLatitude()));
+            bounds.setMaxLat(max(location.getLatitude(), segment.getMaxLatitude()));
+        }else{
+            bounds.setMaxLat(location.getLatitude());
         }
 
         if (segment.getMaxLongitude() != null) {
-            bounds.setMaxLon(max(bounds.getMaxLon(), segment.getMaxLongitude()));
+            bounds.setMaxLon(max(location.getLongitude(), segment.getMaxLongitude()));
+        }else{
+            bounds.setMaxLon(location.getLongitude());
         }
 
         return bounds;
@@ -170,17 +192,17 @@ public class LocationProcessorService extends IntentService {
 
 
     /**
-     * Iterates over the location samples that came with the intent.
-     * Write the location samples to the database.
      *
-     * Compute the bounding box which encapsulates the locations.
+     * Write the location sample to the database.
+     *
+     *
      * @param location
      * @param segmentId
      * @return
      */
-    private LatLonBounds saveLocationSamples(Location location, String segmentId){
+    private void saveLocationSamples(Location location, String segmentId){
 
-        LatLonBounds bounds = new LatLonBounds();
+
 
         // save the new location samples
         Timber.d("Displaying locations from Service");
@@ -197,13 +219,10 @@ public class LocationProcessorService extends IntentService {
         Timber.d("++++++++++++++++");
 
         // save location sample to db
-        debugSampleCount++;
         createNewLocationFromSample(this, location, segmentId);
+        debugSampleCount++;
 
-        bounds.update(latitude, longitude);
 
-
-        return bounds;
     }
 
 

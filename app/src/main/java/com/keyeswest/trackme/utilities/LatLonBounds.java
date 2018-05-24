@@ -9,9 +9,6 @@ public class LatLonBounds {
     Double mMinLat = null;
     Double mMinLon = null;
     Double mMaxLat = null;
-
-
-
     Double mMaxLon = null;
 
     public LatLonBounds(){}

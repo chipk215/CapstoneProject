@@ -14,7 +14,7 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "TrackerBase.db";
 
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
 
     public TrackerBaseHelper(Context context){
@@ -107,6 +107,10 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         values.put(SegmentSchema.SegmentTable.COLUMN_DISTANCE,0f);
         values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME,0);
         values.put(SegmentSchema.SegmentTable.COLUMN_MAX_SPEED,0f);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LAT,-90.0f);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LAT,90.0f);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LON,-180.0f);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LON,180.0f);
 
 
         return values;
