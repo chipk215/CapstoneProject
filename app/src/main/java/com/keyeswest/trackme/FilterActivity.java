@@ -50,11 +50,23 @@ public class FilterActivity extends AppCompatActivity {
         return filtersCleared;
     }
 
+    public static boolean isDateFilterSet(Intent data){
+        boolean isSet = data.getBooleanExtra(EXTRA_DATE_FILTER, false);
+        return isSet;
+    }
+
+    public static boolean isFavoriteFilterSet(Intent data){
+        boolean isSet = data.getBooleanExtra(EXTRA_FAVORITE_FILTER, false);
+        return isSet;
+    }
+
     private static final String EXTRA_CHANGE_FILTER_RESULT = "extraChangeFilterResult";
     private static final String EXTRA_CLEAR_FILTERS = "extraClearFilters";
     private static final String EXTRA_SHOW_DATE_RANGE =  "extraShowDateRange";
     private static final String EXTRA_START_DATE = "extraStartDate";
     private static final String EXTRA_END_DATE = "extraEndDate";
+    private static final String EXTRA_DATE_FILTER = "extraDateFilter";
+    private static final String EXTRA_FAVORITE_FILTER = "extraFavoriteFilter";
 
     private Unbinder mUnbinder;
 
@@ -85,13 +97,17 @@ public class FilterActivity extends AppCompatActivity {
     @BindView(R.id.end_date_tv)
     TextView mEndDateTextView;
 
+    // determines whether dates should be saved to shared preferences
     private boolean mDateRangeUpdatedByUser;
+
+    //specifies  whether date filter is set when user exits filter activity
+    private boolean mIsDateFilterOn;
 
     // filter date range
     private Long mStartDate= null;
     private long mEndDate;
 
-    boolean mShowingDateRange = false;
+    private boolean mShowingDateRange = false;
 
 
 
@@ -119,8 +135,10 @@ public class FilterActivity extends AppCompatActivity {
             showDateRangeDates(false);
         }
 
-
+        // configure the filter favorite switch to either on or off
         setCurrentFavoriteFilterSelection();
+
+        mIsDateFilterOn = isDateRangeSet(FilterActivity.this);
 
         mSubmitButton.setOnClickListener(new View.OnClickListener(){
 
@@ -128,8 +146,8 @@ public class FilterActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // save the favorite filter selection to shared preferences
-                boolean isSelected = mFavoriteSwitch.isChecked();
-                saveFavoriteFilter(FilterActivity.this, isSelected);
+                boolean isFavoriteFilter = mFavoriteSwitch.isChecked();
+                saveFavoriteFilter(FilterActivity.this, isFavoriteFilter);
 
                 // save the date range to shared preferences if the user set a date range
                 if (mDateRangeUpdatedByUser){
@@ -137,7 +155,10 @@ public class FilterActivity extends AppCompatActivity {
                     saveDateRangeFilter(FilterActivity.this, mStartDate, mEndDate);
                 }
 
-                setFilterResult(true, false);
+                setFilterResult(true, false, mIsDateFilterOn,
+                        isFavoriteFilter);
+
+
                 finish();
 
             }
@@ -151,7 +172,7 @@ public class FilterActivity extends AppCompatActivity {
                 // previous invocation
                 Calendar calendar = GregorianCalendar.getInstance();
 
-                if (isDateRangeSet(FilterActivity.this)){
+                if (mIsDateFilterOn){
 
                     //read the date range from shared preferences
                     mStartDate = getStartDate(FilterActivity.this);
@@ -200,6 +221,8 @@ public class FilterActivity extends AppCompatActivity {
                                 showDateRangeDates(true);
                                 mDateRangeUpdatedByUser = true;
 
+                                mIsDateFilterOn = true;
+
                             }
                         },
                         year,month, day);
@@ -210,6 +233,7 @@ public class FilterActivity extends AppCompatActivity {
                     public void onCancel(DialogInterface dialog) {
                         showDateRangeDates(false);
                         mDateRangeUpdatedByUser = false;
+                        mIsDateFilterOn = false;
                     }
                 });
 
@@ -222,7 +246,9 @@ public class FilterActivity extends AppCompatActivity {
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFilterResult(false, false);
+                setFilterResult(false, false, mIsDateFilterOn ,
+                        mFavoriteSwitch.isChecked() );
+
                 finish();
             }
         });
@@ -235,7 +261,7 @@ public class FilterActivity extends AppCompatActivity {
             // clear all filters
             FilterSharedPreferences.clearFilters(this, true);
             // set return result to include cleared result
-            setFilterResult(true, true);
+            setFilterResult(true, true, false, false);
             finish();
         }
     }
@@ -259,10 +285,15 @@ public class FilterActivity extends AppCompatActivity {
     }
 
     // set the filter results in the return intent
-    private void setFilterResult(boolean filtersChanged, boolean cleared){
+    private void setFilterResult(boolean filtersChanged, boolean cleared, boolean dateFilterOn,
+                                 boolean favoriteFilterOn){
         Intent data = new Intent();
         data.putExtra(EXTRA_CHANGE_FILTER_RESULT, filtersChanged);
         data.putExtra(EXTRA_CLEAR_FILTERS, cleared);
+        if (!cleared){
+            data.putExtra(EXTRA_DATE_FILTER, dateFilterOn);
+            data.putExtra(EXTRA_FAVORITE_FILTER, favoriteFilterOn);
+        }
         setResult(RESULT_OK, data);
     }
 
@@ -291,6 +322,7 @@ public class FilterActivity extends AppCompatActivity {
 
 
     private void setCurrentFavoriteFilterSelection(){
+
         mFavoriteSwitch.setChecked(getFavoriteFilterSetting(FilterActivity.this));
     }
 

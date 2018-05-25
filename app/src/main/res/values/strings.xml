@@ -88,6 +88,9 @@
 
     <string name="location_updated">Location Updated: %1$s</string>
 
+    <string name="date_filter">Trip list filtered by date range.</string>
+    <string name="favorite_filter">Trip list filtered to only show favorites. </string>
+    <string name="favorite_date_filter">Trip list filtered to only show favorites in a date range.</string>
 
     <plurals name="seconds_plural">
         <item quantity="one">second</item>

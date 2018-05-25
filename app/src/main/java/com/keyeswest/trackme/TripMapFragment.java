@@ -37,6 +37,7 @@ import com.keyeswest.trackme.data.LocationLoader;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.data.SegmentSchema;
+import com.keyeswest.trackme.interfaces.UpdateMap;
 import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.ComputeSegmentDurationTask;
@@ -47,7 +48,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -61,7 +61,7 @@ import static com.keyeswest.trackme.utilities.ZoomLevels.CITY_ZOOM;
 import static com.keyeswest.trackme.utilities.ZoomLevels.STREET_ZOOM;
 
 public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
-        LoaderManager.LoaderCallbacks<Cursor> , UpdateMap{
+        LoaderManager.LoaderCallbacks<Cursor> , UpdateMap {
 
     public static TripMapFragment newInstance(Boolean isTwoPane, ArrayList<Uri> tripList){
         Bundle args = new Bundle();

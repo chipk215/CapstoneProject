@@ -399,6 +399,7 @@ public class TripListFragment extends Fragment
                 }else{
                     Timber.d("Filter result:  filters set");
                     filterItem.setIcon(R.drawable.filter_remove_outline);
+                    showFilterStatus(data);
                     mListFiltered = true;
                 }
 
@@ -406,6 +407,7 @@ public class TripListFragment extends Fragment
             }
         }
     }
+
 
 
 
@@ -461,6 +463,23 @@ public class TripListFragment extends Fragment
             }
         }
         mDisplayButton.setEnabled(selectedSegment != null);
+    }
+
+    private void showFilterStatus(Intent data) {
+        boolean dateFilter = FilterActivity.isDateFilterSet(data);
+        boolean favoriteFilter = FilterActivity.isFavoriteFilterSet(data);
+        String message = null;
+        if (dateFilter && favoriteFilter){
+            message = getString(R.string.favorite_date_filter);
+        }else if (dateFilter){
+            message = getString(R.string.date_filter);
+        }else if(favoriteFilter){
+            message = getString(R.string.favorite_filter);
+        }
+        if (message != null){
+            showSnackbar(mFragmentView,message,
+                    Snackbar.LENGTH_LONG);
+        }
     }
 
 }
