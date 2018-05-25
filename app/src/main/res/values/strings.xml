@@ -43,6 +43,8 @@
     <string name="date_filter">Trip list filtered by date range.</string>
     <string name="favorite_filter">Trip list filtered to only show favorites. </string>
     <string name="favorite_date_filter">Trip list filtered to only show favorites in a date range.</string>
+    <string name="action_share">Share</string>
+    <string name="trip">Trip</string>
 
 
    <!-- list_item_log.xml -->

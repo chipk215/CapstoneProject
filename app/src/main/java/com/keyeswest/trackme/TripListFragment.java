@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.DividerItemDecoration;
@@ -98,6 +99,8 @@ public class TripListFragment extends Fragment
     private boolean mListFiltered= false;
     private Menu mMainMenu;
 
+    private SegmentCursor mSegmentCursor;
+
 
     @Override
     public void onAttach(Context context) {
@@ -143,7 +146,7 @@ public class TripListFragment extends Fragment
                              Bundle savedInstanceState) {
         Timber.d("onCreateView invoked");
         // Inflate the layout for this fragment
-        View view =inflater.inflate(R.layout.fragmemt_trip_list, container, false);
+        View view =inflater.inflate(R.layout.fragment_trip_list, container, false);
         mFragmentView = view;
         mUnbinder = ButterKnife.bind(this, view);
 
@@ -171,6 +174,7 @@ public class TripListFragment extends Fragment
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
 
+        setUpFAB(view);
         return view;
     }
 
@@ -256,16 +260,16 @@ public class TripListFragment extends Fragment
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         Timber.d("onLoadFinished invoked");
         if (cursor != null) {
-            SegmentCursor segmentCursor = new SegmentCursor(cursor);
-            Timber.d("Number of records = %s", segmentCursor.getCount());
-            mTrackLogAdapter = new TrackLogAdapter(segmentCursor,
+            mSegmentCursor = new SegmentCursor(cursor);
+            Timber.d("Number of records = %s", mSegmentCursor.getCount());
+            mTrackLogAdapter = new TrackLogAdapter(mSegmentCursor,
                     mSelectedSegments, this);
 
             mTrackLogAdapter.setHasStableIds(true);
             mTrackLogListView.setAdapter(mTrackLogAdapter);
 
             // Determine whether Display button should be disabled
-            updateDisplayButtonState(segmentCursor);
+            updateDisplayButtonState(mSegmentCursor);
 
         }
     }
@@ -480,6 +484,38 @@ public class TripListFragment extends Fragment
             showSnackbar(mFragmentView,message,
                     Snackbar.LENGTH_LONG);
         }
+    }
+
+    private void setUpFAB(View view){
+        view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if (mSegmentCursor != null) {
+                    mSegmentCursor.moveToPosition(-1);
+                    String message="";
+                    int count = 1;
+                    String newLine = System.getProperty("line.separator");
+                    while(mSegmentCursor.moveToNext()){
+                        Segment segment = mSegmentCursor.getSegment();
+                        message += getString(R.string.trip) + " " + Integer.toString(count) +  newLine;
+                        message += getString(R.string.date) + "  " + segment.getDate() +  newLine;
+                        message += getString(R.string.start_time) + "  " + segment.getTime() +  newLine;
+                        message += getString(R.string.distance) + segment.getDistanceMiles();
+                        message += System.getProperty("line.separator") + newLine;
+                        count++;
+
+                    }
+
+
+                    startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+                            .setType("text/plain")
+                            .setSubject("Trip Log")
+                            .setText(message)
+                            .getIntent(), getString(R.string.action_share)));
+                }
+            }
+        });
     }
 
 }
