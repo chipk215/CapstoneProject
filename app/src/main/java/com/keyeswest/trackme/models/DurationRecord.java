@@ -3,6 +3,7 @@ package com.keyeswest.trackme.models;
 import android.content.Context;
 
 import com.keyeswest.trackme.R;
+import com.keyeswest.trackme.utilities.PluralHelpers;
 
 import java.text.DecimalFormat;
 
@@ -14,7 +15,6 @@ public class DurationRecord {
     private final static int SEC_PER_HOUR = 3600;
     private final static int MILLISECONDS_PER_SECOND = 1000;
 
-    private final static double EPSILON = 1E-6;
 
     private Context mContext;
     private double mValue;
@@ -28,15 +28,15 @@ public class DurationRecord {
 
         if (mValue < SEC_PER_MINUTE){
             mDimension = mContext.getResources().getQuantityString(R.plurals.seconds_plural,
-                    getPluralQuantity(mValue));
+                    PluralHelpers.getPluralQuantity(mValue));
         }else if (mValue < SEC_PER_HOUR){
             mValue = mValue / SEC_PER_MINUTE;
             mDimension = mContext.getResources().getQuantityString(R.plurals.minutes_plural,
-                    getPluralQuantity(mValue));
+                    PluralHelpers.getPluralQuantity(mValue));
         }else{
             mValue = mValue/SEC_PER_HOUR;
             mDimension = mContext.getResources().getQuantityString(R.plurals.hours_plural,
-                    getPluralQuantity(mValue));
+                    PluralHelpers.getPluralQuantity(mValue));
         }
     }
 
@@ -51,12 +51,6 @@ public class DurationRecord {
         return decimalFormat.format(mValue);
     }
 
-    private boolean isSingular(double value){
-        return (abs(value - 1.0d) < EPSILON) ? true : false;
-    }
 
-    private int getPluralQuantity(double value){
-        return isSingular(value) ? 1 : 2;
-    }
 
 }

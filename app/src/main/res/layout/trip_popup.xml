@@ -139,7 +139,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:text="@string/mile"
+        tools:text="miles"
         android:textColor="@android:color/white"
         app:layout_constraintBaseline_toBaselineOf="@+id/distance_tv"
         app:layout_constraintEnd_toEndOf="parent"

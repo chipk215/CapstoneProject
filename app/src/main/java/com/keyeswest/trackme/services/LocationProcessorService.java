@@ -127,6 +127,8 @@ public class LocationProcessorService extends IntentService {
                         bounds = adjustSegmentBounds(segment, location);
 
                         segmentDistance = segment.getDistance() + incrementDistance;
+                        Long incrementalDuration = location.getTime() - previousLocation.getTimeStamp();
+                        segment.setElapsedTime(segment.getElapsedTime() + incrementalDuration);
 
                     }else{
                         Timber.d("Discarding location sample. Location change not greater than threshold");
@@ -139,16 +141,17 @@ public class LocationProcessorService extends IntentService {
                     saveLocationSamples(location, segmentId);
                     // the database is returning 0's for uninitialized segment max,min coordinates
                     bounds = adjustSegmentBounds(segment, location);
+                    segment.setElapsedTime(0L);
 
                 }
 
 
-                //update segment with distance and bounding box data
+                //update segment with distance, elapsed time, and bounding box data
                 if (bounds != null) {
-                    Queries.updateSegmentBoundsDistance(this, segmentId,
+                    Queries.updateSegmentBoundsDistanceElapsedTime(this, segmentId,
                             bounds.getMinLat(), bounds.getMaxLat(),
                             bounds.getMinLon(), bounds.getMaxLon(),
-                            segmentDistance);
+                            segmentDistance, segment.getElapsedTime());
 
                     // broadcast the location samples for plotting
                     broadcastLocationSamples(location);

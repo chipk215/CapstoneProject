@@ -40,8 +40,9 @@ import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.interfaces.UpdateMap;
 import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
-import com.keyeswest.trackme.tasks.ComputeSegmentDurationTask;
+
 import com.keyeswest.trackme.utilities.LatLonBounds;
+import com.keyeswest.trackme.utilities.PluralHelpers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -449,6 +450,12 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
                 TextView distanceView = customView.findViewById(R.id.distance_tv);
                 distanceView.setText(segment.getDistanceMiles());
+                TextView distanceDimension = customView.findViewById(R.id.distance_unit_lbl);
+
+                distanceDimension.setText(getContext().getResources()
+                        .getQuantityString(R.plurals.miles_plural,
+                                PluralHelpers.getPluralQuantity(segment.getDistance())));
+
 
                 TextView startTimeView = customView.findViewById(R.id.start_time_tv);
                 startTimeView.setText(segment.getTime());
@@ -457,25 +464,11 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 final TextView durationDimension =
                         customView.findViewById(R.id.duration_dimension_tv);
 
-                if (segment.getElapsedTime() == 0){
-                    new ComputeSegmentDurationTask(getContext(),
-                            new ComputeSegmentDurationTask.ResultsCallback() {
-                                @Override
-                                public void onComplete(Long duration) {
-                                    segment.setElapsedTime(duration);
-                                    DurationRecord record = segment.getSegmentDuration(getContext());
-                                    durationView.setText(record.getValue());
-                                    durationDimension.setText(record.getDimension());
+                Timber.d("Segment duration retrieved from db.");
+                DurationRecord record = segment.getSegmentDuration(getContext());
+                durationView.setText(record.getValue());
+                durationDimension.setText(record.getDimension());
 
-                                }
-                            }).execute(segment.getId().toString());
-                }else{
-
-                    Timber.d("Segment duration retrieved from db.");
-                    DurationRecord record = segment.getSegmentDuration(getContext());
-                    durationView.setText(record.getValue());
-                    durationDimension.setText(record.getDimension());
-                }
 
                 popup.showAtLocation(mRootView.findViewById(R.id.map), Gravity.CENTER, 0, 0);
 

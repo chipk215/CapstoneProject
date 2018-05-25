@@ -116,9 +116,9 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
-    public static ContentValues updateSegmentRecordBoundsDistance(Double minLat, Double maxLat,
+    public static ContentValues updateSegmentRecordBoundsDistanceElapsed(Double minLat, Double maxLat,
                                                                       Double minLon, Double maxLon,
-                                                                      Double distance){
+                                                                      Double distance, long elapsed){
 
         ContentValues values = new ContentValues();
         values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LAT, minLat);
@@ -126,6 +126,7 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LON, minLon);
         values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LON, maxLon);
         values.put(SegmentSchema.SegmentTable.COLUMN_DISTANCE, distance);
+        values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME, elapsed);
 
         return values;
 

@@ -1,5 +1,6 @@
 package com.keyeswest.trackme.adapters;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.utilities.PluralHelpers;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     private SegmentCursor mCursor;
     private SegmentClickListener mSegmentClickListener;
     private List<Segment> mInitialSelectedSegments;
+    private Context mContext;
 
 
 
@@ -39,11 +42,12 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
 
 
-    public TrackLogAdapter(SegmentCursor cursor, List<Segment> selectedSegments,SegmentClickListener listener){
+    public TrackLogAdapter(SegmentCursor cursor, Context context, List<Segment> selectedSegments, SegmentClickListener listener){
         mCursor = cursor;
         mSegmentClickListener = listener;
         mInitialSelectedSegments = selectedSegments;
         mSelectionsFrozen = false;
+        mContext = context;
     }
 
 
@@ -64,6 +68,10 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         holder.mDateView.setText(mCursor.getSegment().getDate());
         holder.mTimeView.setText(mCursor.getSegment().getTime());
         holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
+
+        String mileOrMiles = mContext.getResources().getQuantityString(R.plurals.miles_plural,
+                        PluralHelpers.getPluralQuantity(mCursor.getSegment().getDistance()));
+        holder.mMilesLabel.setText(mileOrMiles);
         holder.mSegment = mCursor.getSegment();
 
         boolean favoriteState = holder.mSegment.isFavorite();
@@ -144,6 +152,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         private CheckBox mCheckBox;
         private View mItemView;
         private Segment mSegment;
+        private TextView mMilesLabel;
 
         public Segment getSegment(){
             return mSegment;
@@ -162,6 +171,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             mTimeView = view.findViewById(R.id.time_tv);
             mCheckBox = view.findViewById(R.id.checkBox);
             mCheckBox.setClickable(false);
+            mMilesLabel = view.findViewById(R.id.miles_label_tv);
 
 
             mTrashButton = view.findViewById(R.id.delete_btn);

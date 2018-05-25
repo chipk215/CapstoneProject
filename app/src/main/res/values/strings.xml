@@ -45,10 +45,10 @@
     <string name="favorite_date_filter">Trip list filtered to only show favorites in a date range.</string>
     <string name="action_share">Share</string>
     <string name="trip">Trip</string>
+    <string name="trip_elapsed">Trip Time (elapsed):</string>
 
 
    <!-- list_item_log.xml -->
-    <string name="mile">miles</string>
     <string name="delete">delete</string>
     <string name="favorite">favorite</string>
     <string name="distance">Distance: </string>
@@ -112,6 +112,9 @@
         <item quantity="other">hours</item>
     </plurals>
 
-
+    <plurals name="miles_plural">
+        <item quantity="one">mile</item>
+        <item quantity="other">miles</item>
+    </plurals>
 
 </resources>

@@ -29,10 +29,12 @@ import android.widget.Button;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
+import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.DeleteTripTask;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
+import com.keyeswest.trackme.utilities.PluralHelpers;
 import com.keyeswest.trackme.utilities.SortSharedPreferences;
 import com.keyeswest.trackme.utilities.SortResult;
 
@@ -44,6 +46,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
+
+import static java.lang.Math.abs;
 
 
 public class TripListFragment extends Fragment
@@ -65,6 +69,8 @@ public class TripListFragment extends Fragment
     }
 
     public TripListFragment() {}
+
+
 
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
@@ -262,7 +268,7 @@ public class TripListFragment extends Fragment
         if (cursor != null) {
             mSegmentCursor = new SegmentCursor(cursor);
             Timber.d("Number of records = %s", mSegmentCursor.getCount());
-            mTrackLogAdapter = new TrackLogAdapter(mSegmentCursor,
+            mTrackLogAdapter = new TrackLogAdapter(mSegmentCursor, getContext(),
                     mSelectedSegments, this);
 
             mTrackLogAdapter.setHasStableIds(true);
@@ -501,8 +507,18 @@ public class TripListFragment extends Fragment
                         message += getString(R.string.trip) + " " + Integer.toString(count) +  newLine;
                         message += getString(R.string.date) + "  " + segment.getDate() +  newLine;
                         message += getString(R.string.start_time) + "  " + segment.getTime() +  newLine;
-                        message += getString(R.string.distance) + segment.getDistanceMiles();
-                        message += System.getProperty("line.separator") + newLine;
+                        DurationRecord durationRecord = segment.getSegmentDuration(getContext());
+
+                        message+= getString(R.string.trip_elapsed) + " " +
+                                durationRecord.getValue()+ " " +
+                                durationRecord.getDimension() + newLine;
+
+                        message += getString(R.string.distance) + "  " +
+                                segment.getDistanceMiles() + " " +
+                                getContext().getResources()
+                                        .getQuantityString(R.plurals.miles_plural,
+                                                PluralHelpers.getPluralQuantity(segment.getDistance()));
+                        message += newLine + newLine;
                         count++;
 
                     }
@@ -517,5 +533,8 @@ public class TripListFragment extends Fragment
             }
         });
     }
+
+
+
 
 }

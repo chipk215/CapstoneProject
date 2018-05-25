@@ -10,14 +10,15 @@ import com.keyeswest.trackme.models.Segment;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 import timber.log.Timber;
 
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createSegmentRecord;
-import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsDistance;
 
+
+import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsDistanceElapsed;
 import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordFavoriteStatus;
 import static com.keyeswest.trackme.data.TracksContentProvider.CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 
@@ -180,16 +181,16 @@ public class Queries {
     }
 
 
-    public static int updateSegmentBoundsDistance(Context context, String segmentId,
+    public static int updateSegmentBoundsDistanceElapsedTime(Context context, String segmentId,
                                                   double minLat, double maxLat,
                                                   double minLon, double maxLon,
-                                                  double distance){
+                                                  double distance, long elpasedTime){
 
         //update the segment
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         String[] selectionArgs = {segmentId};
-        ContentValues updateValues = updateSegmentRecordBoundsDistance(minLat, maxLat,
-                minLon, maxLon, distance);
+        ContentValues updateValues = updateSegmentRecordBoundsDistanceElapsed(minLat, maxLat,
+                minLon, maxLon, distance, elpasedTime);
         ContentResolver resolver = context.getContentResolver();
         int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
                 selectionClause, selectionArgs);
