@@ -124,6 +124,7 @@ public class TracksContentProvider extends ContentProvider {
                 break;
 
             case LOCATION_FROM_JOIN:
+                Timber.d("Executing Location From Join query");
                 String segmentId = uri.getPathSegments().get(1);
 
                 String[] args = new String[]{segmentId};
@@ -132,6 +133,7 @@ public class TracksContentProvider extends ContentProvider {
                                 "FROM location l " +
                                 "INNER JOIN segment s ON s.segment_id = l.segmentid " +
                                 "WHERE s._id = ?", args);
+
 
                 break;
 

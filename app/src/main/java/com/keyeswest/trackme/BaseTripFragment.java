@@ -39,6 +39,7 @@ import com.keyeswest.trackme.tasks.StartSegmentTask;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -99,7 +100,7 @@ public abstract class BaseTripFragment extends Fragment
     private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
     private static final int MAP_PADDING = 24;
 
-    private static final int LOCATION_LOADER = 1;
+    //private static final int LOCATION_LOADER = 1;
 
     private Unbinder mUnbinder;
 
@@ -145,6 +146,9 @@ public abstract class BaseTripFragment extends Fragment
     private FusedLocationProviderClient mFusedLocationClient;
 
 
+    //used to generate loader ids
+    private Random mRandom = new Random();
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -183,6 +187,8 @@ public abstract class BaseTripFragment extends Fragment
 
         mStartUpdatesButton.setEnabled(true);
         mStopUpdatesButton.setEnabled(false);
+
+
         if (savedInstanceState != null) {
             boolean isTracking = savedInstanceState.getByte(IS_TRACKING_EXTRA) != 0;
             if (isTracking) {
@@ -294,7 +300,8 @@ public abstract class BaseTripFragment extends Fragment
         // This ensures that the plotted trip always begins at the start even if this activity
         // is paused.
         if (mTrackingSegment != null){
-            getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
+            Timber.d("initloader for locations");
+            getLoaderManager().initLoader(mRandom.nextInt() ,null, this);
         }else{
             mResumeReady = true;
         }
@@ -327,7 +334,17 @@ public abstract class BaseTripFragment extends Fragment
             mPlot = mMap.addPolyline(mPolylineOptions);
         }
 
-        List<LatLng> points = mPlot.getPoints();
+        List<LatLng> points ;
+        if (mPlottedPoints != null){
+            // mPlottedPoitns were read from database on configuration change
+            points = mPlottedPoints;
+            mPlottedPoints = null;  // don't include them again
+            points.addAll(mPlot.getPoints());
+        }else{
+            points = mPlot.getPoints();
+        }
+
+
 
         Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
                     Double.toString(location.getLongitude()));
@@ -367,6 +384,7 @@ public abstract class BaseTripFragment extends Fragment
         savedInstanceState.putByte(IS_TRACKING_EXTRA, (byte)(isTracking ? 1 : 0));
 
         if (isTracking){
+            // save the segment information associated with the sample locations
             savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
         }
 
@@ -404,12 +422,13 @@ public abstract class BaseTripFragment extends Fragment
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        Timber.d("entering onCreateLoader");
         return LocationLoader.getLocationsForSegmentByRowId(getContext(), mTrackingSegment.getRowId());
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        Timber.d("Resumed locations loaded from db");
+        Timber.d("on load finished ");
         if (data.getCount() > 0){
             mPlottedPoints = new ArrayList<>();
             LocationCursor cursor = new LocationCursor(data);
@@ -421,11 +440,9 @@ public abstract class BaseTripFragment extends Fragment
             }
             Timber.d("Resumed point count= %s", Long.toString(mPlottedPoints.size()));
             cursor.close();
-            getLoaderManager().destroyLoader(LOCATION_LOADER);
+           // getLoaderManager().destroyLoader(LOCATION_LOADER);
             mResumeReady = true;
-            if (mPlot != null){
-                mPlot.setPoints(mPlottedPoints);
-            }
+
             displayMap();
 
         }

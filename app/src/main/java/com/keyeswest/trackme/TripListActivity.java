@@ -17,6 +17,7 @@ import com.keyeswest.trackme.models.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,6 +43,9 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
 
     private TripMapFragment mTripMapFragment;
 
+    //used to generate loader ids
+    private Random mRandom = new Random();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +54,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_triplist);
-       // Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this);
         ButterKnife.bind(this);
 
         mSelectedSegments = new ArrayList<>();

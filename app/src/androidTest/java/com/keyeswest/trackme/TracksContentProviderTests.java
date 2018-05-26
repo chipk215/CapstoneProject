@@ -15,6 +15,7 @@ import com.keyeswest.trackme.data.TracksContentProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static com.keyeswest.trackme.data.TracksContentProvider.CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
@@ -110,6 +111,19 @@ public class TracksContentProviderTests extends TracksContentProviderBaseTest {
         int expectedSegmentMatchCode = TracksContentProvider.SEGMENT_WITH_ID;
         assertEquals(failMessage,expectedSegmentMatchCode, actualSegmentMatchCode);
 
+    }
+
+    @Test
+    public void testLocationFromJoinUriMatcher(){
+        String segmentRowId = "8";
+        Uri requestUri = CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
+        requestUri = requestUri.buildUpon().appendPath(segmentRowId).build();
+
+        UriMatcher testMatcher = TracksContentProvider.buildUriMatcher();
+        String failMessage = "Error: The join request URI was matched incorrectly.";
+        int actualLocationMatchCode = testMatcher.match(requestUri);
+        int expectedLocationMatchCode = TracksContentProvider.LOCATION_FROM_JOIN;
+        assertEquals(failMessage,expectedLocationMatchCode, actualLocationMatchCode );
     }
 
 

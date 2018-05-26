@@ -41,9 +41,10 @@ public class TracksContentProviderUpdateTests extends TracksContentProviderBaseT
         double minLon = -116.0d;
         double maxLon = -115.0d;
         double distance = 10d;
+        long elpasedTime = 10l;
 
-        int rowsUpdated = Queries.updateSegmentBoundsDistance(mContext,segmentId.toString(), minLat, maxLat,
-                minLon,maxLon, distance);
+        int rowsUpdated = Queries.updateSegmentBoundsDistanceElapsedTime(mContext,segmentId.toString(), minLat, maxLat,
+                minLon,maxLon, distance, elpasedTime);
 
         Assert.assertEquals(1, rowsUpdated);
 
