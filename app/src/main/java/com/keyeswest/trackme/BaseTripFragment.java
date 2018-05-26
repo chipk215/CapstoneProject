@@ -98,9 +98,9 @@ public abstract class BaseTripFragment extends Fragment
 
     private static final String IS_TRACKING_EXTRA = "isTrackingExtra";
     private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
-    private static final int MAP_PADDING = 24;
 
-    //private static final int LOCATION_LOADER = 1;
+
+    private static final int LOCATION_LOADER = 1;
 
     private Unbinder mUnbinder;
 
@@ -145,9 +145,6 @@ public abstract class BaseTripFragment extends Fragment
 
     private FusedLocationProviderClient mFusedLocationClient;
 
-
-    //used to generate loader ids
-    private Random mRandom = new Random();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -301,7 +298,7 @@ public abstract class BaseTripFragment extends Fragment
         // is paused.
         if (mTrackingSegment != null){
             Timber.d("initloader for locations");
-            getLoaderManager().initLoader(mRandom.nextInt() ,null, this);
+            getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
         }else{
             mResumeReady = true;
         }
@@ -440,7 +437,7 @@ public abstract class BaseTripFragment extends Fragment
             }
             Timber.d("Resumed point count= %s", Long.toString(mPlottedPoints.size()));
             cursor.close();
-           // getLoaderManager().destroyLoader(LOCATION_LOADER);
+            getLoaderManager().destroyLoader(LOCATION_LOADER);
             mResumeReady = true;
 
             displayMap();
@@ -465,7 +462,6 @@ public abstract class BaseTripFragment extends Fragment
     private void startUpdates() {
         mService.requestLocationUpdates();
     }
-
 
     private void stopUpdates() {
         mService.removeLocationUpdates();
