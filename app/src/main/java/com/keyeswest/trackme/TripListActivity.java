@@ -110,6 +110,15 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                             .add(R.id.trip_map_container, tripMapFragment,TRIP_MAP_TAG)
                             .commit();
 
+                    Fragment fragment = fragmentManager.findFragmentByTag(TRIP_LIST_TAG);
+                    if (fragment instanceof TripListFragment ){
+                        // this assumes the trip list fragment has not executed onCreateView at
+                        // this point - valid since this is the parent activity
+                        ((TripListFragment) fragment).showDisplayButton(false);
+                    } else {
+                        throw new IllegalStateException("Unexpected fragment type.");
+                    }
+
                 }
 
             }else{
@@ -126,7 +135,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                     if (fragment instanceof TripListFragment ){
                         // this assumes the trip list fragment has not executed onCreateView at
                         // this point - valid since this is the parent activity
-                        ((TripListFragment) fragment).showDisplayButton();
+                        ((TripListFragment) fragment).showDisplayButton(true);
                     } else {
                        throw new IllegalStateException("Unexpected fragment type.");
                     }

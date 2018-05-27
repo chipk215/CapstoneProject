@@ -429,7 +429,7 @@ public class TripListFragment extends Fragment
      * when on a tablet and going from landscape to portrait.
      *
      */
-    public void showDisplayButton(){
+    public void showDisplayButton(Boolean show){
         mHideDisplayButton = false;
     }
 
