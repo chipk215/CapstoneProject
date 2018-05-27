@@ -70,8 +70,6 @@ public class TripListFragment extends Fragment
 
     public TripListFragment() {}
 
-
-
     public static final int MAX_TRIP_SELECTIONS = 4;
     public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
     private static final String TWO_PANE_EXTRA = "twoPaneExtra";
@@ -140,7 +138,6 @@ public class TripListFragment extends Fragment
             Timber.d("Restoring mSelectedSegments and filter state after config change");
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_SEGMENTS);
             mListFiltered = savedInstanceState.getByte(FILTER_STATE_EXTRA) != 0;
-
 
         }else {
             mSelectedSegments = new ArrayList<>();
@@ -421,19 +418,19 @@ public class TripListFragment extends Fragment
     }
 
 
-
-
     @Override
     public void onFavoriteClick(Segment segment, boolean favorite) {
         new UpdateFavoriteStatusTask(getContext(), segment.getId(), favorite).execute();
     }
 
 
-    //TODO verify this is invoked before onCreateView during a configuration change
-    // otherwise figure out a better mechanism for controlling visibility of display button
+    /**
+     * Invoked by parent activity on a configuration change going from two pane to one pane, as
+     * when on a tablet and going from landscape to portrait.
+     *
+     */
     public void showDisplayButton(){
         mHideDisplayButton = false;
-
     }
 
 
@@ -543,8 +540,6 @@ public class TripListFragment extends Fragment
             }
         });
     }
-
-
 
 
 }

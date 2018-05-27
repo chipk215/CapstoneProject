@@ -45,11 +45,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     private List<Segment> mSelectedSegments;
 
 
-    // TODO do not save as a property find when needed using findfragmentbytag
-    private TripMapFragment mTripMapFragment;
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Timber.d("onCreate TripListActivity");
@@ -64,6 +59,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         mTwoPane = (mTwoPaneDivider != null);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
+
         if (savedInstanceState == null) {
             // Add fragment for displaying list of trips
             TripListFragment tripListFragment = TripListFragment.newInstance(mTwoPane);
@@ -75,13 +71,12 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
             if (mTwoPane) {
                 // Add fragment for displaying selected trips
                 ArrayList<Uri> tripList = new ArrayList<>();
-                mTripMapFragment = TripMapFragment.newInstance(mTwoPane, tripList);
+                TripMapFragment tripMapFragment = TripMapFragment.newInstance(mTwoPane, tripList);
 
                 fragmentManager = getSupportFragmentManager();
                 fragmentManager.beginTransaction()
-                        .add(R.id.trip_map_container, mTripMapFragment,TRIP_MAP_TAG)
+                        .add(R.id.trip_map_container, tripMapFragment,TRIP_MAP_TAG)
                         .commit();
-
             }
         }else{
 
@@ -94,10 +89,12 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
             if (mTwoPane){
                 // we are now in two pane mode, were we before or is this a new orientation?
 
-
                 if (tripMapFragment != null){
                     // we came from a 2 pane rotation
-                    Timber.d("Uh oh .. shouldn't be here.. ERROR CASE");
+                    IllegalStateException exception = new IllegalStateException("Unsupported configuration");
+                    Timber.wtf(exception, "Uh oh .. shouldn't be here.. ERROR CASE");
+                    throw exception;
+
                 }else{
                     //if we are now in 2 pane mode but were in single pane before
                     // this would correspond to rotating from portrait to landscape on a tablet
@@ -106,13 +103,12 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                     for(Segment segment : mSelectedSegments){
                         tripList.add(segment.getSegmentUri());
                     }
-                    mTripMapFragment = TripMapFragment.newInstance(mTwoPane, tripList);
+                    tripMapFragment = TripMapFragment.newInstance(mTwoPane, tripList);
 
                     fragmentManager = getSupportFragmentManager();
                     fragmentManager.beginTransaction()
-                            .add(R.id.trip_map_container, mTripMapFragment,TRIP_MAP_TAG)
+                            .add(R.id.trip_map_container, tripMapFragment,TRIP_MAP_TAG)
                             .commit();
-
 
                 }
 
@@ -126,18 +122,17 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                             .remove(tripMapFragment)
                             .commit();
 
-
-                    //TODO make sure fragment is of right type before applying cast
-                    TripListFragment tripListFragment =(TripListFragment) fragmentManager.findFragmentByTag(TRIP_LIST_TAG);
-                    tripListFragment.showDisplayButton();
-
+                    Fragment fragment = fragmentManager.findFragmentByTag(TRIP_LIST_TAG);
+                    if (fragment instanceof TripListFragment ){
+                        // this assumes the trip list fragment has not executed onCreateView at
+                        // this point - valid since this is the parent activity
+                        ((TripListFragment) fragment).showDisplayButton();
+                    } else {
+                       throw new IllegalStateException("Unexpected fragment type.");
+                    }
                 }
-
-
                 // otherwise single pane to single pane should be covered
-
             }
-
 
         }
     }
@@ -147,8 +142,15 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
        mSelectedSegments.add(selectedSegment);
 
         if (mTwoPane){
-            if ((mTripMapFragment != null) && (mTripMapFragment.isVisible())){
-                mTripMapFragment.addSegment(selectedSegment);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment fragment = fragmentManager.findFragmentByTag(TRIP_MAP_TAG);
+            if (fragment instanceof TripMapFragment ) {
+                TripMapFragment tripMapFragment = (TripMapFragment)fragment;
+                if ((tripMapFragment != null) && (tripMapFragment.isVisible())) {
+                    tripMapFragment.addSegment(selectedSegment);
+                }
+            }else{
+                throw new IllegalStateException("Unexpected fragment type.");
             }
         }
     }
@@ -159,11 +161,21 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         mSelectedSegments.remove(segment);
 
         if (mTwoPane){
-            if ((mTripMapFragment != null) && (mTripMapFragment.isVisible())){
-                mTripMapFragment.removeSegment(segment);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment fragment = fragmentManager.findFragmentByTag(TRIP_MAP_TAG);
+            if (fragment instanceof TripMapFragment ) {
+                TripMapFragment tripMapFragment = (TripMapFragment)fragment;
+                if ((tripMapFragment != null) && (tripMapFragment.isVisible())){
+                    tripMapFragment.removeSegment(segment);
+                }
+            }else{
+                throw new IllegalStateException("Unexpected fragment type.");
             }
         }
     }
+
+
+
 
     @Override
     public void plotSelectedTrips() {
