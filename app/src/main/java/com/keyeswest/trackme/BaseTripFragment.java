@@ -66,6 +66,9 @@ import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLoca
  *       activity is Stopped so that the corresponding trip plot depict all the the locations
  *       collected since the trip was started.
  *
+ *     - in this scenario the app may not be removed from memory and when resumed only onStart
+ *       and onResume is invoked. Neither of these methods process savedInstance state bundle.
+ *
  *  3) User stops the location service via the notification posted when the location service is
  *     in the foreground.
  *
@@ -129,6 +132,9 @@ public abstract class BaseTripFragment extends Fragment
     @BindView(R.id.remove_updates_button)
     Button mStopUpdatesButton;
 
+    // Holds previously plotted points (locations) read from the database when the activity is
+    // resumed. This is the key data object for distinguishing when the app is restarted without
+    // being removed from memory.
     List<LatLng> mPlottedPoints = new ArrayList<>();
 
     protected LocationService mService = null;
@@ -299,6 +305,7 @@ public abstract class BaseTripFragment extends Fragment
         if (mTrackingSegment != null){
             Timber.d("initloader for locations");
             getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
+            mResumeReady = false;
         }else{
             mResumeReady = true;
         }
@@ -322,6 +329,32 @@ public abstract class BaseTripFragment extends Fragment
     }
 
 
+    /**
+     * Entry conditions:
+     *
+     * 1) Initial entry when user starts tracking
+     *     - mPolylineOptions will be null, mPlot is created and will have no points
+     *     - mPlottedPoints containing previously plotted locations points will be null
+     *
+     * 2) Normal update with new location
+     *     - mPolyline will not be null, mPlot contains track (plotted points)
+     *     - mPlottedPoints containing previously plotted locations points will be null
+     *
+     * 3) Initial invocation after a configuration (rotation) change
+     *    - mPolylineOptions will be null
+     *    - mPLot will be recreated and be empty
+     *    - mPlottedPoints containing previously plotted locations points will not be null
+     *
+     * 4) App is restarted after user pauses and then restarts without the app being removed
+     * from memory
+     *    - mPolyline options will not be null
+     *    - mPlot will have plotted data up to the point where the app was paused
+     *    - mPlottedPoints containing previously plotted locations points will not be null
+     *
+     *    - in this case we should dump the mPlot points and replace with mPlottedPoints
+     *
+     * @param location
+     */
     @Override
     public void updatePlot(Location location) {
         Timber.d("Received Sample Broadcast message in updatePlot");
@@ -336,7 +369,7 @@ public abstract class BaseTripFragment extends Fragment
             // mPlottedPoitns were read from database on configuration change
             points = mPlottedPoints;
             mPlottedPoints = null;  // don't include them again
-            points.addAll(mPlot.getPoints());
+            //points.addAll(mPlot.getPoints());
         }else{
             points = mPlot.getPoints();
         }
