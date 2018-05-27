@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -61,6 +62,10 @@ import static com.keyeswest.trackme.TripMapActivity.EXTRA_URI;
 import static com.keyeswest.trackme.utilities.ZoomLevels.CITY_ZOOM;
 import static com.keyeswest.trackme.utilities.ZoomLevels.STREET_ZOOM;
 
+
+/**
+ * Displays trips selected from trip lost on a map.
+ */
 public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<Cursor> , UpdateMap {
 
@@ -78,7 +83,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     public TripMapFragment(){}
 
     private static final String TWO_PANE_EXTRA = "twoPaneExtra";
-    private static final String LOADER_TYPE_EXTRA = "loaderTypeExtra";
+
 
     //available colors for up to 4 plotted segments
     private static final int[] plotLineColorResources = {R.color.plotOne,
@@ -171,7 +176,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Timber.d("onCreate invoked");
+        Timber.d("onCreate TripMapFragment invoked");
 
 
         mMasterSegmentUriList = getArguments().getParcelableArrayList(EXTRA_URI);
@@ -273,6 +278,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     @Override
     public void onDestroy(){
+        Timber.d("onDestroy TripMapFragment");
         mSegmentPlotter.quitSafely();
 
         for(Polyline plotLine : mPolyLines){
@@ -320,7 +326,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         if (isSegment) {
             // All the segments in the segment list will be loaded with a single database query
             Timber.d("Loading segments");
-
 
             return SegmentLoader.newSegmentsFromUriList(getContext(), mLoadSegmentUriList);
 
@@ -413,11 +418,11 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             mLocationLoadsFinishedCount = 0;
         }
 
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Timber.d("onMap Ready TripMapFragment");
         setMapReady(true);
         mMap = googleMap;
 
@@ -588,7 +593,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     }
 
     private void displayMap(){
-
+        Timber.d("displayMap TripMapFragment");
         LatLngBounds bounds = computeBoundingBoxForSegments();
         if (bounds != null) {
             Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
@@ -606,7 +611,16 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 // zoom in a bit more if we are displaying trip tracts
                 zoomLevel = STREET_ZOOM;
             }
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, zoomLevel));
+
+            //  mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, zoomLevel));
+            mMap.moveCamera( CameraUpdateFactory.zoomTo( zoomLevel ) );
+            // begin new code:
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels;
+            int padding = (int) (width * 0.12); // offset from edges of the map 12% of screen
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+            mMap.moveCamera(cu);
+
 
             //debugSegmentToLocationsMap();
             for (Segment segment : mSegmentList) {

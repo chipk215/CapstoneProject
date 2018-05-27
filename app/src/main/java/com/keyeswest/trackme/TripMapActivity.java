@@ -11,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Used when target is phone (not tablet).
+ */
 public class TripMapActivity extends AppCompatActivity
  {
 

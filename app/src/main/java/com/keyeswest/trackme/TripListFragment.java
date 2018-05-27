@@ -147,6 +147,8 @@ public class TripListFragment extends Fragment
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -424,6 +426,14 @@ public class TripListFragment extends Fragment
     @Override
     public void onFavoriteClick(Segment segment, boolean favorite) {
         new UpdateFavoriteStatusTask(getContext(), segment.getId(), favorite).execute();
+    }
+
+
+    //TODO verify this is invoked before onCreateView during a configuration change
+    // otherwise figure out a better mechanism for controlling visibility of display button
+    public void showDisplayButton(){
+        mHideDisplayButton = false;
+
     }
 
 

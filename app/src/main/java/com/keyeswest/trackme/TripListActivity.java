@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -32,6 +33,8 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     }
 
     public static final String ARG_SELECTED_TRIPS = "argSelectedTrips";
+    private static final String TRIP_MAP_TAG = "tripMapTag";
+    private static final String TRIP_LIST_TAG = "tripListTag";
 
     @Nullable
     @BindView(R.id.map_divider_view)
@@ -41,10 +44,10 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
     // List of currently selected/checked trips
     private List<Segment> mSelectedSegments;
 
+
+    // TODO do not save as a property find when needed using findfragmentbytag
     private TripMapFragment mTripMapFragment;
 
-    //used to generate loader ids
-    private Random mRandom = new Random();
 
 
     @Override
@@ -60,12 +63,13 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         mSelectedSegments = new ArrayList<>();
         mTwoPane = (mTwoPaneDivider != null);
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
         if (savedInstanceState == null) {
             // Add fragment for displaying list of trips
             TripListFragment tripListFragment = TripListFragment.newInstance(mTwoPane);
-            FragmentManager fragmentManager = getSupportFragmentManager();
+
             fragmentManager.beginTransaction()
-                    .add(R.id.trip_list_container, tripListFragment)
+                    .add(R.id.trip_list_container, tripListFragment, TRIP_LIST_TAG)
                     .commit();
 
             if (mTwoPane) {
@@ -75,13 +79,66 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
 
                 fragmentManager = getSupportFragmentManager();
                 fragmentManager.beginTransaction()
-                        .add(R.id.trip_map_container, mTripMapFragment)
+                        .add(R.id.trip_map_container, mTripMapFragment,TRIP_MAP_TAG)
                         .commit();
 
             }
         }else{
+
             Timber.d("Restoring mSelectedSegments (Activity) and filter state after config change");
             mSelectedSegments = savedInstanceState.getParcelableArrayList(ARG_SELECTED_TRIPS);
+
+            // A configuration change occurred - see if a tripMapFragment has been added
+            Fragment tripMapFragment = fragmentManager.findFragmentByTag(TRIP_MAP_TAG);
+
+            if (mTwoPane){
+                // we are now in two pane mode, were we before or is this a new orientation?
+
+
+                if (tripMapFragment != null){
+                    // we came from a 2 pane rotation
+                    Timber.d("Uh oh .. shouldn't be here.. ERROR CASE");
+                }else{
+                    //if we are now in 2 pane mode but were in single pane before
+                    // this would correspond to rotating from portrait to landscape on a tablet
+                    //start a TripMapFragment
+                    ArrayList<Uri> tripList = new ArrayList<>();
+                    for(Segment segment : mSelectedSegments){
+                        tripList.add(segment.getSegmentUri());
+                    }
+                    mTripMapFragment = TripMapFragment.newInstance(mTwoPane, tripList);
+
+                    fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .add(R.id.trip_map_container, mTripMapFragment,TRIP_MAP_TAG)
+                            .commit();
+
+
+                }
+
+            }else{
+
+                // we are in single pane mode
+                if (tripMapFragment != null) {
+                    // if we came from two pane mode (rotation from landscape to portrait on tablet) then
+                    // remove the TripMapFragment
+                    fragmentManager.beginTransaction()
+                            .remove(tripMapFragment)
+                            .commit();
+
+
+                    //TODO make sure fragment is of right type before applying cast
+                    TripListFragment tripListFragment =(TripListFragment) fragmentManager.findFragmentByTag(TRIP_LIST_TAG);
+                    tripListFragment.showDisplayButton();
+
+                }
+
+
+                // otherwise single pane to single pane should be covered
+
+            }
+
+
         }
     }
 
