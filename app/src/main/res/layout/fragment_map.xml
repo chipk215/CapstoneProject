@@ -1,120 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        >
 
-        map:layout_constraintBottom_toTopOf="@+id/switch1"
-        map:layout_constraintTop_toTopOf="parent"
-        tools:context=".TripMapActivity" />
 
-    <View
-        android:id="@+id/segment_one_view"
-        android:layout_width="@dimen/fm_view_width"
-        android:layout_height="@dimen/fm_view_height"
-        android:layout_marginStart="@dimen/margin_16"
+        <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
 
-        android:layout_marginTop="@dimen/margin_10"
-        android:background="@color/plotOne"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/switch1" />
+            map:layout_constraintBottom_toTopOf="@+id/switch1"
+            map:layout_constraintTop_toTopOf="parent"
+            tools:context=".TripMapActivity" />
 
-    <View
-        android:id="@+id/segment_two_view"
-        android:layout_width="@dimen/fm_view_width"
-        android:layout_height="@dimen/fm_view_height"
-        android:layout_marginStart="@dimen/margin_16"
-        android:layout_marginTop="@dimen/margin_10"
-        android:background="@color/plotTwo"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/switch2" />
+        <View
+            android:id="@+id/segment_one_view"
+            android:layout_width="@dimen/fm_view_width"
+            android:layout_height="@dimen/fm_view_height"
+            android:layout_marginStart="@dimen/margin_16"
 
-    <View
-        android:id="@+id/segment_three_view"
-        android:layout_width="@dimen/fm_view_width"
-        android:layout_height="@dimen/fm_view_height"
-        android:layout_marginEnd="@dimen/margin_2"
-        android:layout_marginTop="@dimen/margin_10"
-        android:background="@color/plotThree"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/switch3"
-        app:layout_constraintTop_toTopOf="@+id/switch3" />
+            android:layout_marginTop="@dimen/margin_10"
+            android:background="@color/plotOne"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/switch1" />
 
-    <View
-        android:id="@+id/segment_four_view"
-        android:layout_width="@dimen/fm_view_width"
-        android:layout_height="@dimen/fm_view_height"
-        android:layout_marginEnd="@dimen/margin_2"
-        android:layout_marginTop="@dimen/margin_10"
-        android:background="@color/plotFour"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@+id/switch4"
-        app:layout_constraintTop_toTopOf="@+id/switch4" />
+        <View
+            android:id="@+id/segment_two_view"
+            android:layout_width="@dimen/fm_view_width"
+            android:layout_height="@dimen/fm_view_height"
+            android:layout_marginStart="@dimen/margin_16"
+            android:layout_marginTop="@dimen/margin_10"
+            android:background="@color/plotTwo"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/switch2" />
 
-    <Switch
-        android:id="@+id/switch1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_8"
-        android:layout_marginStart="@dimen/margin_2"
-        android:textOff="@string/hide"
-        android:textOn="@string/show"
-        android:showText="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/switch2"
-        app:layout_constraintStart_toEndOf="@+id/segment_one_view" />
+        <View
+            android:id="@+id/segment_three_view"
+            android:layout_width="@dimen/fm_view_width"
+            android:layout_height="@dimen/fm_view_height"
+            android:layout_marginEnd="@dimen/margin_2"
+            android:layout_marginTop="@dimen/margin_10"
+            android:background="@color/plotThree"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/switch3"
+            app:layout_constraintTop_toTopOf="@+id/switch3" />
 
-    <Switch
-        android:id="@+id/switch2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_16"
-        android:layout_marginStart="@dimen/margin_2"
-        android:textOff="@string/hide"
-        android:textOn="@string/show"
-        android:showText="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/segment_two_view" />
+        <View
+            android:id="@+id/segment_four_view"
+            android:layout_width="@dimen/fm_view_width"
+            android:layout_height="@dimen/fm_view_height"
+            android:layout_marginEnd="@dimen/margin_2"
+            android:layout_marginTop="@dimen/margin_10"
+            android:background="@color/plotFour"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@+id/switch4"
+            app:layout_constraintTop_toTopOf="@+id/switch4" />
 
-    <Switch
-        android:id="@+id/switch3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_8"
-        android:layout_marginEnd="@dimen/margin_16"
-        android:textOff="@string/hide"
-        android:textOn="@string/show"
-        android:showText="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/switch4"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <Switch
+            android:id="@+id/switch1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_8"
+            android:layout_marginStart="@dimen/margin_2"
+            android:textOff="@string/hide"
+            android:textOn="@string/show"
+            android:showText="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/switch2"
+            app:layout_constraintStart_toEndOf="@+id/segment_one_view" />
 
-    <Switch
-        android:id="@+id/switch4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_16"
-        android:layout_marginEnd="@dimen/margin_16"
-        android:textOff="@string/hide"
-        android:textOn="@string/show"
-        android:showText="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <Switch
+            android:id="@+id/switch2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_16"
+            android:layout_marginStart="@dimen/margin_2"
+            android:textOff="@string/hide"
+            android:textOn="@string/show"
+            android:showText="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/segment_two_view" />
 
-</android.support.constraint.ConstraintLayout>
+        <Switch
+            android:id="@+id/switch3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_8"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:textOff="@string/hide"
+            android:textOn="@string/show"
+            android:showText="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/switch4"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Switch
+            android:id="@+id/switch4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_16"
+            android:layout_marginEnd="@dimen/margin_16"
+            android:textOff="@string/hide"
+            android:textOn="@string/show"
+            android:showText="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <include layout="@layout/share_fab_layout"/>
+</android.support.design.widget.CoordinatorLayout>

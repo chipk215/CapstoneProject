@@ -1,7 +1,9 @@
 package com.keyeswest.trackme;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +12,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,6 +23,7 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -42,10 +47,16 @@ import com.keyeswest.trackme.interfaces.UpdateMap;
 import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
 
+import com.keyeswest.trackme.tasks.EmailMapTask;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 import com.keyeswest.trackme.utilities.PluralHelpers;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -172,6 +183,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     // Set of ids associated with segment loaders
     private Set<Integer> mSegmentLoaderIds = new HashSet<>();
 
+    private List<File> mEmailAttachments = new ArrayList<>();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -266,6 +279,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         }
 
         mRootView = view;
+
+        setUpFAB(view);
         return view;
     }
 
@@ -283,6 +298,10 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
         for(Polyline plotLine : mPolyLines){
             plotLine.setTag(null);
+        }
+
+        for (File file : mEmailAttachments){
+            file.delete();
         }
 
         super.onDestroy();
@@ -739,6 +758,44 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     private void enablePolylineClicks(){
         for (Polyline p: mPolyLines){
             p.setClickable(true);
+        }
+    }
+
+
+    private void setUpFAB(View view){
+        view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                captureScreen();
+
+
+            }
+
+        });
+    }
+
+
+    private void captureScreen(){
+        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+            @Override
+            public void onSnapshotReady(Bitmap bitmap) {
+
+                new EmailMapTask(getContext(), bitmap, new EmailMapTask.ResultsCallback() {
+                    @Override
+                    public void onComplete(File file) {
+                        if (file != null){
+                            mEmailAttachments.add(file);
+                        }
+                    }
+                }).execute();
+
+            }
+        };
+
+        // take a picture of the map
+        if ( (mMap != null) && getMapReady()){
+            mMap.snapshot(callback);
         }
     }
 
