@@ -7,14 +7,14 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <LinearLayout
-        android:layout_width="400dp"
+        android:layout_width="@dimen/ftl_width"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:background="@color/windowBackground"
         android:elevation="2dp"
 
         android:orientation="vertical"
-        android:paddingTop="@dimen/activity_vertical_margin">
+        android:paddingTop="@dimen/margin_16">
 
 
         <android.support.v7.widget.RecyclerView
@@ -23,9 +23,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp" />
+            android:layout_marginEnd="@dimen/margin_8"
+            android:layout_marginStart="@dimen/margin_8"
+            android:layout_marginTop="@dimen/margin_8" />
 
 
         <Button
@@ -33,10 +33,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginBottom="@dimen/margin_8"
+            android:layout_marginEnd="@dimen/margin_8"
+            android:layout_marginStart="@dimen/margin_8"
+            android:layout_marginTop="@dimen/margin_16"
             android:text="@string/display_trips" />
 
 

@@ -11,8 +11,8 @@
         android:id="@+id/sort_heading_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="@dimen/margin_16"
+        android:layout_marginTop="@dimen/margin_16"
         android:text="@string/sort_trip_list"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -23,8 +23,8 @@
         android:id="@+id/radioFilterGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="@dimen/margin_8"
+        android:layout_marginTop="@dimen/margin_8"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="@+id/sort_heading_tv"
         app:layout_constraintTop_toBottomOf="@+id/sort_heading_tv">
@@ -60,9 +60,9 @@
 
     <Button
         android:id="@+id/submit_btn"
-        android:layout_width="132dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="@dimen/as_button_height"
+        android:layout_height="@dimen/as_button_width"
+        android:layout_marginTop="@dimen/margin_8"
         android:text="@string/submit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -74,6 +74,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="226dp" />
+        app:layout_constraintGuide_begin="@dimen/as_constraint_guide" />
 
 </android.support.constraint.ConstraintLayout>

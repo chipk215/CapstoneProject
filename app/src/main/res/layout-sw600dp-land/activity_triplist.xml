@@ -7,7 +7,7 @@
 
     <FrameLayout
         android:id="@+id/trip_list_container"
-        android:layout_width="360dp"
+        android:layout_width="@dimen/at_width"
         android:layout_height="match_parent" />
 
     <!-- A small divider -->
