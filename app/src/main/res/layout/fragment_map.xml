@@ -125,5 +125,5 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <include layout="@layout/share_fab_layout"/>
+
 </android.support.design.widget.CoordinatorLayout>

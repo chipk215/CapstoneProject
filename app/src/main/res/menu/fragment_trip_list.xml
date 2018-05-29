@@ -14,12 +14,16 @@
 
     <item
         android:id="@+id/sort"
-        android:title="@string/sort"
-        />
+        android:title="@string/sort" />
 
     <item
         android:id="@+id/new_trip"
-        android:title="@string/new_trip"
-        />
+        android:title="@string/new_trip" />
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_mail"
+        android:title="@string/action_share"
+        app:showAsAction="ifRoom"/>
 
 </menu>

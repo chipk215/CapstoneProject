@@ -17,6 +17,9 @@ import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -185,12 +188,15 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     private List<File> mEmailAttachments = new ArrayList<>();
 
+    private Menu mMenu;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate TripMapFragment invoked");
 
+        setHasOptionsMenu(true);
 
         mMasterSegmentUriList = getArguments().getParcelableArrayList(EXTRA_URI);
         mIsTwoPane = getArguments().getBoolean(TWO_PANE_EXTRA);
@@ -280,8 +286,28 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
         mRootView = view;
 
-        setUpFAB(view);
         return view;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.fragment_trip_map, menu);
+        mMenu = menu;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+
+            case R.id.share:
+                captureScreen();
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
 
@@ -759,20 +785,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         for (Polyline p: mPolyLines){
             p.setClickable(true);
         }
-    }
-
-
-    private void setUpFAB(View view){
-        view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                captureScreen();
-
-
-            }
-
-        });
     }
 
 

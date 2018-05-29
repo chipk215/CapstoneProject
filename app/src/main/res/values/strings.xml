@@ -46,6 +46,7 @@
     <string name="action_share">Share</string>
     <string name="trip">Trip</string>
     <string name="trip_elapsed">Trip Time (elapsed):</string>
+    <string name="trip_list_subject">Trip Log</string>
 
 
    <!-- list_item_log.xml -->

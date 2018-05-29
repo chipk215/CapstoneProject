@@ -179,7 +179,7 @@ public class TripListFragment extends Fragment
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
 
-        setUpFAB(view);
+
         return view;
     }
 
@@ -226,6 +226,9 @@ public class TripListFragment extends Fragment
                 intent = FilterActivity.newIntent(getContext(), mListFiltered);
                 startActivityForResult(intent, REQUEST_FILTER_PREFERENCES);
                 return true;
+
+            case R.id.share:
+                shareTripList();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -499,7 +502,44 @@ public class TripListFragment extends Fragment
         }
     }
 
-    private void setUpFAB(View view){
+
+    private void shareTripList(){
+        if (mSegmentCursor != null) {
+            mSegmentCursor.moveToPosition(-1);
+            String message="";
+            int count = 1;
+            String newLine = System.getProperty("line.separator");
+            while(mSegmentCursor.moveToNext()){
+                Segment segment = mSegmentCursor.getSegment();
+                message += getString(R.string.trip) + " " + Integer.toString(count) +  newLine;
+                message += getString(R.string.date) + "  " + segment.getDate() +  newLine;
+                message += getString(R.string.start_time) + "  " + segment.getTime() +  newLine;
+                DurationRecord durationRecord = segment.getSegmentDuration(getContext());
+
+                message+= getString(R.string.trip_elapsed) + " " +
+                        durationRecord.getValue()+ " " +
+                        durationRecord.getDimension() + newLine;
+
+                message += getString(R.string.distance) + "  " +
+                        segment.getDistanceMiles() + " " +
+                        getContext().getResources()
+                                .getQuantityString(R.plurals.miles_plural,
+                                        PluralHelpers.getPluralQuantity(segment.getDistance()));
+                message += newLine + newLine;
+                count++;
+
+            }
+
+
+            startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+                    .setType("text/plain")
+                    .setSubject(getContext().getString(R.string.trip_list_subject))
+                    .setText(message)
+                    .getIntent(), getString(R.string.action_share)));
+        }
+    }
+
+ /*   private void setUpFAB(View view){
         view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -540,6 +580,6 @@ public class TripListFragment extends Fragment
             }
         });
     }
-
+*/
 
 }
