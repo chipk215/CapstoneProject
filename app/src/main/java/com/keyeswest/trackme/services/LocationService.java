@@ -22,6 +22,8 @@ import com.keyeswest.trackme.R;
 
 import timber.log.Timber;
 
+import static com.keyeswest.trackme.utilities.LocationPreferences.setRequestingLocationUpdates;
+
 public abstract class LocationService extends Service {
 
     private static final String PACKAGE_NAME =
@@ -123,7 +125,8 @@ public abstract class LocationService extends Service {
             Timber.d("User stopped tracking from notification");
             removeLocationUpdates();
 
-            // how will
+            // update location tracking state
+            setRequestingLocationUpdates(this, false);
         }
         // Tells the system to not try to recreate the service after it has been killed.
         return START_NOT_STICKY;

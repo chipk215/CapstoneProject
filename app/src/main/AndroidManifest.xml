@@ -16,9 +16,13 @@
             android:name=".TripMapActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".TripListActivity" />
-        <activity android:name=".NewTripActivity" android:launchMode="singleTop" />
+        <activity
+            android:name=".NewTripActivity"
+            android:launchMode="singleTask"
+            android:parentActivityName=".TripListActivity"/>
         <activity android:name=".SortActivity" />
-        <activity android:name=".PermissionActivity"
+        <activity
+            android:name=".PermissionActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,23 +39,33 @@
             android:name=".data.TracksContentProvider"
             android:authorities="com.keyeswest.trackme"
             android:exported="true" />
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.keyeswest.trackme.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
 
-
         <service
             android:name=".services.LocationProcessorService"
             android:exported="false" />
 
-        <activity android:name=".FilterActivity"></activity>
+        <service android:name=".widget.TrackMeWidgetService" />
+
+        <activity android:name=".FilterActivity" />
+
+        <receiver android:name=".widget.TrackMeWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/track_me_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

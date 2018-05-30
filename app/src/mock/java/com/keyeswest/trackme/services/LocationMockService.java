@@ -171,15 +171,23 @@ public class LocationMockService extends LocationService {
     @Override
     public void removeLocationUpdates() {
         Timber.d("Stopping mocked location service");
-        LocationPreferences.setRequestingLocationUpdates(this, false);
+
         mStopped = true;
-        stopSelf();
+
+        if (serviceIsRunningInForeground(this)){
+            Timber.d("Service is in foreground ");
+            stopForeground(true);
+            stopSelf();
+        }else {
+            Timber.d("Service is not in foreground ");
+            stopSelf();
+        }
     }
 
     @Override
     public void requestLocationUpdates() {
         Timber.d("Requesting locations");
-        LocationPreferences.setRequestingLocationUpdates(this, true);
+
         startService(new Intent(getApplicationContext(), LocationMockService.class));
         mStopped = false;
         Message message = mServiceHandler.obtainMessage();

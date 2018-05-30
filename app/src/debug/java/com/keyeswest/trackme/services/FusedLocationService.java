@@ -136,7 +136,7 @@ public class FusedLocationService extends LocationService {
     @Override
     public void requestLocationUpdates() {
         Timber.d("Requesting location updates");
-        LocationPreferences.setRequestingLocationUpdates(this, true);
+
         startService(new Intent(getApplicationContext(), FusedLocationService.class));
         try {
             mFusedLocationClient.requestLocationUpdates(mLocationRequest,
