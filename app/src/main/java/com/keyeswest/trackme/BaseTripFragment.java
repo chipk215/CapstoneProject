@@ -98,7 +98,7 @@ public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<Cursor>, NewTripActivity.NotifyBackPressed{
 
-    private static final String IS_TRACKING_EXTRA = "isTrackingExtra";
+
     private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
     protected static final String INITIAL_NEW_TRIP_STARTED_EXTRA = "initialNewTripStartedExtra";
 
@@ -161,12 +161,8 @@ public abstract class BaseTripFragment extends Fragment
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         Timber.d("onCreate Trip Fragment");
-
-
     }
 
 
@@ -176,6 +172,9 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("onStart invoked");
         super.onStart();
 
+        // if the start tracking button is disabled but we are not tracking fix the start
+        // button state. This state occurs when the user stops tracking using the posted
+        // notification when the location service was in the foreground.
         if ((! mStartUpdatesButton.isEnabled()) && (! requestingLocationUpdates(getContext())) ) {
             if (getActivity() != null) {
                 Timber.d("Entering NewTrip Activity due to user terminating location service");
@@ -201,9 +200,9 @@ public abstract class BaseTripFragment extends Fragment
 
         setTrackButtonState(true);
 
-
         if (savedInstanceState != null) {
-            boolean isTracking = savedInstanceState.getByte(IS_TRACKING_EXTRA) != 0;
+
+            boolean isTracking = requestingLocationUpdates(getContext());
             if (isTracking) {
                 setTrackButtonState(false);
 
@@ -217,7 +216,6 @@ public abstract class BaseTripFragment extends Fragment
             @Override
             public void onClick(View view) {
                 startNewTrip();
-
             }
         });
 
@@ -226,10 +224,7 @@ public abstract class BaseTripFragment extends Fragment
         mStopUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Timber.i( "Stopping location updates");
                 stopUpdates();
-
-
             }
         });
 
@@ -243,47 +238,25 @@ public abstract class BaseTripFragment extends Fragment
 
         mapFragment.getMapAsync(this);
 
-        mSampleReceiver = new ProcessedLocationSampleReceiver();
-        mSampleReceiver.registerCallback(this);
-        IntentFilter filter = new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE);
-        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(getContext());
-        lbm.registerReceiver(mSampleReceiver, filter);
-
         return view;
     }
 
 
 
     @Override
-    public void onViewStateRestored(Bundle savedInstanceState){
-        super.onViewStateRestored(savedInstanceState);
-
-        Timber.d("onViewStateRestored Trip Fragment");
-    }
-
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Timber.d("onActivityCreated Trip Fragment");
-    }
-
-    @Override
     public void onPause() {
         Timber.d("Trip tracking paused, unregistering plot receiver");
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
-
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        Timber.d("Trip tracking resumed, re-registering plot receiver");
         super.onResume();
+        Timber.d("Trip tracking resumed, re-registering plot receiver");
+
 
         Timber.d("mMapDisplayed= " + Boolean.toString(mMapDisplayed));
-
 
         // Check the database and load any locations associated with the segment being plotted.
         // This ensures that the plotted trip always begins at the start even if this activity
@@ -296,8 +269,6 @@ public abstract class BaseTripFragment extends Fragment
             mResumeReady = true;
         }
 
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
-                new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
 
 
         mStartTrip = NewTripActivity.startTrip(getActivity().getIntent());
@@ -308,7 +279,6 @@ public abstract class BaseTripFragment extends Fragment
             if (mTrackingSegment == null) {
 
                 if (mMapDisplayed) {
-
                     // NewTripActivity started but not tracking when widget starts tracking
                     startNewTrip();
                 }
@@ -418,11 +388,8 @@ public abstract class BaseTripFragment extends Fragment
     public void onSaveInstanceState(Bundle savedInstanceState){
         Timber.d("onSaveInstanceState invoked");
 
-        // save the state of the buttons
-        boolean isTracking = mStopUpdatesButton.isEnabled();
-        savedInstanceState.putByte(IS_TRACKING_EXTRA, (byte)(isTracking ? 1 : 0));
 
-        if (isTracking){
+        if (mTrackingSegment != null){
             // save the segment information associated with the sample locations
             savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
         }
@@ -517,6 +484,13 @@ public abstract class BaseTripFragment extends Fragment
 
 
     private void startUpdates() {
+
+        // start listening for location sample updates
+        mSampleReceiver = new ProcessedLocationSampleReceiver();
+        mSampleReceiver.registerCallback(this);
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
+                new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
+
         LocationPreferences.setRequestingLocationUpdates(getContext(), true);
         mService.requestLocationUpdates();
         setTrackButtonState(false);
@@ -527,6 +501,10 @@ public abstract class BaseTripFragment extends Fragment
 
     private void stopUpdates() {
         Timber.d("Entering stopUpdates");
+
+        //Stop listening for new location samples
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
+
         LocationPreferences.setRequestingLocationUpdates(getContext(), false);
 
  /*
@@ -552,13 +530,14 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("New Trip Started");
 
         try {
-            Timber.i( "Starting location updates");
+            Timber.d( "Starting location updates");
             if ((mMap!= null ) && (mPlot != null)){
                 mPlot.remove();
                 mPolylineOptions = null;
             }
-            mStartUpdatesButton.setEnabled(false);
-            mStopUpdatesButton.setEnabled(true);
+
+            setTrackButtonState(false);
+
 
             // create a segment record in the db to hold the location samples
             StartSegmentTask task = new StartSegmentTask(getContext(),

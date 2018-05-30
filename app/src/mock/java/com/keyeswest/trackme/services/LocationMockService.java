@@ -29,7 +29,6 @@ import static com.keyeswest.trackme.tasks.StartSegmentTask.SEGMENT_ID_KEY;
 
 public class LocationMockService extends LocationService {
 
-    private static final String UPDATE_EXTRA_KEY = "updateKey";
 
     private static final int START_CODE = 1;
     private static final int WHAT_CODE = 3;
