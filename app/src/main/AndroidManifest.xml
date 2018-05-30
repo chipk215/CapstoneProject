@@ -20,7 +20,7 @@
 
         <activity
             android:name=".NewTripActivity"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:parentActivityName=".TripListActivity"/>
 
         <activity android:name=".SortActivity" />

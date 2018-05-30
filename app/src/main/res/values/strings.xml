@@ -89,8 +89,8 @@
     <!-- LocationService -->
     <string name="channel_name">Notification Channel Name</string>
     <string name="sampling_service_notice">Location Sampling Service</string>
-    <string name="launch_activity">Start application</string>
-    <string name="remove_location_updates">Stop location updates</string>
+    <string name="launch_activity">Open TrackMe</string>
+    <string name="remove_location_updates">Stop updates</string>
 
     <!-- LocationPreferences -->
     <string name="location_updated">Location Updated: %1$s</string>

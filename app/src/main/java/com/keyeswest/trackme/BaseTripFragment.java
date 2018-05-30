@@ -83,6 +83,10 @@ import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLoca
  *     the foreground, the intent flag "FLAG_ACTIVITY_REORDER_TO_FRONT" in combination with the
  *     activity "singleTop" launch mode brings the NewTripActivity back into view.
  *
+ *  5) Widget starts activity when no instance of activity exists.
+ *
+ *  6) Widget starts activity when activity instance exists.
+ *
  *  -------------------------
  *
  *  Why is NotifyBackPressed implemented in this fragment as a method invoked from the
@@ -201,13 +205,19 @@ public abstract class BaseTripFragment extends Fragment
         setTrackButtonState(true);
 
         if (savedInstanceState != null) {
-
+            mTrackingSegment = savedInstanceState.getParcelable(TRACKED_SEGMENT_EXTRA);
             boolean isTracking = requestingLocationUpdates(getContext());
             if (isTracking) {
                 setTrackButtonState(false);
 
-                mTrackingSegment = savedInstanceState.getParcelable(TRACKED_SEGMENT_EXTRA);
                 mTripStarted = savedInstanceState.getBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA);
+
+            }else{
+                //TODO if a plotted trip was showing after the user stopped tracking it should
+                // be redisplayed on a rotation
+                if (mTrackingSegment != null){
+                    // replot trip
+                }
 
             }
         }
@@ -255,6 +265,13 @@ public abstract class BaseTripFragment extends Fragment
         super.onResume();
         Timber.d("Trip tracking resumed, re-registering plot receiver");
 
+        if (requestingLocationUpdates(getContext())) {
+            mSampleReceiver = new ProcessedLocationSampleReceiver();
+            mSampleReceiver.registerCallback(this);
+            LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
+                    new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
+        }
+
 
         Timber.d("mMapDisplayed= " + Boolean.toString(mMapDisplayed));
 
@@ -265,6 +282,8 @@ public abstract class BaseTripFragment extends Fragment
             Timber.d("initloader for locations");
             getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
             mResumeReady = false;
+
+
         }else{
             mResumeReady = true;
         }
@@ -389,11 +408,11 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("onSaveInstanceState invoked");
 
 
-        if (mTrackingSegment != null){
-            // save the segment information associated with the sample locations
-            savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
-        }
+        // save the segment information associated with the sample locations
+        savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
 
+
+        // TODO revisit do we need this?
         savedInstanceState.putBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA, mTripStarted);
 
         super.onSaveInstanceState(savedInstanceState);
@@ -538,11 +557,9 @@ public abstract class BaseTripFragment extends Fragment
 
             setTrackButtonState(false);
 
-
             // create a segment record in the db to hold the location samples
             StartSegmentTask task = new StartSegmentTask(getContext(),
                     new StartSegmentTask.ResultsCallback() {
-
 
                         @Override
                         public void onComplete(Segment segment) {
