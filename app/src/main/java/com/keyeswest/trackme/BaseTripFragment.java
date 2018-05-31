@@ -13,6 +13,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -159,6 +160,8 @@ public abstract class BaseTripFragment extends Fragment
 
         mStartTrip = getArguments().getBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA);
         Timber.d("Start Trip: " + Boolean.toString(mStartTrip));
+
+        setHasOptionsMenu(true);
     }
 
 
@@ -225,6 +228,16 @@ public abstract class BaseTripFragment extends Fragment
     }
 
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                stopUpdates();
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onPause() {
