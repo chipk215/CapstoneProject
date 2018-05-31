@@ -121,5 +121,6 @@
     </plurals>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="launch_app_icon">Launch app icon</string>
 
 </resources>
