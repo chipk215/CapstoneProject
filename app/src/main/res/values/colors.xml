@@ -3,7 +3,7 @@
     <color name="colorPrimary">#4caf50</color>
     <color name="colorPrimaryDark">#388E3C</color>
     <color name="colorPrimaryLight">#C8E6C9</color>
-    <color name="secondaryColor">#7C4DFF</color>
+    <color name="secondaryColor">#E040FB</color>
     <color name="textColorPrimary">#212121</color>
     <color name="secondaryTextColor">#757575</color>
     <color name="divider">#BDBDBD</color>
@@ -12,7 +12,7 @@
 
     <color name="windowBackground">#FFFFFF</color>
     <color name="navigationBarColor">#000000</color>
-    <color name="colorAccent">#7C4DFF</color>
+    <color name="colorAccent">#E040FB</color>
     <color name="plotOne">#ffff0000</color>
     <color name="plotTwo">#ff0000ff</color>
     <color name="plotThree">#ff00ff00</color>
