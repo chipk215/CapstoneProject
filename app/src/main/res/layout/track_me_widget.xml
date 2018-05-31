@@ -22,7 +22,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/open_track_id"
-        android:text="@string/open_track"/>
+        android:id="@+id/open_list_id"
+        android:text="@string/open_list"/>
 </LinearLayout>
 

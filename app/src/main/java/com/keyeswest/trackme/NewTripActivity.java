@@ -13,6 +13,7 @@ import timber.log.Timber;
 public class NewTripActivity  extends AppCompatActivity {
 
     public static final String NEW_TRIP_EXTRA = "newTripExtra";
+    public static final String STOP_TRIP_EXTRA = "stopTripExtra";
     public static final String OPTIONS_EXTRA = "optionsExtra";
 
     public static Intent newIntent(Context packageContext){
@@ -28,15 +29,19 @@ public class NewTripActivity  extends AppCompatActivity {
     }
 
 
-    public static boolean startTrip(Intent intent){
+    public static boolean isStartTrip(Intent intent){
         return intent.getBooleanExtra(NEW_TRIP_EXTRA,false);
+    }
+
+    public static boolean isStopTrip(Intent intent){
+        return intent.getBooleanExtra(STOP_TRIP_EXTRA, false);
     }
 
     public interface NotifyBackPressed{
         void backPressed();
     }
 
-    Fragment mFragment;
+    NewTripFragment mFragment;
 
 
     @Override
@@ -44,21 +49,17 @@ public class NewTripActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
-        Intent intent = getIntent();
-        if (intent != null){
-            Bundle bundle = intent.getBundleExtra(OPTIONS_EXTRA);
-            if (bundle != null){
-                Timber.d("NewTripActivity startTrip= " + Boolean.toString(bundle.getBoolean(NEW_TRIP_EXTRA)));
-            }
-
-        }
-
+        Intent intent= getIntent();
+        boolean newTrip = isStartTrip(intent);
+        Timber.d("Start Trip: " + Boolean.toString(newTrip));
+        boolean stopTrip = isStopTrip(intent);
+        Timber.d("Stop Trip: " + Boolean.toString(stopTrip));
 
 
         FragmentManager fm = getSupportFragmentManager();
-        mFragment = fm.findFragmentById(R.id.fragment_container);
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 
-        if (mFragment == null) {
+        if (fragment == null) {
             mFragment = new NewTripFragment();
             fm.beginTransaction()
                     .add(R.id.fragment_container, mFragment)
@@ -89,13 +90,20 @@ public class NewTripActivity  extends AppCompatActivity {
         Timber.d("onNewIntent invoked");
         super.onNewIntent(intent);
 
+        boolean newTrip = isStartTrip(intent);
+        if (newTrip){
+            FragmentManager fm = getSupportFragmentManager();
+            mFragment = new NewTripFragment();
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, mFragment)
+                    .commit();
+        }else if (isStopTrip(intent)){
+            mFragment.stopUpdates();
+        }
+
         setIntent(intent);
 
-        FragmentManager fm = getSupportFragmentManager();
-        mFragment = new NewTripFragment();
-        fm.beginTransaction()
-                .replace(R.id.fragment_container, mFragment)
-                .commit();
+
     }
 
 

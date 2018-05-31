@@ -167,7 +167,8 @@ public abstract class BaseTripFragment extends Fragment
         super.onCreate(savedInstanceState);
         Timber.d("onCreate Trip Fragment");
 
-        mStartTrip = NewTripActivity.startTrip(getActivity().getIntent());
+        mStartTrip = NewTripActivity.isStartTrip(getActivity().getIntent());
+        Timber.d("Start Trip: " + Boolean.toString(mStartTrip));
     }
 
 
@@ -356,12 +357,14 @@ public abstract class BaseTripFragment extends Fragment
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Timber.d("onMapReady");
         mMap = googleMap;
        // mMapReady = true;
         mMap.setMyLocationEnabled(true);
         displayMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
 
         if (mStartTrip && !mTripStarted){
+            Timber.d("Start new trip");
             startNewTrip();
             mTripStarted = true;
         }
@@ -498,7 +501,7 @@ public abstract class BaseTripFragment extends Fragment
         TrackMeWidgetService.getTrackingState(getContext());
     }
 
-    private void stopUpdates() {
+    public void stopUpdates() {
         Timber.d("Entering stopUpdates");
 
         //Stop listening for new location samples

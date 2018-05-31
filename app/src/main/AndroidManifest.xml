@@ -16,7 +16,10 @@
         <activity
             android:name=".TripMapActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".TripListActivity" />
+
+
+        <activity android:name=".TripListActivity"
+            android:launchMode="singleTop" />
 
         <activity
             android:name=".NewTripActivity"
