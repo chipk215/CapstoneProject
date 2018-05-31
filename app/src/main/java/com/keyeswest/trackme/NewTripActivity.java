@@ -9,12 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 
 import timber.log.Timber;
 
-
+/**
+ * Manages the functionality associated with tracking the user's position and creating a trip.
+ */
 public class NewTripActivity  extends AppCompatActivity {
 
-    public static final String NEW_TRIP_EXTRA = "newTripExtra";
-    public static final String STOP_TRIP_EXTRA = "stopTripExtra";
-    public static final String OPTIONS_EXTRA = "optionsExtra";
+    // Extra keys used by App Widget to start activity with a request to start a trip
+    // or stop tracking the user and end the trip.
+    private static final String NEW_TRIP_EXTRA = "newTripExtra";
+    private static final String STOP_TRIP_EXTRA = "stopTripExtra";
 
     public static Intent newIntent(Context packageContext){
         Intent intent = new Intent(packageContext, NewTripActivity.class);
@@ -28,17 +31,19 @@ public class NewTripActivity  extends AppCompatActivity {
         return intent;
     }
 
+    public static Intent stopTripIntent(Context packageContext){
+        Intent intent = new Intent(packageContext, NewTripActivity.class);
+        intent.putExtra(STOP_TRIP_EXTRA, true);
+        return intent;
+    }
 
-    public static boolean isStartTrip(Intent intent){
+
+    private static boolean isStartTrip(Intent intent){
         return intent.getBooleanExtra(NEW_TRIP_EXTRA,false);
     }
 
-    public static boolean isStopTrip(Intent intent){
+    private static boolean isStopTrip(Intent intent){
         return intent.getBooleanExtra(STOP_TRIP_EXTRA, false);
-    }
-
-    public interface NotifyBackPressed{
-        void backPressed();
     }
 
     NewTripFragment mFragment;
@@ -85,6 +90,12 @@ public class NewTripActivity  extends AppCompatActivity {
 
     }
 
+    /**
+     * Handle the case where the user has navigated to the new trip screen and has not started
+     * tracking. The user then pauses the app and goes to the home screen and uses the app widget
+     * to start tracking a new trip.
+     * @param intent
+     */
     @Override
     protected void onNewIntent(Intent intent) {
         Timber.d("onNewIntent invoked");
@@ -92,19 +103,21 @@ public class NewTripActivity  extends AppCompatActivity {
 
         boolean newTrip = isStartTrip(intent);
         if (newTrip){
+
+            // Replace the existing fragment with a new fragment with an argument that causes
+            // trip tracking to be started without the user having to press the start
+            // tracking button.
             FragmentManager fm = getSupportFragmentManager();
-            mFragment = NewTripFragment.newInstance(newTrip);
+            mFragment = NewTripFragment.newInstance(true);
             fm.beginTransaction()
                     .replace(R.id.fragment_container, mFragment)
                     .commit();
         }else if (isStopTrip(intent)){
+            // Handle the app widget request to stop tracking
             mFragment.stopUpdates();
         }
 
         setIntent(intent);
-
-
     }
-
 
 }

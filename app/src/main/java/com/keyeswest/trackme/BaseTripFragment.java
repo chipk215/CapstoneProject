@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.LocationLoader;
+import com.keyeswest.trackme.interfaces.NotifyBackPressed;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
 import com.keyeswest.trackme.services.LocationService;
@@ -78,15 +79,13 @@ import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLoca
  *       shared preference requesting location state is false then the location service has
  *       been stopped and the button states need to be corrected.
  *
- *  4) User open the app via the notification posted when the location service is in the foreground.
+ *  4) User opens the app via the notification posted when the location service is in the foreground.
  *
  *     - if the user opens the app via the notification posted when the location service is in
  *     the foreground, the intent flag "FLAG_ACTIVITY_REORDER_TO_FRONT" in combination with the
  *     activity "singleTop" launch mode brings the NewTripActivity back into view.
  *
- *  5) Widget starts activity when no instance of activity exists.
- *
- *  6) Widget starts activity when activity instance exists.
+ *  5) Widget starts activity.
  *
  *  -------------------------
  *
@@ -101,7 +100,7 @@ import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLoca
 
 public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived, OnMapReadyCallback,
-        LoaderManager.LoaderCallbacks<Cursor>, NewTripActivity.NotifyBackPressed{
+        LoaderManager.LoaderCallbacks<Cursor>, NotifyBackPressed {
 
 
     private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
@@ -286,7 +285,7 @@ public abstract class BaseTripFragment extends Fragment
      *
      * 3) Initial invocation after a configuration (rotation) change
      *    - mPolylineOptions will be null
-     *    - mPLot will be recreated and be empty
+     *    - mPlot will be recreated and be empty
      *    - mPlottedPoints containing previously plotted locations points will not be null
      *
      * 4) App is restarted after user pauses and then restarts without the app being removed

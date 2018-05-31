@@ -13,8 +13,7 @@ import com.keyeswest.trackme.TripListActivity;
 
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.NewTripActivity.NEW_TRIP_EXTRA;
-import static com.keyeswest.trackme.NewTripActivity.STOP_TRIP_EXTRA;
+
 
 /**
  * Implementation of App Widget functionality.
@@ -36,17 +35,14 @@ public class TrackMeWidgetProvider extends AppWidgetProvider {
 
 
         //Setup intent to start a new trip
-        Intent startTripIntent =new Intent(context, NewTripActivity.class);
-        startTripIntent.putExtra(NEW_TRIP_EXTRA, true);
+        Intent startTripIntent = NewTripActivity.newTripIntent(context);
         PendingIntent pendingStartTrip = PendingIntent.getActivity(context, 0,
                 startTripIntent,PendingIntent.FLAG_UPDATE_CURRENT);
-
         views.setOnClickPendingIntent(R.id.start_track_id, pendingStartTrip);
 
 
         //Setup intent to send a new trip (stop tracking)
-        Intent stopTripIntent = new Intent(context, NewTripActivity.class);
-        stopTripIntent.putExtra(STOP_TRIP_EXTRA,true);
+        Intent stopTripIntent = NewTripActivity.stopTripIntent(context);
         PendingIntent pendingStopTrip = PendingIntent.getActivity(context, 1,
                 stopTripIntent,PendingIntent.FLAG_UPDATE_CURRENT );
         views.setOnClickPendingIntent(R.id.stop_track_id, pendingStopTrip);

@@ -15,7 +15,8 @@
 
         <activity
             android:name=".TripMapActivity"
-            android:label="@string/title_activity_maps" />
+            android:label="@string/title_activity_maps"
+            android:parentActivityName=".TripListActivity"/>
 
 
         <activity android:name=".TripListActivity"
