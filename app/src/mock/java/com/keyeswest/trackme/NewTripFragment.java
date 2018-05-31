@@ -19,6 +19,14 @@ import timber.log.Timber;
  */
 public class NewTripFragment extends BaseTripFragment {
 
+    public static NewTripFragment newInstance(Boolean startTrip){
+        NewTripFragment fragment = new NewTripFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA, startTrip);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
 
     public NewTripFragment() {
         // Required empty public constructor

@@ -115,16 +115,6 @@ public abstract class BaseTripFragment extends Fragment
 
     private Location mLastLocation;
 
-    // Indicates when google map is initialized and ready to use (async initialization)
-    private boolean mMapReady = false;
-
-    // Indicates when current location has been returned
-    private boolean mCurrentLocationReady = false;
-
-    // When fragment is resumed, a call to the database is made to retrieve location samples
-    // that were delivered while the fragment was paused.
-  //  private boolean mResumeReady = false;
-
     private PolylineOptions mPolylineOptions;
     private Polyline mPlot;
 
@@ -167,7 +157,7 @@ public abstract class BaseTripFragment extends Fragment
         super.onCreate(savedInstanceState);
         Timber.d("onCreate Trip Fragment");
 
-        mStartTrip = NewTripActivity.isStartTrip(getActivity().getIntent());
+        mStartTrip = getArguments().getBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA);
         Timber.d("Start Trip: " + Boolean.toString(mStartTrip));
     }
 
@@ -250,25 +240,6 @@ public abstract class BaseTripFragment extends Fragment
 
         getLastLocation();
 
-
-      /*
-        if (mStartTrip){
-
-            // if started from the widget, after NewTripActivity had already started but not plotting
-            // then invoke display map to start a new trip
-            if (mTrackingSegment == null) {
-
-                if (mMapDisplayed) {
-                    // NewTripActivity started but not tracking when widget starts tracking
-                    startNewTrip();
-                }
-
-            }else{
-                mTripStarted = true;
-            }
-        }
-        Timber.d("Retrieved start trip extra from intent: " + Boolean.toString(mStartTrip));
-        */
     }
 
 
@@ -551,7 +522,6 @@ public abstract class BaseTripFragment extends Fragment
 
 
     private void setTrackButtonState(boolean enableTracking){
-
         mStartUpdatesButton.setEnabled(enableTracking);
         mStopUpdatesButton.setEnabled(!enableTracking);
     }

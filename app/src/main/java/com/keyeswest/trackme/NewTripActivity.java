@@ -60,7 +60,7 @@ public class NewTripActivity  extends AppCompatActivity {
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 
         if (fragment == null) {
-            mFragment = new NewTripFragment();
+            mFragment = NewTripFragment.newInstance(newTrip);
             fm.beginTransaction()
                     .add(R.id.fragment_container, mFragment)
                     .commit();
@@ -77,8 +77,8 @@ public class NewTripActivity  extends AppCompatActivity {
         // the service running.
         //
         // This handles the case where the user does not stop tracking before hitting the back button
-        if (mFragment instanceof NotifyBackPressed) {
-            ((NotifyBackPressed) mFragment).backPressed();
+        if (mFragment != null) {
+             mFragment.backPressed();
         }
 
         super.onBackPressed();
@@ -93,7 +93,7 @@ public class NewTripActivity  extends AppCompatActivity {
         boolean newTrip = isStartTrip(intent);
         if (newTrip){
             FragmentManager fm = getSupportFragmentManager();
-            mFragment = new NewTripFragment();
+            mFragment = NewTripFragment.newInstance(newTrip);
             fm.beginTransaction()
                     .replace(R.id.fragment_container, mFragment)
                     .commit();
