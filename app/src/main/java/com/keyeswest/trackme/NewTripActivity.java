@@ -90,5 +90,13 @@ public class NewTripActivity  extends AppCompatActivity {
         super.onNewIntent(intent);
 
         setIntent(intent);
+
+        FragmentManager fm = getSupportFragmentManager();
+        mFragment = new NewTripFragment();
+        fm.beginTransaction()
+                .replace(R.id.fragment_container, mFragment)
+                .commit();
     }
+
+
 }

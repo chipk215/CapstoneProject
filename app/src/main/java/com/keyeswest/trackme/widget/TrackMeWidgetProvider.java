@@ -35,7 +35,7 @@ public class TrackMeWidgetProvider extends AppWidgetProvider {
         views.setBoolean(R.id.stop_track_id, "setEnabled", sIsTracking);
 
         Intent startTripIntent =new Intent(context, NewTripActivity.class);
-        startTripIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+     //   startTripIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startTripIntent.putExtra(NEW_TRIP_EXTRA, true);
 
 

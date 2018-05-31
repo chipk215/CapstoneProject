@@ -123,7 +123,7 @@ public abstract class BaseTripFragment extends Fragment
 
     // When fragment is resumed, a call to the database is made to retrieve location samples
     // that were delivered while the fragment was paused.
-    private boolean mResumeReady = false;
+  //  private boolean mResumeReady = false;
 
     private PolylineOptions mPolylineOptions;
     private Polyline mPlot;
@@ -155,18 +155,19 @@ public abstract class BaseTripFragment extends Fragment
     // Monitors the state of the connection to the service.
     final protected ServiceConnection mServiceConnection = getServiceConnection();
 
-    private FusedLocationProviderClient mFusedLocationClient;
-
     private boolean mStartTrip = false;
     private boolean mTripStarted = false;
 
     private boolean mMapDisplayed = false;
 
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Timber.d("onCreate Trip Fragment");
+
+        mStartTrip = NewTripActivity.startTrip(getActivity().getIntent());
     }
 
 
@@ -200,7 +201,6 @@ public abstract class BaseTripFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
         mUnbinder = ButterKnife.bind(this, view);
 
-        mResumeReady = false;
 
         setTrackButtonState(true);
 
@@ -211,13 +211,6 @@ public abstract class BaseTripFragment extends Fragment
                 setTrackButtonState(false);
 
                 mTripStarted = savedInstanceState.getBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA);
-
-            }else{
-                //TODO if a plotted trip was showing after the user stopped tracking it should
-                // be redisplayed on a rotation
-                if (mTrackingSegment != null){
-                    // replot trip
-                }
 
             }
         }
@@ -230,23 +223,12 @@ public abstract class BaseTripFragment extends Fragment
         });
 
 
-
         mStopUpdatesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopUpdates();
             }
         });
-
-
-        // In all cases put the current location on the map
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-        getLastLocation();
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.plot_map);
-
-        mapFragment.getMapAsync(this);
 
         return view;
     }
@@ -265,32 +247,10 @@ public abstract class BaseTripFragment extends Fragment
         super.onResume();
         Timber.d("Trip tracking resumed, re-registering plot receiver");
 
-        if (requestingLocationUpdates(getContext())) {
-            mSampleReceiver = new ProcessedLocationSampleReceiver();
-            mSampleReceiver.registerCallback(this);
-            LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
-                    new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
-        }
+        getLastLocation();
 
 
-        Timber.d("mMapDisplayed= " + Boolean.toString(mMapDisplayed));
-
-        // Check the database and load any locations associated with the segment being plotted.
-        // This ensures that the plotted trip always begins at the start even if this activity
-        // is paused.
-        if (mTrackingSegment != null){
-            Timber.d("initloader for locations");
-            getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
-            mResumeReady = false;
-
-
-        }else{
-            mResumeReady = true;
-        }
-
-
-
-        mStartTrip = NewTripActivity.startTrip(getActivity().getIntent());
+      /*
         if (mStartTrip){
 
             // if started from the widget, after NewTripActivity had already started but not plotting
@@ -307,6 +267,7 @@ public abstract class BaseTripFragment extends Fragment
             }
         }
         Timber.d("Retrieved start trip extra from intent: " + Boolean.toString(mStartTrip));
+        */
     }
 
 
@@ -359,6 +320,7 @@ public abstract class BaseTripFragment extends Fragment
 
         if (mPolylineOptions == null){
             mPolylineOptions = new PolylineOptions();
+            Timber.d("New mPlot line created.");
             mPlot = mMap.addPolyline(mPolylineOptions);
         }
 
@@ -367,11 +329,9 @@ public abstract class BaseTripFragment extends Fragment
             // mPlottedPoints were read from database on configuration change
             points = mPlottedPoints;
             mPlottedPoints = null;  // don't include them again
-            //points.addAll(mPlot.getPoints());
         }else{
             points = mPlot.getPoints();
         }
-
 
 
         Timber.d("Lat: " + Double.toString(location.getLatitude()) + "  Lon: " +
@@ -397,9 +357,15 @@ public abstract class BaseTripFragment extends Fragment
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMapReady = true;
+       // mMapReady = true;
         mMap.setMyLocationEnabled(true);
-        displayMap();
+        displayMap(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+
+        if (mStartTrip && !mTripStarted){
+            startNewTrip();
+            mTripStarted = true;
+        }
+
     }
 
 
@@ -407,10 +373,8 @@ public abstract class BaseTripFragment extends Fragment
     public void onSaveInstanceState(Bundle savedInstanceState){
         Timber.d("onSaveInstanceState invoked");
 
-
         // save the segment information associated with the sample locations
         savedInstanceState.putParcelable(TRACKED_SEGMENT_EXTRA, mTrackingSegment);
-
 
         // TODO revisit do we need this?
         savedInstanceState.putBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA, mTripStarted);
@@ -419,38 +383,37 @@ public abstract class BaseTripFragment extends Fragment
     }
 
 
-
-    private void displayMap(){
+    private void displayMap(LatLng cameraPosition){
         Timber.d("displayMap invoked");
-        if (mMapReady && mResumeReady && mCurrentLocationReady) {
 
-
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),
-                    mLastLocation.getLongitude()), 15));
-
-            mMapDisplayed = true;
-
-            // Handle the widget new trip request
-            if (mStartTrip && !mTripStarted){
-                startNewTrip();
-                mTripStarted = true;
-            }
-
-
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cameraPosition, 15));
+        if (mTrackingSegment != null){
+            // load data from db
+            Timber.d("initloader for locations");
+            getLoaderManager().initLoader(LOCATION_LOADER ,null, this);
         }
     }
 
 
+
     @SuppressWarnings("MissingPermission")
     private void getLastLocation(){
-        mFusedLocationClient.getLastLocation()
+        FusedLocationProviderClient fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(getContext());
+
+        fusedLocationClient.getLastLocation()
                 .addOnCompleteListener(getActivity(),new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null){
+
+                            Timber.d("Obtained current location");
                             mLastLocation = task.getResult();
-                            mCurrentLocationReady = true;
-                            displayMap();
+
+                            // request map to be generated
+                            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.plot_map);
+                            mapFragment.getMapAsync(BaseTripFragment.this);
 
                         }else{
                             // handle error case where location not known
@@ -458,6 +421,9 @@ public abstract class BaseTripFragment extends Fragment
                     }
                 });
     }
+
+
+    /* ------------------  Loader Callbacks    -----------------------------*/
 
     @NonNull
     @Override
@@ -481,9 +447,20 @@ public abstract class BaseTripFragment extends Fragment
             Timber.d("Resumed point count= %s", Long.toString(mPlottedPoints.size()));
             cursor.close();
             getLoaderManager().destroyLoader(LOCATION_LOADER);
-            mResumeReady = true;
 
-            displayMap();
+            if (requestingLocationUpdates(getContext())) {
+                //start listening
+                mSampleReceiver = new ProcessedLocationSampleReceiver();
+                mSampleReceiver.registerCallback(this);
+                LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
+                        new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
+            }else{
+                mPolylineOptions = new PolylineOptions();
+                mPlot = mMap.addPolyline(mPolylineOptions);
+                mPlot.setPoints(mPlottedPoints);
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(mPlottedPoints.get(mPlottedPoints.size()-1)));
+            }
 
         }
     }
@@ -493,6 +470,7 @@ public abstract class BaseTripFragment extends Fragment
 
     }
 
+    /* ------------ Back button helper  ---------------------------*/
 
     // This handles the case where the user does not stop tracking before hitting the back button
     @Override
@@ -501,6 +479,8 @@ public abstract class BaseTripFragment extends Fragment
         stopUpdates();
     }
 
+
+    /* --------------- Private Methods ---------------------------*/
 
     private void startUpdates() {
 
@@ -526,18 +506,6 @@ public abstract class BaseTripFragment extends Fragment
 
         LocationPreferences.setRequestingLocationUpdates(getContext(), false);
 
- /*
-        if (mBound) {
-
-            Timber.d("mBound is true.. invoking unbindService");
-            // Unbind from the service. This signals to the service that this activity is no longer
-            // in the foreground, and the service can respond by promoting itself to a foreground
-            // service.
-            getContext().unbindService(mServiceConnection);
-            mBound = false;
-        }
- */
-
         Timber.d("Invoking location service to stop updates");
         mService.removeLocationUpdates();
         setTrackButtonState(true);
@@ -551,6 +519,7 @@ public abstract class BaseTripFragment extends Fragment
         try {
             Timber.d( "Starting location updates");
             if ((mMap!= null ) && (mPlot != null)){
+                Timber.d( "Clearing old plot line");
                 mPlot.remove();
                 mPolylineOptions = null;
             }
