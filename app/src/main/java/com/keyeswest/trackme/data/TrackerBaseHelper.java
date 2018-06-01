@@ -5,7 +5,16 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.google.gson.Gson;
+import com.keyeswest.trackme.LocationWrapper;
+import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.models.Segment;
+
+import java.io.InputStream;
+import java.util.Scanner;
+import java.util.UUID;
+
+import timber.log.Timber;
 
 public class TrackerBaseHelper extends SQLiteOpenHelper {
 
@@ -16,9 +25,12 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 4;
 
+    private Context mContext;
+
 
     public TrackerBaseHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        mContext = context;
     }
 
 
@@ -68,6 +80,9 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
                         ");";
 
         db.execSQL(SQL_CREATE_SEGMENT_TABLE);
+
+        // seed the database with sample trip data
+        seedWithTripData(db);
     }
 
     @Override
@@ -146,6 +161,44 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME, duration);
 
         return values;
+    }
+
+    private void seedWithTripData(SQLiteDatabase db){
+        // read the sample location file
+        // read the raw resource json file
+        InputStream inputStream = mContext.getResources().openRawResource(R.raw.track1);
+        String jsonString = null;
+        Scanner scanner = new Scanner(inputStream);
+        try {
+            jsonString = scanner.useDelimiter("\\A").next();
+        } catch (Exception ex) {
+            Timber.e(ex, "Error reading mock track data"); } finally {
+            scanner.close();
+        }
+
+        LocationWrapper[] locationsWrapped=null;
+
+        if (jsonString != null) {
+            Gson gson = new Gson();
+            locationsWrapped = gson.fromJson(jsonString, LocationWrapper[].class);
+        }
+
+        if (locationsWrapped != null) {
+
+            LocationWrapper firstSample = locationsWrapped[0];
+            String segmentId = UUID.randomUUID().toString();
+            ContentValues segmentValues = createSegmentRecord(segmentId,
+                    firstSample.getTimeStamp() );
+
+            db.insert(SegmentSchema.SegmentTable.TABLE_NAME , null, segmentValues);
+            for (LocationWrapper mockSample : locationsWrapped) {
+                ContentValues locationValue =
+                         createLocationRecord(mockSample.getTimeStamp() ,
+                                 mockSample.getLatitude(), mockSample.getLongitude(), segmentId);
+                db.insert(LocationSchema.LocationTable.TABLE_NAME,null, locationValue);
+            }
+        }
+
     }
 
 

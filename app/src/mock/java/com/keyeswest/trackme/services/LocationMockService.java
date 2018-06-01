@@ -10,15 +10,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.google.android.gms.location.LocationResult;
+
 import com.google.gson.Gson;
 import com.keyeswest.trackme.LocationWrapper;
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.utilities.LocationPreferences;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Scanner;
 
 import timber.log.Timber;
