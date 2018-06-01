@@ -4,8 +4,6 @@ import com.keyeswest.trackme.SortPreferenceEnum;
 
 public class SortResult {
 
-
-
     private boolean mSortChanged;
     private SortPreferenceEnum mSelectedSort;
 

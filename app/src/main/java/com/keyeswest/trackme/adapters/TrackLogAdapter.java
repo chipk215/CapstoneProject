@@ -29,17 +29,12 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     private List<Segment> mInitialSelectedSegments;
     private Context mContext;
 
-
-
     public interface SegmentClickListener{
         void onItemChecked(Segment segment );
         void onItemUnchecked(Segment segment);
         void onDeleteClick(Segment segment);
         void onFavoriteClick(Segment segment, boolean selected);
-
-
     }
-
 
 
     public TrackLogAdapter(SegmentCursor cursor, Context context, List<Segment> selectedSegments, SegmentClickListener listener){
@@ -135,11 +130,9 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         return position;
     }
 
-
     public void setSelectionsFrozen(boolean freeze){
         mSelectionsFrozen = freeze;
     }
-
 
      public class LogHolder extends RecyclerView.ViewHolder {
 
@@ -208,7 +201,6 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         public void setOnClickListener(View.OnClickListener onClickListener){
             mItemView.setOnClickListener(onClickListener);
         }
-
 
     }
 

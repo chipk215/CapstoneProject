@@ -31,30 +31,41 @@ import static com.keyeswest.trackme.utilities.FilterSharedPreferences.isDateRang
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.saveDateRangeFilter;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.saveFavoriteFilter;
 
+/**
+ * Handles filter selection for the trip list.
+ */
 public class FilterActivity extends AppCompatActivity {
 
+    // The user clears all filters by selecting the clear filter icon. Otherwise
+    // the activity is started in order to set a filter.
     public static Intent newIntent(Context packageContext, boolean clearFilter){
         Intent intent = new Intent(packageContext, FilterActivity.class);
         intent.putExtra(EXTRA_CLEAR_FILTERS, clearFilter);
         return intent;
     }
 
+    // Helper for invoking client to determine if result of filter request changed the filter
+    //settings.
     public static boolean getFilterChangedResult(Intent data){
         boolean filterChanged = data.getBooleanExtra(EXTRA_CHANGE_FILTER_RESULT,
                 true);
         return filterChanged;
     }
 
+    //Helper for invoking client to determine if user cleared filters during filter request.
     public static boolean getFiltersClearedResult(Intent data){
         boolean filtersCleared = data.getBooleanExtra(EXTRA_CLEAR_FILTERS,false);
         return filtersCleared;
     }
 
+
+    //Helper for invoking client to determine if user set a date range.
     public static boolean isDateFilterSet(Intent data){
         boolean isSet = data.getBooleanExtra(EXTRA_DATE_FILTER, false);
         return isSet;
     }
 
+    //Helper for invoking client to determine if user set the favorites only filter..
     public static boolean isFavoriteFilterSet(Intent data){
         boolean isSet = data.getBooleanExtra(EXTRA_FAVORITE_FILTER, false);
         return isSet;
@@ -306,23 +317,17 @@ public class FilterActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
-        Timber.d("onSaveInstanceState invoked");
-
         // save the set of selected trips
         savedInstanceState.putBoolean(EXTRA_SHOW_DATE_RANGE, mShowingDateRange);
         if (mShowingDateRange){
             savedInstanceState.putLong(EXTRA_START_DATE, mStartDate);
             savedInstanceState.putLong(EXTRA_END_DATE, mEndDate);
-
         }
-
         super.onSaveInstanceState(savedInstanceState);
-
     }
 
 
     private void setCurrentFavoriteFilterSelection(){
-
         mFavoriteSwitch.setChecked(getFavoriteFilterSetting(FilterActivity.this));
     }
 

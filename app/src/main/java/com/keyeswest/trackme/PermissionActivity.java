@@ -25,10 +25,7 @@ public class PermissionActivity extends AppCompatActivity {
     private TextView mExitTextView;
     private Button mExitButton;
 
-
     private boolean mRequiresPermission = true;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +56,6 @@ public class PermissionActivity extends AppCompatActivity {
         }else {
             startTripListActivity();
         }
-
-
     }
 
     @Override
@@ -109,9 +104,7 @@ public class PermissionActivity extends AppCompatActivity {
                 startTripListActivity();
             } else {
 
-
                 mPermissionTextView.setVisibility(View.VISIBLE);
-
 
                 // Permission denied.
 
@@ -201,9 +194,6 @@ public class PermissionActivity extends AppCompatActivity {
 
 
     private void startTripListActivity(){
-
-
-
         Intent intent = TripListActivity.newIntent(this);
         startActivity(intent);
         finish();
@@ -211,8 +201,6 @@ public class PermissionActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-
-        Timber.d("OnStop invoked");
         getIntent().putExtra(PERMISSION_EXTRA, mRequiresPermission ? 1: 0);
         super.onStop();
     }

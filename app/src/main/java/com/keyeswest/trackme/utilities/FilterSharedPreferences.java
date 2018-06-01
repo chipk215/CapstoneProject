@@ -37,7 +37,6 @@ public class FilterSharedPreferences {
             boolean updated = false;
             // don't save defaults if preferences have previously been saved
 
-
             if (! sharedPreferences.contains(FAVORITE_PREFERENCES_KEY)){
                 editor.putBoolean(FAVORITE_PREFERENCES_KEY, DEFAULT_FAVORITES_ONLY_FILTER);
                 updated = true;

@@ -6,15 +6,12 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.google.android.gms.location.LocationResult;
 import com.keyeswest.trackme.data.LocationCursor;
 import com.keyeswest.trackme.data.Queries;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import timber.log.Timber;
 
@@ -81,7 +78,7 @@ public class LocationProcessorService extends IntentService {
             if (location != null)  {
 
                 String segmentId = intent.getStringExtra(SEGMENT_ID_EXTRA_KEY);
-                Timber.d("SegmentId= " + segmentId);
+                Timber.d("SegmentId= %s", segmentId);
 
 
                 // retrieve the last location belonging to this segment from the db
@@ -205,12 +202,9 @@ public class LocationProcessorService extends IntentService {
      */
     private void saveLocationSamples(Location location, String segmentId){
 
-
-
         // save the new location samples
         Timber.d("Displaying locations from Service");
         Timber.d("++++++++++++++++");
-
 
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
@@ -224,7 +218,6 @@ public class LocationProcessorService extends IntentService {
         // save location sample to db
         createNewLocationFromSample(this, location, segmentId);
         debugSampleCount++;
-
 
     }
 

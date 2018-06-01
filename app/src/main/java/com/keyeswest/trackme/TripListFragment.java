@@ -47,8 +47,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
 
-import static java.lang.Math.abs;
-
 
 public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
@@ -155,7 +153,6 @@ public class TripListFragment extends Fragment
         mFragmentView = view;
         mUnbinder = ButterKnife.bind(this, view);
 
-
         if (mHideDisplayButton){
             mDisplayButton.setVisibility(View.GONE);
         }
@@ -178,7 +175,6 @@ public class TripListFragment extends Fragment
         DividerItemDecoration itemDecorator = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
         itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
         mTrackLogListView.addItemDecoration(itemDecorator);
-
 
         return view;
     }
@@ -437,7 +433,6 @@ public class TripListFragment extends Fragment
     }
 
 
-
     private void showSnackbar(View view, String message, int duration){
         // Create snackbar
         final Snackbar snackbar = Snackbar.make(view, message, duration);
@@ -530,7 +525,6 @@ public class TripListFragment extends Fragment
 
             }
 
-
             startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
                     .setType("text/plain")
                     .setSubject(getContext().getString(R.string.trip_list_subject))
@@ -538,48 +532,5 @@ public class TripListFragment extends Fragment
                     .getIntent(), getString(R.string.action_share)));
         }
     }
-
- /*   private void setUpFAB(View view){
-        view.findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                if (mSegmentCursor != null) {
-                    mSegmentCursor.moveToPosition(-1);
-                    String message="";
-                    int count = 1;
-                    String newLine = System.getProperty("line.separator");
-                    while(mSegmentCursor.moveToNext()){
-                        Segment segment = mSegmentCursor.getSegment();
-                        message += getString(R.string.trip) + " " + Integer.toString(count) +  newLine;
-                        message += getString(R.string.date) + "  " + segment.getDate() +  newLine;
-                        message += getString(R.string.start_time) + "  " + segment.getTime() +  newLine;
-                        DurationRecord durationRecord = segment.getSegmentDuration(getContext());
-
-                        message+= getString(R.string.trip_elapsed) + " " +
-                                durationRecord.getValue()+ " " +
-                                durationRecord.getDimension() + newLine;
-
-                        message += getString(R.string.distance) + "  " +
-                                segment.getDistanceMiles() + " " +
-                                getContext().getResources()
-                                        .getQuantityString(R.plurals.miles_plural,
-                                                PluralHelpers.getPluralQuantity(segment.getDistance()));
-                        message += newLine + newLine;
-                        count++;
-
-                    }
-
-
-                    startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                            .setType("text/plain")
-                            .setSubject("Trip Log")
-                            .setText(message)
-                            .getIntent(), getString(R.string.action_share)));
-                }
-            }
-        });
-    }
-*/
 
 }

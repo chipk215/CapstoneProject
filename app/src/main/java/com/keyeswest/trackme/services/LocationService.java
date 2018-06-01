@@ -17,7 +17,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 
 import com.keyeswest.trackme.NewTripActivity;
-import com.keyeswest.trackme.PermissionActivity;
 import com.keyeswest.trackme.R;
 
 import timber.log.Timber;
@@ -94,9 +93,6 @@ public abstract class LocationService extends Service {
         mChangingConfiguration = false;
 
     }
-
-
-
 
 
     protected void createNotificationChannel() {

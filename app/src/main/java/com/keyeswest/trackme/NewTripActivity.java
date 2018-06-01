@@ -74,21 +74,18 @@ public class NewTripActivity  extends AppCompatActivity {
 
 
 
+    /** Allow the fragment to stop location service
+     *  We only want to stop the background service on a back press.
+     *  This handles the case where the user does not stop tracking before hitting the back button.
+    */
     @Override
     public void onBackPressed(){
-
-        // Allow the fragment to stop location service
-        // We only want to stop the background service on a back press otherwise keep
-        // the service running.
-        //
-        // This handles the case where the user does not stop tracking before hitting the back button
         if (mFragment != null) {
-             mFragment.backPressed();
+            mFragment.backPressed();
         }
-
         super.onBackPressed();
-
     }
+
 
     /**
      * Handle the case where the user has navigated to the new trip screen and has not started

@@ -8,8 +8,6 @@ import android.location.Location;
 
 import com.keyeswest.trackme.services.LocationProcessorService;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import timber.log.Timber;
 
@@ -27,8 +25,6 @@ public class ProcessedLocationSampleReceiver extends BroadcastReceiver {
     public void registerCallback(OnSamplesReceived callback){
         mCallback = callback;
     }
-
-
 
     @Override
     public void onReceive(Context context, Intent intent) {

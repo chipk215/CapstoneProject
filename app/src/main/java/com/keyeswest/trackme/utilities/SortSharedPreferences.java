@@ -19,7 +19,7 @@ public class SortSharedPreferences {
     public static void saveDefaultSortPreferences(Context context, boolean force){
 
         SharedPreferences sharedPreferences =
-                context.getSharedPreferences(SORT_PREFERENCES, context.MODE_PRIVATE);
+                context.getSharedPreferences(SORT_PREFERENCES, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         if (force) {
@@ -36,7 +36,6 @@ public class SortSharedPreferences {
                 editor.putString(SORT_PREFERENCES_KEY, SortSharedPreferences.DEFAULT_SORT.getCode());
                 updated = true;
             }
-
 
             if (updated){
                 editor.commit();

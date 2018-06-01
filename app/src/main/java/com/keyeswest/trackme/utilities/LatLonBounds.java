@@ -6,10 +6,10 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class LatLonBounds {
-    Double mMinLat = null;
-    Double mMinLon = null;
-    Double mMaxLat = null;
-    Double mMaxLon = null;
+    private Double mMinLat = null;
+    private Double mMinLon = null;
+    private Double mMaxLat = null;
+    private Double mMaxLon = null;
 
     public LatLonBounds(){}
 

@@ -53,7 +53,6 @@ public class NewTripFragment extends BaseTripFragment {
     }
 
 
-
     @Override
     public void onStart(){
 

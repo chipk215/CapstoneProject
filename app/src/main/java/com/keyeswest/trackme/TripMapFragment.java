@@ -1,7 +1,6 @@
 package com.keyeswest.trackme;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -12,8 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.app.ShareCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.content.Loader;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,7 +23,6 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -49,17 +45,12 @@ import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.interfaces.UpdateMap;
 import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
-
 import com.keyeswest.trackme.tasks.EmailMapTask;
 import com.keyeswest.trackme.utilities.LatLonBounds;
 import com.keyeswest.trackme.utilities.PluralHelpers;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -78,7 +69,7 @@ import static com.keyeswest.trackme.utilities.ZoomLevels.STREET_ZOOM;
 
 
 /**
- * Displays trips selected from trip lost on a map.
+ * Displays trips selected from trip list on a map.
  */
 public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<Cursor> , UpdateMap {
@@ -375,12 +366,10 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             return SegmentLoader.newSegmentsFromUriList(getContext(), mLoadSegmentUriList);
 
         } else {
-            //See notes on id for location loader in onLoadFinished method below.
 
             Timber.d("Loading locations. Location Loader id= %s", Integer.toString(id));
            // Timber.d("Request load of segment uri = "+ mLoadSegmentUriList.get(id - LOCATION_LOADER).toString());
 
-            // need a table matching loader id with segment uri
             return LocationLoader.newLocationsForSegment(getContext(),
                     mLocationLoaderToSegmentUri.get(id));
         }
@@ -638,7 +627,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     }
 
     private void displayMap(){
-        Timber.d("displayMap TripMapFragment");
         LatLngBounds bounds = computeBoundingBoxForSegments();
         if (bounds != null) {
             Timber.d("Bounds: maxLat= %s", Double.toString(bounds.northeast.latitude));
@@ -708,6 +696,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     }
     */
 
+    //Permissions were granted when app first installed.
     @SuppressLint("MissingPermission")
     private LatLngBounds computeBoundingBoxForSegments(){
         LatLngBounds bounds = null;
@@ -726,7 +715,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 // get the user's position
                 getLastLocation();
             }
-
 
         }else {
 
@@ -747,6 +735,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     }
 
 
+    //Permissions were granted when app first installed.
     @SuppressWarnings("MissingPermission")
     private void getLastLocation(){
 

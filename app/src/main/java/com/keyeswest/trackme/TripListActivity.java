@@ -18,7 +18,6 @@ import com.keyeswest.trackme.models.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -118,7 +117,6 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                     } else {
                         throw new IllegalStateException("Unexpected fragment type.");
                     }
-
                 }
 
             }else{

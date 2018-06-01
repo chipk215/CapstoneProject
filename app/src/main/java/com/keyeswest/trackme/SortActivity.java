@@ -94,12 +94,8 @@ public class SortActivity extends AppCompatActivity {
                 // send back a result for a snackbar message
                 setSortResult(true);
                 finish();
-
-
             }
         });
-
-
     }
 
     private void setCurrentSortPreference() {
