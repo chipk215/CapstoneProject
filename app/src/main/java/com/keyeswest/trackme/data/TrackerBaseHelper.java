@@ -6,13 +6,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.google.gson.Gson;
-import com.keyeswest.trackme.LocationWrapper;
+
 import com.keyeswest.trackme.R;
+import com.keyeswest.trackme.models.Location;
+
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.models.Trip;
+import com.keyeswest.trackme.utilities.TripDeserializer;
 
 import java.io.InputStream;
 import java.util.Scanner;
-import java.util.UUID;
+
 
 import timber.log.Timber;
 
@@ -131,6 +135,26 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
+    public static ContentValues createTripSegmentRecord(String id, long timeStamp,double distance,
+                                                        double minLat, double minLon,
+                                                        double maxLat, double maxLon,
+                                                        double duration){
+        ContentValues values = new ContentValues();
+        values.put(SegmentSchema.SegmentTable.COLUMN_ID, id);
+        values.put(SegmentSchema.SegmentTable.COLUMN_TIME_STAMP, timeStamp);
+        values.put(SegmentSchema.SegmentTable.COLUMN_FAVORITE, 0);
+        values.put(SegmentSchema.SegmentTable.COLUMN_DISTANCE,distance);
+        values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME,duration);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_SPEED,0f);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LAT,maxLat);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LAT,minLat);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MAX_LON,maxLon);
+        values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LON,minLon);
+
+
+        return values;
+    }
+
     public static ContentValues updateSegmentRecordBoundsDistanceElapsed(Double minLat, Double maxLat,
                                                                       Double minLon, Double maxLon,
                                                                       Double distance, long elapsed){
@@ -164,39 +188,31 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
     }
 
     private void seedWithTripData(SQLiteDatabase db){
-        // read the sample location file
-        // read the raw resource json file
-        InputStream inputStream = mContext.getResources().openRawResource(R.raw.track1);
-        String jsonString = null;
-        Scanner scanner = new Scanner(inputStream);
-        try {
-            jsonString = scanner.useDelimiter("\\A").next();
-        } catch (Exception ex) {
-            Timber.e(ex, "Error reading mock track data"); } finally {
-            scanner.close();
-        }
 
-        LocationWrapper[] locationsWrapped=null;
+        Trip[] trips = TripDeserializer.readJson(mContext);
 
-        if (jsonString != null) {
-            Gson gson = new Gson();
-            locationsWrapped = gson.fromJson(jsonString, LocationWrapper[].class);
-        }
+        if (trips != null) {
+            for (Trip trip : trips){
+                Segment segment = trip.getSegment();
+                Location[] locations = trip.getLocations();
+                String segmentId = segment.getId().toString();
+                ContentValues segmentValues = createTripSegmentRecord(segmentId,
+                        segment.getTimeStamp(),segment.getDistance(),
+                        segment.getMinLatitude(), segment.getMinLongitude(),
+                        segment.getMaxLatitude(),segment.getMaxLongitude(),
+                        segment.getElapsedTime());
 
-        if (locationsWrapped != null) {
+                db.insert(SegmentSchema.SegmentTable.TABLE_NAME , null, segmentValues);
 
-            LocationWrapper firstSample = locationsWrapped[0];
-            String segmentId = UUID.randomUUID().toString();
-            ContentValues segmentValues = createSegmentRecord(segmentId,
-                    firstSample.getTimeStamp() );
-
-            db.insert(SegmentSchema.SegmentTable.TABLE_NAME , null, segmentValues);
-            for (LocationWrapper mockSample : locationsWrapped) {
-                ContentValues locationValue =
-                         createLocationRecord(mockSample.getTimeStamp() ,
-                                 mockSample.getLatitude(), mockSample.getLongitude(), segmentId);
-                db.insert(LocationSchema.LocationTable.TABLE_NAME,null, locationValue);
+                for (Location location : locations){
+                    ContentValues locationValue =
+                            createLocationRecord(location.getTimeStamp() ,
+                                    location.getLatitude(), location.getLongitude(), segmentId);
+                    db.insert(LocationSchema.LocationTable.TABLE_NAME,null, locationValue);
+                }
             }
+
+
         }
 
     }

@@ -1,5 +1,7 @@
 package com.keyeswest.trackme.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.UUID;
 
 public class Location {
@@ -7,9 +9,14 @@ public class Location {
     public Location(){}
 
     private UUID segmentId;
+
+    @SerializedName("TimeStamp")
     private long timeStamp;
 
+    @SerializedName("Latitude")
     private double latitude;
+
+    @SerializedName("Longitude")
     private double longitude;
 
     public UUID getSegmentId() {

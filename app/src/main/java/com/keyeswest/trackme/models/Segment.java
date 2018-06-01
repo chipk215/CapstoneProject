@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.data.SegmentSchema;
 
@@ -19,15 +20,32 @@ public class Segment implements Parcelable {
 
     private static double METERS_TO_MILES = 0.000621371;
 
+    @SerializedName("ID")
     private UUID mId;
+
+    @SerializedName("TimeStamp")
     private long mTimeStamp;
+
     private boolean mFavorite = false;
+
+    @SerializedName("MinLat")
     private Double mMinLatitude = null;
+
+    @SerializedName("MaxLat")
     private Double mMaxLatitude = null;
+
+    @SerializedName("MinLon")
     private Double mMinLongitude = null;
+
+    @SerializedName("MaxLon")
     private Double mMaxLongitude = null;
+
+    @SerializedName("Distance")
     private Double mDistance = null;
+
+    @SerializedName("Duration")
     private long mElapsedTime = 0;
+
     private Double mMaximumSpeed = 0d;
     private long mRowId = 0;
 
