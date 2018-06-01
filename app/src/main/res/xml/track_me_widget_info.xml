@@ -2,7 +2,7 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/track_me_widget"
     android:initialLayout="@layout/track_me_widget"
-    android:minHeight="110dp"
+    android:minHeight="180dp"
     android:minWidth="180dp"
     android:previewImage="@mipmap/ic_launcher"
     android:resizeMode="horizontal|vertical"

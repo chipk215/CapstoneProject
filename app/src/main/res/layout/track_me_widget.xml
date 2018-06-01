@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    android:background="@color/windowBackground"
+    android:background="@color/colorPrimaryDark"
     android:orientation="vertical"
     android:padding="@dimen/margin_4"
     >
@@ -16,11 +16,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/start_track_id"
+            style="?android:attr/buttonBarButtonStyle"
+            android:textColor="@drawable/widget_button_text_color"
             android:text="@string/start_trip"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/stop_track_id"
+            style="?android:attr/buttonBarButtonStyle"
+            android:textColor="@drawable/widget_button_text_color"
             android:layout_marginStart="@dimen/margin_4"
             android:text="@string/stop_trip"/>
     </LinearLayout>
@@ -28,9 +32,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/open_list_id"
-        android:src="@mipmap/ic_launcher"
-
+        android:src="@drawable/track"
+        android:scaleType="fitCenter"
+        android:background="@android:color/transparent"
         android:layout_gravity="center_horizontal"
+        android:padding="0dp"
         android:contentDescription="@string/launch_app_icon" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:layout_marginTop="@dimen/margin_4"
+        android:layout_marginBottom="@dimen/margin_4"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@color/windowBackground"/>
 </LinearLayout>
 
