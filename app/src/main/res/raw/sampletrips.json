@@ -3,7 +3,7 @@
     "Segment" : {
       "ID" : "27903b5e-65dc-11e8-adc0-fa7ae01bbebc",
       "TimeStamp" : 1524406854,
-      "Duration" : 1105,
+      "Duration" : 1105000,
       "Distance" : 9670,
       "MinLat" : 43.6754564,
       "MinLon" : -116.35398,
