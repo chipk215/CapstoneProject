@@ -51,7 +51,7 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-
+        Timber.d("onCreate invoked");
         final String SQL_CREATE_LOCATION_TABLE =
                 CREATE_TABLE + LocationSchema.LocationTable.TABLE_NAME +
                         " (" +

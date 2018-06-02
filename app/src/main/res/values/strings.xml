@@ -123,5 +123,7 @@
     <string name="add_widget">Add widget</string>
     <string name="launch_app_icon">Launch app icon</string>
     <string name="trip_log">Trip Log</string>
+    <string name="tracks">Tracks</string>
+    <string name="log">Log</string>
 
 </resources>
