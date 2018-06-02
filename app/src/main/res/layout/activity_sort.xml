@@ -60,8 +60,8 @@
 
     <Button
         android:id="@+id/submit_btn"
-        android:layout_width="@dimen/as_button_height"
-        android:layout_height="@dimen/as_button_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_8"
         android:text="@string/submit"
         app:layout_constraintEnd_toEndOf="parent"
