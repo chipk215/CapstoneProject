@@ -307,7 +307,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     @Override
     public void onDestroyView(){
         // Handle case where user exits activity with trip dialog showing. Eliminate memory leak.
-        if (mPopupWindow.isShowing()) {
+        if ((mPopupWindow != null ) && (mPopupWindow.isShowing())) {
             mPopupWindow.dismiss();
             mPopupWindow = null;
         }

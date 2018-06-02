@@ -5,19 +5,13 @@
 help track vehicle usage, file trip expense reports, or compare differences in daily routes that are frequented by the user.
 
 ## User Notes
-*TrackMe* provides two principal features, a trip log to display information about trips that have been saved and a trip tracker for capturing new trip data. Trip tracking is initated using the "New Trip" menu item or using the app widget that is installed with the app. After the user grants for the app to use location services the app's top level view is the trip log screen shown here:
+*TrackMe* provides two principal features, a trip log to display information about trips that have been saved and a trip tracker for capturing new trip data. Trip tracking is initated using the "New Trip" menu item or using the app widget that is installed with the app. After the user grants for the app to use location services the app's top level view is the trip log screen (phone version) shown here:
 
 ![alt text](docs/readmeImages/triplog.png)
 
-A user can start tracking a trip and see their trip track on a map. The app does not have to stay in the foreground for the
-duration of the trip. If the user transitions to another application the tracking service used by the app continues collecting
-location positions while the app is not in the foreground. The tracking service is promoted to a foreground service when 
-the app is paused. While the tracking service is running as a foreground service, a notification is posted so that the 
-user can stop the tracking service or open the app via the notification.
 
-A log of the user's trips is maintained which can be sorted, filtered, and shared.  A user can select trips from the log and 
-see the corresponding track of the trip on a map. The user can retrieve information about the trip by clicking on the track 
-in the map view.  Multiple trip tracks can be viewed on the map simulataneously for comparison.
+The Trip Log is a list of previously recorded trips. The trip log can be filtered by date range or to only include trips that have been marked as favorites. The trip log can also be sorted by trip date or trip distance using the Sort menu time.  Trips can be deleted using the trash can or favored using the Star icon.
 
-More description and pictures to follow...
+Up to four trips can be selected for viewing on a map and to obtain additonal trip details. Check the boxes on the left corresponding to the trips to view and select the "Display Trips" button on the bottom of the screen. A plot of the trips is then shown:
+
 
