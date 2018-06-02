@@ -11,6 +11,8 @@ help track vehicle usage, file trip expense reports, or compare differences in d
 
 The Trip Log is a list of previously recorded trips. The log can be filtered by date range or to only include trips that have been marked as favorites. The trip log can also be sorted by trip date or trip distance using the Sort menu item.  Trips can be deleted using the trash can or favored using the Star icon.
 
+*Installation Note: * TrackMe installs with a sample trip saved in the database which can be used to explore the functionality of the app without having to take a trip to collect data. The sampel trip an be delted when it is no longer needed.
+
 Up to four trips can be selected for viewing on a map and to obtain additonal trip details. Check the boxes on the left corresponding to the trips as illustrated in the trip log image above and tap the "Display Trips" button to see plots of the selected trips. Here is an example of two selected trips being displayed:
 
 ![Trip Tracks](docs/readmeImages/triptracks.png)
