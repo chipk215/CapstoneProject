@@ -181,6 +181,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     private Menu mMenu;
 
+    private PopupWindow mPopupWindow;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -304,6 +306,12 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     @Override
     public void onDestroyView(){
+        // Handle case where user exits activity with trip dialog showing. Eliminate memory leak.
+        if (mPopupWindow.isShowing()) {
+            mPopupWindow.dismiss();
+            mPopupWindow = null;
+        }
+
         super.onDestroyView();
         mUnbinder.unbind();
     }
@@ -471,14 +479,15 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 final Segment segment = (Segment)polyline.getTag();
 
                 View customView = mInflater.inflate(R.layout.trip_popup,null);
-                final PopupWindow popup = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
+
+                mPopupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
 
                 Button okButton = customView.findViewById(R.id.ok_button);
                 okButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        popup.dismiss();
+                        mPopupWindow.dismiss();
                         enablePolylineClicks();
                     }
                 });
@@ -509,7 +518,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 durationDimension.setText(record.getDimension());
 
 
-                popup.showAtLocation(mRootView.findViewById(R.id.map), Gravity.CENTER, 0, 0);
+                mPopupWindow.showAtLocation(mRootView.findViewById(R.id.map), Gravity.CENTER, 0, 0);
 
             }
         });
