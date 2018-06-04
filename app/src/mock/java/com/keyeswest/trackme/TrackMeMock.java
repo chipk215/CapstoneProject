@@ -4,7 +4,7 @@ import android.app.Application;
 
 import timber.log.Timber;
 
-public class TrackMe extends Application {
+public class TrackMeMock extends TrackMe {
 
     @Override
     public void onCreate(){
@@ -19,3 +19,4 @@ public class TrackMe extends Application {
         });
     }
 }
+

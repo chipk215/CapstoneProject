@@ -31,6 +31,7 @@ public class PermissionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         Timber.d("onCreate invoked");
 
         setContentView(R.layout.activity_permission);

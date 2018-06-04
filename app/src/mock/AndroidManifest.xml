@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.keyeswest.trackme">
 
-    <application>
+    <application
+        android:name=".TrackMeMock">
 
         <service android:name="com.keyeswest.trackme.services.LocationMockService"
             android:exported="false" />

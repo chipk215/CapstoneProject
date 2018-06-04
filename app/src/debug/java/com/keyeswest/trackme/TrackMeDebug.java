@@ -1,10 +1,10 @@
 package com.keyeswest.trackme;
 
-import android.app.Application;
+
 
 import timber.log.Timber;
 
-public class TrackMe extends Application {
+public class TrackMeDebug extends TrackMe {
 
     @Override
     public void onCreate(){
@@ -17,5 +17,6 @@ public class TrackMe extends Application {
                 return super.createStackElementTag(element) + ':' + element.getLineNumber();
             }
         });
+
     }
 }

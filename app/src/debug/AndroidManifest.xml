@@ -3,7 +3,8 @@
     package="com.keyeswest.trackme">
 
 
-    <application>
+    <application
+        android:name=".TrackMeDebug" >
 
         <service android:name="com.keyeswest.trackme.services.FusedLocationService"
             android:exported="false" />
