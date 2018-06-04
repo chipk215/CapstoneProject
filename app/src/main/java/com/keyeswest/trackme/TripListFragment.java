@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
@@ -102,6 +103,9 @@ public class TripListFragment extends Fragment
     private Menu mMainMenu;
 
     private SegmentCursor mSegmentCursor;
+
+    @BindView(R.id.shimmer_view_container)
+    ShimmerFrameLayout mShimmerViewContainer;
 
 
     @Override
@@ -192,6 +196,7 @@ public class TripListFragment extends Fragment
     public void onResume(){
         super.onResume();
         Timber.d("onResume invoked");
+        mShimmerViewContainer.startShimmerAnimation();
 
     }
 
@@ -199,6 +204,7 @@ public class TripListFragment extends Fragment
     public void onPause(){
         super.onPause();
         Timber.d("onPause invoked");
+        mShimmerViewContainer.stopShimmerAnimation();
     }
 
 
@@ -257,12 +263,16 @@ public class TripListFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         Timber.d("onCreateLoader invoked");
+
         return SegmentLoader.newAllSegmentsSortedByPreferences(getContext());
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
         Timber.d("onLoadFinished invoked");
+        // Stopping Shimmer Effect's animation after data is loaded to ListView
+        mShimmerViewContainer.stopShimmerAnimation();
+        mShimmerViewContainer.setVisibility(View.GONE);
         if (cursor != null) {
             mSegmentCursor = new SegmentCursor(cursor);
             Timber.d("Number of records = %s", mSegmentCursor.getCount());
