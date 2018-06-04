@@ -32,31 +32,25 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$androidSupportVersion"
     implementation "com.android.support:design:$androidSupportVersion"
     implementation "com.android.support:support-v4:$androidSupportVersion"
-
     implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
+
+    //Google Services
+    implementation "com.google.android.gms:play-services-location:15.0.0"
+    implementation 'com.google.android.gms:play-services-maps:15.0.0'
+
+
+    //Third party libs
 
     //Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
     //ButterKnife
     implementation "com.jakewharton:butterknife:$butterKnifeVersion"
-    implementation 'com.google.android.gms:play-services-maps:15.0.0'
-
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.android.support:support-v4:27.1.1'
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
-
-
-
-    implementation "com.google.android.gms:play-services-location:15.0.0"
+    implementation 'com.borax12.materialdaterangepicker:library:1.9'
+    implementation 'com.google.code.gson:gson:2.8.2'
 
     implementation 'com.facebook.stetho:stetho:1.5.0'
-
-    implementation 'com.borax12.materialdaterangepicker:library:1.9'
-
-
-
-    implementation 'com.google.code.gson:gson:2.8.2'
 
 
     testImplementation 'junit:junit:4.12'
