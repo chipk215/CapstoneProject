@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -31,6 +32,7 @@ import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
+import com.keyeswest.trackme.receivers.BatteryLevelReceiver;
 import com.keyeswest.trackme.tasks.DeleteTripTask;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
@@ -104,6 +106,8 @@ public class TripListFragment extends Fragment
     private SegmentCursor mSegmentCursor;
 
 
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -140,6 +144,9 @@ public class TripListFragment extends Fragment
         }else {
             mSelectedSegments = new ArrayList<>();
         }
+
+
+
     }
 
 

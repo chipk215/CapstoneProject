@@ -63,6 +63,8 @@
 
         <service android:name=".widget.TrackMeWidgetService" />
 
+        <service android:name=".services.BatteryMonitoringService" />
+
         <activity android:name=".FilterActivity" />
 
         <receiver android:name=".widget.TrackMeWidgetProvider">
@@ -74,6 +76,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/track_me_widget_info" />
         </receiver>
+
+
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="85d1239bead425363847e4e9a35af89356cfe88f" />

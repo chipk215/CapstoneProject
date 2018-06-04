@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Binder;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.keyeswest.trackme.NewTripActivity;
 import com.keyeswest.trackme.R;
+import com.keyeswest.trackme.receivers.BatteryLevelReceiver;
 
 import timber.log.Timber;
 
@@ -55,6 +57,7 @@ public abstract class LocationService extends Service {
     protected abstract Intent getNotificationIntent();
 
     protected HandlerThread mHandlerThread;
+
 
 
     @Override
@@ -136,7 +139,8 @@ public abstract class LocationService extends Service {
 
     @Override
     public void onDestroy() {
-        //mServiceHandler.removeCallbacksAndMessages(null);
+       super.onDestroy();
+
     }
 
     /**
