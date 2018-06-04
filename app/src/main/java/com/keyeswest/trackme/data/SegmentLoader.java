@@ -16,8 +16,6 @@ import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getEndDate
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getFavoriteFilterSetting;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getStartDate;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.isDateRangeSet;
-import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES;
-import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES_KEY;
 
 
 public class SegmentLoader extends CursorLoader {
@@ -28,11 +26,7 @@ public class SegmentLoader extends CursorLoader {
 
         Timber.d("newAllSegmentsSortedByPreferences invoked");
 
-        SharedPreferences sharedPreferences =
-                context.getSharedPreferences(SORT_PREFERENCES, context.MODE_PRIVATE);
-
-        String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
-                SortSharedPreferences.DEFAULT_SORT.getCode());
+        String sortByCode = SortSharedPreferences.getSortByCode(context);
 
         String orderByClause;
 

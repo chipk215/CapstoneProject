@@ -22,6 +22,7 @@ public abstract class  TrackMe extends Application {
 
         filter.addAction(Intent.ACTION_BATTERY_LOW);
         filter.addAction(Intent.ACTION_BATTERY_OKAY);
+        // FYI - Not able to get receiver to work when registering by manifest.
         registerReceiver(mBatteryLevelReceiver, filter);
     }
 

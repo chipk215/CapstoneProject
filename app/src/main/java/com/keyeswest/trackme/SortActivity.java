@@ -18,8 +18,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
 
-import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES;
-import static com.keyeswest.trackme.utilities.SortSharedPreferences.SORT_PREFERENCES_KEY;
+import static com.keyeswest.trackme.utilities.SortSharedPreferences.getSortByCode;
+
 
 public class SortActivity extends AppCompatActivity {
 
@@ -99,11 +99,8 @@ public class SortActivity extends AppCompatActivity {
     }
 
     private void setCurrentSortPreference() {
-        SharedPreferences sharedPreferences =
-                getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);
 
-        String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
-                SortSharedPreferences.DEFAULT_SORT.getCode());
+        String sortByCode = getSortByCode(this);
 
 
         mSelectedSort= SortPreferenceEnum.lookupByCode(sortByCode);
@@ -143,11 +140,8 @@ public class SortActivity extends AppCompatActivity {
     }
 
     private void setSortOrder( SortPreferenceEnum preference){
-        SharedPreferences sharedPreferences =
-                getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        editor.putString(SORT_PREFERENCES_KEY, preference.getCode());
-        editor.commit();
+        SortSharedPreferences.setSortOrder(this, preference.getCode());
+
     }
 }

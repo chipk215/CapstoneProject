@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 
 import com.keyeswest.trackme.SortPreferenceEnum;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class SortSharedPreferences {
 
-    public static final String SORT_PREFERENCES = "sortPreferences";
-    public static final String SORT_PREFERENCES_KEY = "sortPreferencesKey";
-    public static final SortPreferenceEnum DEFAULT_SORT = SortPreferenceEnum.NEWEST;
+    private static final String SORT_PREFERENCES = "sortPreferences";
+    private static final String SORT_PREFERENCES_KEY = "sortPreferencesKey";
+    private static final SortPreferenceEnum DEFAULT_SORT = SortPreferenceEnum.NEWEST;
 
     /**
      * Save default sorting preferences.
@@ -19,7 +21,7 @@ public class SortSharedPreferences {
     public static void saveDefaultSortPreferences(Context context, boolean force){
 
         SharedPreferences sharedPreferences =
-                context.getSharedPreferences(SORT_PREFERENCES, Context.MODE_PRIVATE);
+                context.getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         if (force) {
@@ -42,5 +44,26 @@ public class SortSharedPreferences {
             }
         }
 
+    }
+
+
+    public static  String getSortByCode(Context context){
+        SharedPreferences sharedPreferences =
+                context.getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);
+
+        String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
+                SortSharedPreferences.DEFAULT_SORT.getCode());
+
+        return sortByCode;
+    }
+
+
+    public static void setSortOrder(Context context, String sortOrder){
+        SharedPreferences sharedPreferences =
+                context.getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        editor.putString(SORT_PREFERENCES_KEY, sortOrder);
+        editor.commit();
     }
 }
