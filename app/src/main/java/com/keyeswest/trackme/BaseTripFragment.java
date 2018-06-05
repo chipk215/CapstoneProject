@@ -1,8 +1,10 @@
 package com.keyeswest.trackme;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -41,6 +44,7 @@ import com.keyeswest.trackme.widget.TrackMeWidgetService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,6 +52,9 @@ import butterknife.Unbinder;
 import timber.log.Timber;
 
 import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PREFERENCES;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
 import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLocationUpdates;
 
 
@@ -101,7 +108,8 @@ public abstract class BaseTripFragment extends Fragment
         implements ProcessedLocationSampleReceiver.OnSamplesReceived,
         OnMapReadyCallback,
         LoaderManager.LoaderCallbacks<Cursor>,
-        NotifyBackPressed {
+        NotifyBackPressed,
+        SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
     protected static final String INITIAL_NEW_TRIP_STARTED_EXTRA = "initialNewTripStartedExtra";
@@ -154,6 +162,8 @@ public abstract class BaseTripFragment extends Fragment
     // State variables used when tracking is initiated by the app widget.
     private boolean mStartTrip = false;
     private boolean mTripStarted = false;
+
+    private SharedPreferences mBatteryPreferences;
 
 
     @Override
@@ -242,12 +252,7 @@ public abstract class BaseTripFragment extends Fragment
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onPause() {
-        Timber.d("Trip tracking paused, unregistering plot receiver");
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
-        super.onPause();
-    }
+
 
     @Override
     public void onResume() {
@@ -255,6 +260,26 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("Trip tracking resumed, re-registering plot receiver");
         getLastLocation();
 
+        // register for changes in low battery state messages
+        mBatteryPreferences = Objects.requireNonNull(getContext())
+                .getSharedPreferences(BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+
+        if (mBatteryPreferences != null) {
+            Timber.d("registering for shared prefs notification");
+            mBatteryPreferences.registerOnSharedPreferenceChangeListener(this);
+        }
+
+    }
+
+    @Override
+    public void onPause() {
+        Timber.d("Trip tracking paused, unregistering plot receiver");
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
+
+        if (mBatteryPreferences != null) {
+            mBatteryPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        }
+        super.onPause();
     }
 
 
@@ -403,6 +428,7 @@ public abstract class BaseTripFragment extends Fragment
 
                         }else{
                             // handle error case where location not known
+                            Timber.e("Unable to get current location");
                         }
                     }
                 });
@@ -540,5 +566,24 @@ public abstract class BaseTripFragment extends Fragment
     private void setTrackButtonState(boolean enableTracking){
         mStartUpdatesButton.setEnabled(enableTracking);
         mStopUpdatesButton.setEnabled(!enableTracking);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(BATTERY_STATE_EXTRA)){
+            boolean isLow = getLowBatteryState(Objects.requireNonNull(getContext()));
+            if (isLow){
+                // display a toast and exit
+                Toast.makeText(getContext(),getString(R.string.low_battery_message),
+                        Toast.LENGTH_SHORT).show();
+
+                stopUpdates();
+                mStartUpdatesButton.setEnabled(false);
+                mStopUpdatesButton.setEnabled(false);
+
+               // Objects.requireNonNull(getActivity()).finish();
+
+            }
+        }
     }
 }

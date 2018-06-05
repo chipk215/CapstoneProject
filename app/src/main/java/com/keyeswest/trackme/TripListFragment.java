@@ -245,8 +245,6 @@ public class TripListFragment extends Fragment
     public void onPause(){
         super.onPause();
         Timber.d("onPause invoked");
-        mBatteryPreferences = Objects.requireNonNull(getContext()).
-                getSharedPreferences(BatteryStatePreferences.BATTERY_PREFERENCES, Context.MODE_PRIVATE);
 
         if (mBatteryPreferences != null) {
             mBatteryPreferences.unregisterOnSharedPreferenceChangeListener(this);
