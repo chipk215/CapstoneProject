@@ -1,8 +1,7 @@
 # Udacity CapstoneProject (*TrackMe*)
 *TrackMe* is my final project for [Udacity's Android Developer Nanodegree Program](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801 ).
 
-*TrackMe* provides trip tracking which when activated tracks and records the user's movement. Trip tracking can be used to
-help track vehicle usage, file trip expense reports, or compare differences in daily routes that are frequented by the user.
+*TrackMe* provides trip tracking which when activated tracks and records the user's movement. Trip tracking can be used to help track vehicle usage, provide data for trip reports, or compare differences in daily routes that are frequented by the user.
 
 ## User Notes
 *TrackMe* provides two principal features, a trip log to display information about trips that have been saved and a trip tracker for capturing new trip data. Trip tracking is initated using the "New Trip" menu item or using the app widget that is installed with the app. 
@@ -33,10 +32,7 @@ Trip tracking records the location and movement of the user creating a new trip.
 
 ![Tracking](docs/readmeImages/tracking.png)
 
-The trip is completed when the user taps the "Stop Tracking" button.  TODO discuss background tracking and battery usage.
-
-Tracking can also be initiated using the desk top app widget:
-
+The trip is completed when the user taps the "Stop Tracking" button. Tracking can also be initiated using the desk top app widget:  
 ![Widget](docs/readmeImages/widget.png)
 
 ##Tracking Service
@@ -44,8 +40,16 @@ The tracking service continues to run if the user pauses the app using the Andro
 
 ![Notification](docs/readmeImages/notification.png)
 
-The notification is removed if the user resumes using the app in the foreground where the plot of the trip being tracked is displayed. No other screen of the app is accessible while the app is tracking.
+The notification is removed if the user resumes using the app in the foreground where the plot of the trip being tracked is displayed. No other screen of the app is accessible while the app is tracking.  
 
+### Battery Usage
+Generally, in a vehicle, fine grain location data is priovided by GPS, perhaps augmented with cell tower data if the device has cellular connectivity.  GPS updates consume battery power.  If the device is powered within the vehicle the battery will charge and offset the GPS drain.
+
+However, the app monitors battery consumption and disables tracking if the battery level falls below 15%. At this low battery state, any active location service is stopped and new trip tracking cannot be initiated until the battery is charged and comes out of the low battery charge state.
+
+Here is a screenshot of a low battery state:
+
+![Low Battery State](docs/readmeImages/low_battery.png)  
 
 
 

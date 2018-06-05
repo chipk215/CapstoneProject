@@ -20,6 +20,8 @@
 
     <color name="menuBackground">#e0e0e0</color>
 
+    <color name="trip_info">#388E3C</color>
+
 
 
 </resources>
