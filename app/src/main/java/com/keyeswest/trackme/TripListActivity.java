@@ -113,7 +113,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                     if (fragment instanceof TripListFragment ){
                         // this assumes the trip list fragment has not executed onCreateView at
                         // this point - valid since this is the parent activity
-                        ((TripListFragment) fragment).showDisplayButton(false);
+                        ((TripListFragment) fragment).hideDisplayButton(true);
                     } else {
                         throw new IllegalStateException("Unexpected fragment type.");
                     }
@@ -133,7 +133,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
                     if (fragment instanceof TripListFragment ){
                         // this assumes the trip list fragment has not executed onCreateView at
                         // this point - valid since this is the parent activity
-                        ((TripListFragment) fragment).showDisplayButton(true);
+                        ((TripListFragment) fragment).hideDisplayButton(false);
                     } else {
                        throw new IllegalStateException("Unexpected fragment type.");
                     }

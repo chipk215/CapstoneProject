@@ -32,15 +32,17 @@ public class PermissionActivity extends AppCompatActivity {
 
     private boolean mRequiresPermission = true;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Timber.d("onCreate invoked");
-        setCurrentBatteryLevel();
 
+        // As the first activity to run, read the battery level and save low battery
+        // state information to shared preferences. Required in case app starts with battery
+        // in low battery state or the battery has charged since app exited with battery in
+        // a low battery state.
+        setCurrentBatteryLevel();
 
         setContentView(R.layout.activity_permission);
 
@@ -210,6 +212,11 @@ public class PermissionActivity extends AppCompatActivity {
         finish();
     }
 
+
+    /**
+     * Read the current battery level and save low battery state to information to shared
+     * preferences.
+     */
     private void setCurrentBatteryLevel() {
 
         float batteryPercentage = BatteryStatePreferences.getCurrentBatteryPercentLevel(this);

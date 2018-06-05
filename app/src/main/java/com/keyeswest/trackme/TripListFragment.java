@@ -45,6 +45,7 @@ import com.keyeswest.trackme.utilities.SortResult;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import butterknife.BindView;
@@ -56,15 +57,13 @@ import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PR
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.LOW_BATTERY_THRESHOLD;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
-import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setLowBatteryState;
+
 
 
 public class TripListFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor>,
-        TrackLogAdapter.SegmentClickListener, SharedPreferences.OnSharedPreferenceChangeListener
-{
-
-
+        TrackLogAdapter.SegmentClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     public interface TripListListener{
@@ -150,11 +149,14 @@ public class TripListFragment extends Fragment
 
         Timber.d("onCreate invoked");
 
-        mHideDisplayButton = getArguments().getBoolean(TWO_PANE_EXTRA);
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mHideDisplayButton = arguments.getBoolean(TWO_PANE_EXTRA, false);
+        }
 
         setHasOptionsMenu(true);
 
-        SortSharedPreferences.saveDefaultSortPreferences(getContext(),false);
+        SortSharedPreferences.saveDefaultSortPreferences(Objects.requireNonNull(getContext()),false);
         FilterSharedPreferences.clearFilters(getContext(), false);
 
         if (savedInstanceState != null){
@@ -166,15 +168,12 @@ public class TripListFragment extends Fragment
             mSelectedSegments = new ArrayList<>();
         }
 
-
-
-
     }
 
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Timber.d("onCreateView invoked");
         // Inflate the layout for this fragment
@@ -201,8 +200,10 @@ public class TripListFragment extends Fragment
         });
 
         mTrackLogListView.setLayoutManager(new LinearLayoutManager(getContext()));
-        DividerItemDecoration itemDecorator = new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL);
-        itemDecorator.setDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.custom_list_divider));
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(Objects
+                .requireNonNull(getActivity()), DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(Objects.requireNonNull(ContextCompat.getDrawable(getActivity(),
+                R.drawable.custom_list_divider)));
         mTrackLogListView.addItemDecoration(itemDecorator);
 
         return view;
@@ -222,17 +223,13 @@ public class TripListFragment extends Fragment
         super.onResume();
         Timber.d("onResume invoked");
 
-        float batteryPercentage = BatteryStatePreferences.getCurrentBatteryPercentLevel(getActivity());
-        if (batteryPercentage <= LOW_BATTERY_THRESHOLD ){
-            mNewTripMenuItemEnabled = false;
-            mLowBatteryMessage.setVisibility(View.VISIBLE);
-        }else{
-            mNewTripMenuItemEnabled = true;
-            mLowBatteryMessage.setVisibility(View.GONE);
-        }
-        getActivity().invalidateOptionsMenu();
+        //Determine if battery is in a low battery state and set menus accordingly
+        configureMenusWithBatteryStateInformation();
 
-        mBatteryPreferences = getContext().getSharedPreferences(BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+        // register for changes in low battery state messages
+        mBatteryPreferences = Objects.requireNonNull(getContext())
+                .getSharedPreferences(BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+
         if (mBatteryPreferences != null) {
             Timber.d("registering for shared prefs notification");
             mBatteryPreferences.registerOnSharedPreferenceChangeListener(this);
@@ -241,11 +238,16 @@ public class TripListFragment extends Fragment
 
     }
 
+
+
+
     @Override
     public void onPause(){
         super.onPause();
         Timber.d("onPause invoked");
-        mBatteryPreferences = getContext().getSharedPreferences(BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+        mBatteryPreferences = Objects.requireNonNull(getContext()).
+                getSharedPreferences(BatteryStatePreferences.BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+
         if (mBatteryPreferences != null) {
             mBatteryPreferences.unregisterOnSharedPreferenceChangeListener(this);
         }
@@ -256,16 +258,16 @@ public class TripListFragment extends Fragment
         Timber.d("onSharedPreferenceChanged");
         if (key.equals(BATTERY_STATE_EXTRA)){
             // read the battery state
-            boolean isLow = getLowBatteryState(getContext());
+            boolean isLow = getLowBatteryState(Objects.requireNonNull(getContext()));
             if (isLow){
                 Timber.d("Low Battery State Occurred");
-                getActivity().invalidateOptionsMenu();
+                Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
                 mNewTripMenuItemEnabled = false;
                 mLowBatteryMessage.setVisibility(View.VISIBLE);
 
             }else{
                 Timber.d("Low Battery State Ended");
-                getActivity().invalidateOptionsMenu();
+                Objects.requireNonNull(getActivity()).invalidateOptionsMenu();
                 mNewTripMenuItemEnabled = true;
                 mLowBatteryMessage.setVisibility(View.GONE);
             }
@@ -297,7 +299,6 @@ public class TripListFragment extends Fragment
                 startActivityForResult(intent, REQUEST_SORT_PREFERENCES);
                 return true;
             case R.id.filter:
-                Timber.d("Filter request. mListFilter= " + Boolean.toString(mListFiltered));
                 intent = FilterActivity.newIntent(getContext(), mListFiltered);
                 startActivityForResult(intent, REQUEST_FILTER_PREFERENCES);
                 return true;
@@ -389,7 +390,7 @@ public class TripListFragment extends Fragment
     public void onItemChecked(Segment segment) {
 
         mSelectedSegments.add(segment);
-        Timber.d("Adding segment to selected trips: " + segment.getId().toString());
+        Timber.d("Adding segment to selected trips: %s", segment.getId().toString());
 
         mCallback.onTripSelected(segment);
         mDisplayButton.setEnabled(true);
@@ -403,7 +404,7 @@ public class TripListFragment extends Fragment
     public void onItemUnchecked(Segment segment) {
 
         mSelectedSegments.remove(segment);
-        Timber.d("Removing segment to selected trips: " + segment.getId().toString());
+        Timber.d("Removing segment to selected trips: %s", segment.getId().toString());
         mCallback.onTripUnselected(segment);
 
         if (mSelectedSegments.size() < 1){
@@ -425,7 +426,9 @@ public class TripListFragment extends Fragment
         dialog.setTargetFragment(TripListFragment.this, REQUEST_TRIP_DELETE_CONFIRM);
 
         FragmentManager manager = getFragmentManager();
-        dialog.show(manager, DIALOG_DELETE_CONFIRM);
+        if (manager != null) {
+            dialog.show(manager, DIALOG_DELETE_CONFIRM);
+        }
 
 
     }
@@ -511,8 +514,8 @@ public class TripListFragment extends Fragment
      * when on a tablet and going from landscape to portrait.
      *
      */
-    public void showDisplayButton(Boolean show){
-        mHideDisplayButton = false;
+    public void hideDisplayButton(Boolean hide){
+        mHideDisplayButton = hide;
     }
 
 
@@ -531,7 +534,7 @@ public class TripListFragment extends Fragment
     }
 
     private String getSortMessage(SortPreferenceEnum selectedSort){
-        String result = getString(R.string.most_recent_sort);;
+        String result = getString(R.string.most_recent_sort);
         switch(selectedSort){
             case NEWEST:
                 result =  getString(R.string.most_recent_sort);
@@ -600,7 +603,7 @@ public class TripListFragment extends Fragment
 
                 message += getString(R.string.distance) + "  " +
                         segment.getDistanceMiles() + " " +
-                        getContext().getResources()
+                        Objects.requireNonNull(getContext()).getResources()
                                 .getQuantityString(R.plurals.miles_plural,
                                         PluralHelpers.getPluralQuantity(segment.getDistance()));
                 message += newLine + newLine;
@@ -608,12 +611,33 @@ public class TripListFragment extends Fragment
 
             }
 
-            startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+            startActivity(Intent.createChooser(ShareCompat.IntentBuilder
+                    .from(Objects.requireNonNull(getActivity()))
                     .setType("text/plain")
-                    .setSubject(getContext().getString(R.string.trip_list_subject))
+                    .setSubject(Objects.requireNonNull(getContext())
+                    .getString(R.string.trip_list_subject))
                     .setText(message)
                     .getIntent(), getString(R.string.action_share)));
         }
+    }
+
+
+    /**
+     * If the battery is in a low battery state, disable teh new trip menu item and post a low
+     * battery state message. Otherwise, enable tracking functionality.
+     */
+    private void configureMenusWithBatteryStateInformation(){
+        float batteryPercentage = BatteryStatePreferences.getCurrentBatteryPercentLevel(Objects
+                .requireNonNull(getActivity()));
+
+        if (batteryPercentage <= LOW_BATTERY_THRESHOLD ){
+            mNewTripMenuItemEnabled = false;
+            mLowBatteryMessage.setVisibility(View.VISIBLE);
+        }else{
+            mNewTripMenuItemEnabled = true;
+            mLowBatteryMessage.setVisibility(View.GONE);
+        }
+        getActivity().invalidateOptionsMenu();
     }
 
 }
