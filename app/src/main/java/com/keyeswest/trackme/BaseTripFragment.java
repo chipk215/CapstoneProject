@@ -41,6 +41,7 @@ import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
 import com.keyeswest.trackme.services.LocationService;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
+
 import com.keyeswest.trackme.utilities.LocationPreferences;
 import com.keyeswest.trackme.utilities.SnackbarHelper;
 import com.keyeswest.trackme.widget.TrackMeWidgetService;
@@ -57,7 +58,10 @@ import timber.log.Timber;
 import static com.keyeswest.trackme.services.LocationProcessorService.LOCATION_BROADCAST_PLOT_SAMPLE;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PREFERENCES;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
+
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getServiceAborted;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setServiceAborted;
 import static com.keyeswest.trackme.utilities.LocationPreferences.requestingLocationUpdates;
 
 
@@ -193,15 +197,30 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("onStart invoked");
         super.onStart();
 
-        // If the start tracking button is disabled but we are not tracking, fix the start
-        // button state. This state occurs when the user stops tracking using the posted
-        // notification when the location service was in the foreground.
-        if ((! mStartUpdatesButton.isEnabled()) && (! requestingLocationUpdates(getContext())) ) {
-            if (getActivity() != null) {
-                Timber.d("Entering NewTrip Activity due to user terminating location service");
-                setTrackButtonState(true);
+        // Check to see if we went into low power state while paused
+        // We just can't read the low battery state in shared prefs because the battery may have
+        // charged after the tracking service was aborted but before the user re-started the app
+        boolean abortService =  getServiceAborted(Objects.requireNonNull(getContext()));
+
+        if (abortService ){
+            mStartUpdatesButton.setVisibility(View.GONE);
+            mStopUpdatesButton.setVisibility(View.GONE);
+            mLowBatteryExitMessage.setVisibility(View.VISIBLE);
+        }else {
+
+            // If the start tracking button is disabled but we are not tracking, fix the start
+            // button state. This state occurs when the user stops tracking using the posted
+            // notification when the location service was in the foreground.
+            if ((!mStartUpdatesButton.isEnabled()) && (!requestingLocationUpdates(getContext()))) {
+                if (getActivity() != null) {
+                    Timber.d("Entering NewTrip Activity due to user terminating location service");
+                    setTrackButtonState(true);
+                }
             }
         }
+
+        // reset abort flag in Shared Preferences
+        setServiceAborted(getContext(), false);
     }
 
 
@@ -266,6 +285,7 @@ public abstract class BaseTripFragment extends Fragment
     public void onResume() {
         super.onResume();
         Timber.d("Trip tracking resumed, re-registering plot receiver");
+
         getLastLocation();
 
         // register for changes in low battery state messages

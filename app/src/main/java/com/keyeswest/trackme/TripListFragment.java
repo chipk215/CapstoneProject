@@ -39,7 +39,7 @@ import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
 import com.keyeswest.trackme.utilities.BatteryStatePreferences;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
 import com.keyeswest.trackme.utilities.PluralHelpers;
-import com.keyeswest.trackme.utilities.SnackbarHelper;
+
 import com.keyeswest.trackme.utilities.SortSharedPreferences;
 import com.keyeswest.trackme.utilities.SortResult;
 
@@ -58,6 +58,7 @@ import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PR
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.LOW_BATTERY_THRESHOLD;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setServiceAborted;
 import static com.keyeswest.trackme.utilities.SnackbarHelper.showSnackbar;
 
 
@@ -139,8 +140,6 @@ public class TripListFragment extends Fragment
             throw new ClassCastException(context.toString()
                     + " must implement TripListListener");
         }
-
-
     }
 
 
@@ -168,7 +167,6 @@ public class TripListFragment extends Fragment
         }else {
             mSelectedSegments = new ArrayList<>();
         }
-
     }
 
 
@@ -235,6 +233,9 @@ public class TripListFragment extends Fragment
             Timber.d("registering for shared prefs notification");
             mBatteryPreferences.registerOnSharedPreferenceChangeListener(this);
         }
+
+        // Ensure the abort flag for New Trip is cleared
+        setServiceAborted(getContext(), false);
 
 
     }

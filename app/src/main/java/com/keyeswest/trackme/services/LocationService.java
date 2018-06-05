@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Binder;
 import android.os.Build;
@@ -21,11 +22,18 @@ import com.keyeswest.trackme.NewTripActivity;
 import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.receivers.BatteryLevelReceiver;
 
+import java.util.Objects;
+
 import timber.log.Timber;
 
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PREFERENCES;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setServiceAborted;
 import static com.keyeswest.trackme.utilities.LocationPreferences.setRequestingLocationUpdates;
 
-public abstract class LocationService extends Service {
+public abstract class LocationService extends Service
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String PACKAGE_NAME =
             "com.keyeswest.trackme.services.LocationService";
@@ -39,6 +47,8 @@ public abstract class LocationService extends Service {
     protected static final int NOTIFICATION_ID = 14;
 
     private final IBinder mBinder = new LocalBinder();
+
+    private SharedPreferences mBatteryPreferences;
 
     /**
      * Used to check whether the bound activity has really gone away and not unbound as part of an
@@ -70,6 +80,15 @@ public abstract class LocationService extends Service {
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         createNotificationChannel();
+
+        // register for changes in low battery state messages
+        mBatteryPreferences = this.getSharedPreferences(BATTERY_PREFERENCES,
+                Context.MODE_PRIVATE);
+
+        if (mBatteryPreferences != null) {
+            Timber.d("registering for shared prefs notification");
+            mBatteryPreferences.registerOnSharedPreferenceChangeListener(this);
+        }
 
     }
 
@@ -139,7 +158,11 @@ public abstract class LocationService extends Service {
 
     @Override
     public void onDestroy() {
-       super.onDestroy();
+        if (mBatteryPreferences != null) {
+            mBatteryPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        }
+
+        super.onDestroy();
 
     }
 
@@ -200,6 +223,27 @@ public abstract class LocationService extends Service {
             }
         }
         return false;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(BATTERY_STATE_EXTRA)){
+
+            if (getLowBatteryState(this)){
+
+                setServiceAborted(this, true);
+
+                if (serviceIsRunningInForeground(this)){
+
+                    // NewTri[Activity handles low battery state if service not in foreground
+                    removeLocationUpdates();
+                }
+
+            }
+
+
+
+        }
     }
 
     /**
