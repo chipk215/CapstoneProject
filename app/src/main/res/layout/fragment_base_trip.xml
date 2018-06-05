@@ -37,4 +37,17 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/request_updates_button" />
 
+    <TextView
+        android:id="@+id/exit_low_battery_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_48"
+        android:layout_marginStart="@dimen/margin_24"
+        android:padding="@dimen/margin_8"
+        android:text="@string/exit_track_battery"
+        android:background="@color/colorPrimaryLight"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/plot_map"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

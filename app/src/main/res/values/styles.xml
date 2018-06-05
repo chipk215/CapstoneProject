@@ -10,6 +10,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorButtonNormal">@color/colorPrimaryLight</item>
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
+        <!--To change the background of options menu-->
+        <item name="android:itemBackground">@color/menuBackground</item>
     </style>
 
     <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">

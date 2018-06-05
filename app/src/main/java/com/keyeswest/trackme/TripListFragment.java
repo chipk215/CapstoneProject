@@ -39,6 +39,7 @@ import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
 import com.keyeswest.trackme.utilities.BatteryStatePreferences;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
 import com.keyeswest.trackme.utilities.PluralHelpers;
+import com.keyeswest.trackme.utilities.SnackbarHelper;
 import com.keyeswest.trackme.utilities.SortSharedPreferences;
 import com.keyeswest.trackme.utilities.SortResult;
 
@@ -57,7 +58,7 @@ import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PR
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.LOW_BATTERY_THRESHOLD;
 import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
-
+import static com.keyeswest.trackme.utilities.SnackbarHelper.showSnackbar;
 
 
 public class TripListFragment extends Fragment
@@ -517,19 +518,7 @@ public class TripListFragment extends Fragment
     }
 
 
-    private void showSnackbar(View view, String message, int duration){
-        // Create snackbar
-        final Snackbar snackbar = Snackbar.make(view, message, duration);
 
-        // Set an action on it, and a handler
-        snackbar.setAction(R.string.dismiss, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-            }
-        });
-        snackbar.show();
-    }
 
     private String getSortMessage(SortPreferenceEnum selectedSort){
         String result = getString(R.string.most_recent_sort);

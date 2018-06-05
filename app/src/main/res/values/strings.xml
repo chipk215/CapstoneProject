@@ -126,5 +126,6 @@
     <string name="tracks">Tracks</string>
     <string name="log">Log</string>
     <string name="low_battery_message">Low battery level... Tracking disabled until battery charges.</string>
+    <string name="exit_track_battery">Low Battery... Exit trip tracking until battery charges.</string>
 
 </resources>

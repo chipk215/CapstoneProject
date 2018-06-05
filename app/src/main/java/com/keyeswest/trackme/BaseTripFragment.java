@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -19,7 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.TextView;
+
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -40,6 +42,7 @@ import com.keyeswest.trackme.receivers.ProcessedLocationSampleReceiver;
 import com.keyeswest.trackme.services.LocationService;
 import com.keyeswest.trackme.tasks.StartSegmentTask;
 import com.keyeswest.trackme.utilities.LocationPreferences;
+import com.keyeswest.trackme.utilities.SnackbarHelper;
 import com.keyeswest.trackme.widget.TrackMeWidgetService;
 
 import java.util.ArrayList;
@@ -138,6 +141,9 @@ public abstract class BaseTripFragment extends Fragment
     @BindView(R.id.remove_updates_button)
     Button mStopUpdatesButton;
 
+    @BindView(R.id.exit_low_battery_tv)
+    TextView  mLowBatteryExitMessage;
+
     // Holds previously plotted points (locations) read from the database when the activity is
     // resumed. This is the key data object for distinguishing when the app is restarted without
     // being removed from memory.
@@ -165,6 +171,8 @@ public abstract class BaseTripFragment extends Fragment
 
     private SharedPreferences mBatteryPreferences;
 
+    private View mFragmentView;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -172,8 +180,8 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("onCreate Trip Fragment");
 
         // Only the app widget sets the flag to begin tracking when the activity is started.
-        mStartTrip = getArguments().getBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA);
-        Timber.d("Start Trip: " + Boolean.toString(mStartTrip));
+        mStartTrip = Objects.requireNonNull(getArguments()).getBoolean(INITIAL_NEW_TRIP_STARTED_EXTRA);
+        Timber.d("Start Trip: %s", Boolean.toString(mStartTrip));
 
         setHasOptionsMenu(true);
     }
@@ -204,8 +212,8 @@ public abstract class BaseTripFragment extends Fragment
 
         Timber.d("onCreateView Trip Fragment");
 
-        View view = inflater.inflate(R.layout.fragment_base_trip, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
+        mFragmentView = inflater.inflate(R.layout.fragment_base_trip, container, false);
+        mUnbinder = ButterKnife.bind(this, mFragmentView);
 
         setTrackButtonState(true);
 
@@ -235,7 +243,7 @@ public abstract class BaseTripFragment extends Fragment
             }
         });
 
-        return view;
+        return mFragmentView;
     }
 
 
@@ -274,7 +282,7 @@ public abstract class BaseTripFragment extends Fragment
     @Override
     public void onPause() {
         Timber.d("Trip tracking paused, unregistering plot receiver");
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext())).unregisterReceiver(mSampleReceiver);
 
         if (mBatteryPreferences != null) {
             mBatteryPreferences.unregisterOnSharedPreferenceChangeListener(this);
@@ -291,7 +299,7 @@ public abstract class BaseTripFragment extends Fragment
             // Unbind from the service. This signals to the service that this activity is no longer
             // in the foreground, and the service can respond by promoting itself to a foreground
             // service.
-            getContext().unbindService(mServiceConnection);
+            Objects.requireNonNull(getContext()).unbindService(mServiceConnection);
             mBound = false;
         }
 
@@ -323,7 +331,7 @@ public abstract class BaseTripFragment extends Fragment
      *
      *    - in this case we should dump the mPlot points and replace with mPlottedPoints
      *
-     * @param location
+     * @param location - location to plot
      */
     @Override
     public void updatePlot(Location location) {
@@ -383,7 +391,7 @@ public abstract class BaseTripFragment extends Fragment
 
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState){
         Timber.d("onSaveInstanceState invoked");
 
         // save the segment information associated with the sample locations
@@ -410,10 +418,12 @@ public abstract class BaseTripFragment extends Fragment
     @SuppressWarnings("MissingPermission")
     private void getLastLocation(){
         FusedLocationProviderClient fusedLocationClient =
-                LocationServices.getFusedLocationProviderClient(getContext());
+                LocationServices.getFusedLocationProviderClient(Objects
+                        .requireNonNull(getContext()));
 
         fusedLocationClient.getLastLocation()
-                .addOnCompleteListener(getActivity(),new OnCompleteListener<Location>() {
+                .addOnCompleteListener(Objects.requireNonNull(getActivity()),
+                        new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null){
@@ -423,7 +433,10 @@ public abstract class BaseTripFragment extends Fragment
 
                             // request map to be generated
                             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-                            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.plot_map);
+                            SupportMapFragment mapFragment =
+                                    (SupportMapFragment) getChildFragmentManager()
+                                    .findFragmentById(R.id.plot_map);
+
                             mapFragment.getMapAsync(BaseTripFragment.this);
 
                         }else{
@@ -465,7 +478,8 @@ public abstract class BaseTripFragment extends Fragment
                 //start listening for updates if in a tracking state
                 mSampleReceiver = new ProcessedLocationSampleReceiver();
                 mSampleReceiver.registerCallback(this);
-                LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
+                LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext()))
+                        .registerReceiver(mSampleReceiver,
                         new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
 
                 //note that the mPlottedPoints data just read from the db will be used when
@@ -506,7 +520,8 @@ public abstract class BaseTripFragment extends Fragment
         // start listening for location sample updates
         mSampleReceiver = new ProcessedLocationSampleReceiver();
         mSampleReceiver.registerCallback(this);
-        LocalBroadcastManager.getInstance(getContext()).registerReceiver(mSampleReceiver,
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext()))
+                .registerReceiver(mSampleReceiver,
                 new IntentFilter(LOCATION_BROADCAST_PLOT_SAMPLE));
 
         LocationPreferences.setRequestingLocationUpdates(getContext(), true);
@@ -521,7 +536,8 @@ public abstract class BaseTripFragment extends Fragment
         Timber.d("Entering stopUpdates");
 
         //Stop listening for new location samples
-        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mSampleReceiver);
+        LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext()))
+                .unregisterReceiver(mSampleReceiver);
 
         LocationPreferences.setRequestingLocationUpdates(getContext(), false);
 
@@ -574,14 +590,13 @@ public abstract class BaseTripFragment extends Fragment
             boolean isLow = getLowBatteryState(Objects.requireNonNull(getContext()));
             if (isLow){
                 // display a toast and exit
-                Toast.makeText(getContext(),getString(R.string.low_battery_message),
-                        Toast.LENGTH_SHORT).show();
+                SnackbarHelper.showSnackbar(mFragmentView,getString(R.string.low_battery_message),
+                        Snackbar.LENGTH_LONG);
 
                 stopUpdates();
-                mStartUpdatesButton.setEnabled(false);
-                mStopUpdatesButton.setEnabled(false);
-
-               // Objects.requireNonNull(getActivity()).finish();
+                mStartUpdatesButton.setVisibility(View.GONE);
+                mStopUpdatesButton.setVisibility(View.GONE);
+                mLowBatteryExitMessage.setVisibility(View.VISIBLE);
 
             }
         }

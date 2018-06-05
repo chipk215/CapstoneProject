@@ -18,6 +18,8 @@
     <color name="plotThree">#ff00ff00</color>
     <color name="plotFour">#ffffff00</color>
 
+    <color name="menuBackground">#e0e0e0</color>
+
 
 
 </resources>
