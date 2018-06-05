@@ -14,7 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.keyeswest.trackme.utilities.BatteryStatePreferences;
+
 import timber.log.Timber;
+
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.LOW_BATTERY_THRESHOLD;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setLowBatteryState;
 
 public class PermissionActivity extends AppCompatActivity {
 
@@ -27,12 +32,15 @@ public class PermissionActivity extends AppCompatActivity {
 
     private boolean mRequiresPermission = true;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         Timber.d("onCreate invoked");
+        setCurrentBatteryLevel();
+
 
         setContentView(R.layout.activity_permission);
 
@@ -58,6 +66,8 @@ public class PermissionActivity extends AppCompatActivity {
             startTripListActivity();
         }
     }
+
+
 
     @Override
     protected void onResume() {
@@ -198,6 +208,18 @@ public class PermissionActivity extends AppCompatActivity {
         Intent intent = TripListActivity.newIntent(this);
         startActivity(intent);
         finish();
+    }
+
+    private void setCurrentBatteryLevel() {
+
+        float batteryPercentage = BatteryStatePreferences.getCurrentBatteryPercentLevel(this);
+
+        Timber.d("Initial battery percentage= %s", Float.toString(batteryPercentage));
+        if (batteryPercentage <= LOW_BATTERY_THRESHOLD ){
+            setLowBatteryState(this,true);
+        }else{
+            setLowBatteryState(this,false);
+        }
     }
 
     @Override

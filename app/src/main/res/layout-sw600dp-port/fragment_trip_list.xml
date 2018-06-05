@@ -16,6 +16,19 @@
         android:orientation="vertical"
         android:paddingTop="@dimen/margin_16">
 
+        <TextView
+            android:id="@+id/low_battery_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_8"
+            android:layout_marginTop="@dimen/margin_8"
+            android:text="@string/low_battery_message"
+            android:textStyle="italic"
+            android:textColor="@color/textColorPrimary"
+
+
+            />
+
 
         <android.support.v7.widget.RecyclerView
 

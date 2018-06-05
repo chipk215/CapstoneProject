@@ -125,5 +125,6 @@
     <string name="trip_log">Trip Log</string>
     <string name="tracks">Tracks</string>
     <string name="log">Log</string>
+    <string name="low_battery_message">Low battery level... Tracking disabled until battery charges.</string>
 
 </resources>

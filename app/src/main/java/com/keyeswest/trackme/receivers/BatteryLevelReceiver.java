@@ -15,10 +15,10 @@ public class BatteryLevelReceiver extends BroadcastReceiver {
 
         if (Intent.ACTION_BATTERY_LOW.equalsIgnoreCase(intent.getAction())){
             Timber.d("Received low battery notice");
-            BatteryStatePreferences.setLowBatteryLowState(context, true);
+            BatteryStatePreferences.setLowBatteryState(context, true);
         }else if (Intent.ACTION_BATTERY_OKAY.equalsIgnoreCase(intent.getAction())){
             Timber.d("Received battery ok notice");
-            BatteryStatePreferences.setLowBatteryLowState(context, false);
+            BatteryStatePreferences.setLowBatteryState(context, false);
         }
 
     }

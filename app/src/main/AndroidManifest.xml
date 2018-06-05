@@ -63,7 +63,6 @@
 
         <service android:name=".widget.TrackMeWidgetService" />
 
-        <service android:name=".services.BatteryMonitoringService" />
 
         <activity android:name=".FilterActivity" />
 

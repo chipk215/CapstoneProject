@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,15 +26,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.keyeswest.trackme.adapters.TrackLogAdapter;
 import com.keyeswest.trackme.data.SegmentCursor;
 import com.keyeswest.trackme.data.SegmentLoader;
 import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
-import com.keyeswest.trackme.receivers.BatteryLevelReceiver;
+
 import com.keyeswest.trackme.tasks.DeleteTripTask;
 import com.keyeswest.trackme.tasks.UpdateFavoriteStatusTask;
+import com.keyeswest.trackme.utilities.BatteryStatePreferences;
 import com.keyeswest.trackme.utilities.FilterSharedPreferences;
 import com.keyeswest.trackme.utilities.PluralHelpers;
 import com.keyeswest.trackme.utilities.SortSharedPreferences;
@@ -42,6 +44,7 @@ import com.keyeswest.trackme.utilities.SortResult;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import java.util.UUID;
 
 import butterknife.BindView;
@@ -49,9 +52,19 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import timber.log.Timber;
 
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_PREFERENCES;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.BATTERY_STATE_EXTRA;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.LOW_BATTERY_THRESHOLD;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.getLowBatteryState;
+import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setLowBatteryState;
+
 
 public class TripListFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor>, TrackLogAdapter.SegmentClickListener{
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        TrackLogAdapter.SegmentClickListener, SharedPreferences.OnSharedPreferenceChangeListener
+{
+
+
 
 
     public interface TripListListener{
@@ -95,6 +108,9 @@ public class TripListFragment extends Fragment
     @BindView(R.id.display_btn)
     Button mDisplayButton;
 
+    @BindView(R.id.low_battery_tv)
+    TextView mLowBatteryMessage;
+
     // List of currently selected/checked trips
     private List<Segment> mSelectedSegments;
 
@@ -105,6 +121,9 @@ public class TripListFragment extends Fragment
 
     private SegmentCursor mSegmentCursor;
 
+    private SharedPreferences mBatteryPreferences;
+
+    private boolean mNewTripMenuItemEnabled;
 
 
 
@@ -120,6 +139,8 @@ public class TripListFragment extends Fragment
             throw new ClassCastException(context.toString()
                     + " must implement TripListListener");
         }
+
+
     }
 
 
@@ -144,6 +165,7 @@ public class TripListFragment extends Fragment
         }else {
             mSelectedSegments = new ArrayList<>();
         }
+
 
 
 
@@ -200,12 +222,62 @@ public class TripListFragment extends Fragment
         super.onResume();
         Timber.d("onResume invoked");
 
+        float batteryPercentage = BatteryStatePreferences.getCurrentBatteryPercentLevel(getActivity());
+        if (batteryPercentage <= LOW_BATTERY_THRESHOLD ){
+            mNewTripMenuItemEnabled = false;
+            mLowBatteryMessage.setVisibility(View.VISIBLE);
+        }else{
+            mNewTripMenuItemEnabled = true;
+            mLowBatteryMessage.setVisibility(View.GONE);
+        }
+        getActivity().invalidateOptionsMenu();
+
+        mBatteryPreferences = getContext().getSharedPreferences(BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+        if (mBatteryPreferences != null) {
+            Timber.d("registering for shared prefs notification");
+            mBatteryPreferences.registerOnSharedPreferenceChangeListener(this);
+        }
+
+
     }
 
     @Override
     public void onPause(){
         super.onPause();
         Timber.d("onPause invoked");
+        mBatteryPreferences = getContext().getSharedPreferences(BATTERY_PREFERENCES, Context.MODE_PRIVATE);
+        if (mBatteryPreferences != null) {
+            mBatteryPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Timber.d("onSharedPreferenceChanged");
+        if (key.equals(BATTERY_STATE_EXTRA)){
+            // read the battery state
+            boolean isLow = getLowBatteryState(getContext());
+            if (isLow){
+                Timber.d("Low Battery State Occurred");
+                getActivity().invalidateOptionsMenu();
+                mNewTripMenuItemEnabled = false;
+                mLowBatteryMessage.setVisibility(View.VISIBLE);
+
+            }else{
+                Timber.d("Low Battery State Ended");
+                getActivity().invalidateOptionsMenu();
+                mNewTripMenuItemEnabled = true;
+                mLowBatteryMessage.setVisibility(View.GONE);
+            }
+
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu (Menu menu) {
+        Timber.d("onPrepareOptionsMenu");
+        MenuItem newTripItem = menu.findItem(R.id.new_trip);
+        newTripItem.setEnabled(mNewTripMenuItemEnabled);
     }
 
 
@@ -243,6 +315,8 @@ public class TripListFragment extends Fragment
 
         inflater.inflate(R.menu.fragment_trip_list, menu);
         mMainMenu = menu;
+        MenuItem newTripItem = menu.findItem(R.id.new_trip);
+        newTripItem.setEnabled(mNewTripMenuItemEnabled);
 
         // Restore filter icon on configuration change
         if (mListFiltered){
@@ -252,6 +326,8 @@ public class TripListFragment extends Fragment
             getLoaderManager().restartLoader(0, null, this);
         }
     }
+
+
 
     @Override
     public void onDestroyView(){
