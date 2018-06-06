@@ -16,6 +16,14 @@ repositories {
 
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'keyeswest'
+            keyPassword 'password'
+            storeFile file("${project.rootDir}/keystore.jks")
+            storePassword 'password'
+        }
+    }
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
     defaultConfig {
@@ -30,6 +38,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
             debuggable true
@@ -41,38 +50,28 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     // Android Packages
     implementation "com.android.support:appcompat-v7:$androidSupportVersion"
     implementation "com.android.support:design:$androidSupportVersion"
     implementation "com.android.support:support-v4:$androidSupportVersion"
     implementation "com.android.support.constraint:constraint-layout:$constraintLayoutVersion"
-
     //Google Services
-    implementation "com.google.android.gms:play-services-location:15.0.0"
+    implementation 'com.google.android.gms:play-services-location:15.0.0'
     implementation 'com.google.android.gms:play-services-maps:15.0.0'
-
-
     //Third party libs
-
     //Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"
-
     //ButterKnife
     implementation "com.jakewharton:butterknife:$butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
     implementation 'com.borax12.materialdaterangepicker:library:1.9'
     implementation 'com.google.code.gson:gson:2.8.2'
-
     implementation 'com.facebook.stetho:stetho:1.5.0'
-
-
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     releaseImplementation('com.crashlytics.sdk.android:crashlytics:2.9.3@aar') {
         transitive = true
     }
-
 }
