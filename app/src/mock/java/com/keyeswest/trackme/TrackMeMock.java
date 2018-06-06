@@ -1,6 +1,8 @@
 package com.keyeswest.trackme;
 
-import android.app.Application;
+
+
+import com.facebook.stetho.Stetho;
 
 import timber.log.Timber;
 
@@ -8,7 +10,9 @@ public class TrackMeMock extends TrackMe {
 
     @Override
     public void onCreate(){
+
         super.onCreate();
+        Stetho.initializeWithDefaults(this);
 
         Timber.plant(new Timber.DebugTree(){
             // include line numbers

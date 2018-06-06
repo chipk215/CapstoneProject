@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 apply plugin: 'com.android.application'
@@ -59,15 +59,20 @@ dependencies {
     //Google Services
     implementation 'com.google.android.gms:play-services-location:15.0.0'
     implementation 'com.google.android.gms:play-services-maps:15.0.0'
+
     //Third party libs
+
     //Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"
+
     //ButterKnife
     implementation "com.jakewharton:butterknife:$butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
+
     implementation 'com.borax12.materialdaterangepicker:library:1.9'
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.facebook.stetho:stetho:1.5.0'
+    mockImplementation 'com.facebook.stetho:stetho:1.5.0'
+    androidTestImplementation 'com.facebook.stetho:stetho:1.5.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

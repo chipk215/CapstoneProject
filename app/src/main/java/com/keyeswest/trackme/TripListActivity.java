@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
-import com.facebook.stetho.Stetho;
 import com.keyeswest.trackme.data.SegmentSchema;
 import com.keyeswest.trackme.models.Segment;
 
@@ -51,7 +50,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_triplist);
-        Stetho.initializeWithDefaults(this);
+
         ButterKnife.bind(this);
 
         mSelectedSegments = new ArrayList<>();
