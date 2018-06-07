@@ -32,7 +32,11 @@ Trip tracking records the location and movement of the user creating a new trip.
 
 ![Tracking](docs/readmeImages/tracking.png)
 
-The trip is completed when the user taps the "Stop Tracking" button. Tracking can also be initiated using the desk top app widget:  
+The trip is completed when the user taps the "Stop Tracking" button.  
+
+
+### App Widget   
+Tracking can also be initiated using the desk top app widget:  
 ![Widget](docs/readmeImages/widget.png)
 
 ## Tracking Service
