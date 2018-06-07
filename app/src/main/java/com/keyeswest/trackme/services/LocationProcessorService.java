@@ -50,7 +50,7 @@ public class LocationProcessorService extends IntentService {
     public final static String PLOT_SAMPLES_EXTRA_KEY = "sampleData";
 
     // Debug counter  TODO remove from release
-    public static long debugSampleCount =0;
+    private static long debugSampleCount =0;
 
     public LocationProcessorService() {
         super(NAME);

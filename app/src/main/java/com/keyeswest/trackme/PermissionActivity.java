@@ -27,8 +27,6 @@ public class PermissionActivity extends AppCompatActivity {
     private static final String PERMISSION_EXTRA = "permissionExtra";
 
     private TextView mPermissionTextView;
-    private TextView mExitTextView;
-    private Button mExitButton;
 
     private boolean mAskedOnce;
 
@@ -49,17 +47,13 @@ public class PermissionActivity extends AppCompatActivity {
 
         mPermissionTextView = findViewById(R.id.perm_justify_tv);
 
-        mExitTextView = findViewById(R.id.exit_tv);
-        mExitButton = findViewById(R.id.exit_btn);
-        mExitButton.setOnClickListener(new View.OnClickListener() {
+        Button exitButton = findViewById(R.id.exit_btn);
+        exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-
-       // mExitTextView.setVisibility(View.INVISIBLE);
-      //  mExitButton.setVisibility(View.INVISIBLE);
 
         mAskedOnce = false;
 

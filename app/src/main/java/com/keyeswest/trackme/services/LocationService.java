@@ -39,9 +39,9 @@ public abstract class LocationService extends Service
             ".started_from_notification";
 
 
-    public static final String NOTIFICATION_CHANNEL_ID = "channel_01";
+    private static final String NOTIFICATION_CHANNEL_ID = "channel_01";
 
-    protected static final int NOTIFICATION_ID = 14;
+    static final int NOTIFICATION_ID = 14;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -52,10 +52,10 @@ public abstract class LocationService extends Service
      * orientation change. We create a foreground service notification only if the former takes
      * place.
      */
-    protected boolean mChangingConfiguration = false;
+    boolean mChangingConfiguration = false;
 
 
-    protected NotificationManager mNotificationManager;
+    private NotificationManager mNotificationManager;
 
     public abstract void removeLocationUpdates();
 
@@ -63,7 +63,7 @@ public abstract class LocationService extends Service
 
     protected abstract Intent getNotificationIntent();
 
-    protected HandlerThread mHandlerThread;
+    HandlerThread mHandlerThread;
 
 
     @Override
@@ -112,7 +112,7 @@ public abstract class LocationService extends Service
     }
 
 
-    protected void createNotificationChannel() {
+    private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -164,7 +164,7 @@ public abstract class LocationService extends Service
     /**
      * Returns the {@link NotificationCompat} used as part of the foreground service.
      */
-    protected Notification getNotification(){
+    Notification getNotification(){
         Intent intent = getNotificationIntent();
 
         // Extra to help us figure out if we arrived in onStartCommand via the notification or not.
@@ -206,7 +206,7 @@ public abstract class LocationService extends Service
      *
      * @param context The {@link Context}.
      */
-    public boolean serviceIsRunningInForeground(Context context) {
+    protected boolean serviceIsRunningInForeground(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(
                 Context.ACTIVITY_SERVICE);
 

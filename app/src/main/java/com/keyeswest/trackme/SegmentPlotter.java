@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import timber.log.Timber;
 
-public class SegmentPlotter<T> extends HandlerThread {
+class SegmentPlotter<T> extends HandlerThread {
     private static final String TAG= "SegmentPlotter";
     private static final int MESSAGE_PLOT = 0;
 

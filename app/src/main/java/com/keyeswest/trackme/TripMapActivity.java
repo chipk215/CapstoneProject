@@ -17,7 +17,7 @@ import java.util.List;
 public class TripMapActivity extends AppCompatActivity
  {
 
-    public static final String EXTRA_URI = "com.keyeswest.fleetracker.extra_uri";
+    public static final String EXTRA_URI = "com.keyeswest.trackme.extra_uri";
 
 
     /**

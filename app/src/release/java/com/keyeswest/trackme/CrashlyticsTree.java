@@ -9,7 +9,7 @@ import timber.log.Timber;
 
 //Attribution: https://blog.xmartlabs.com/2015/07/09/Android-logging-with-Crashlytics-and-Timber/
 
-public class CrashlyticsTree extends Timber.Tree {
+class CrashlyticsTree extends Timber.Tree {
     private static final String CRASHLYTICS_KEY_PRIORITY = "priority";
     private static final String CRASHLYTICS_KEY_TAG = "tag";
     private static final String CRASHLYTICS_KEY_MESSAGE = "message";

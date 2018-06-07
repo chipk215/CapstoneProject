@@ -57,7 +57,7 @@ public class BatteryStatePreferences {
 
 
     /**
-     * Sets an abort flag if the locaiton service was stopped while in foreground due to low power
+     * Sets an abort flag if the location service was stopped while in foreground due to low power
      * state.
      * @param context - context of invoker
      * @param set - true to set; false to clear

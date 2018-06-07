@@ -20,10 +20,10 @@ import timber.log.Timber;
  */
 public class TrackMeWidgetProvider extends AppWidgetProvider {
 
-    static boolean sIsTracking = false;
+    private static boolean sIsTracking = false;
 
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+    private static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+                                        int appWidgetId) {
 
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.track_me_widget);

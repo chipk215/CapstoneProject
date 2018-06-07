@@ -78,7 +78,7 @@ public class FilterActivity extends AppCompatActivity {
     @BindView(R.id.submit_btn)
     Button mSubmitButton;
 
-    // This switch position is read when the submit buttton is pressed. There is no listener for
+    // This switch position is read when the submit button is pressed. There is no listener for
     //the toggle switch itself.
     @BindView(R.id.favorite_sw)
     Switch mFavoriteSwitch;

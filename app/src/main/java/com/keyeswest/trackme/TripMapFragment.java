@@ -170,7 +170,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     private Boolean mIsTwoPane;
 
     // serves as a queue for plot line line colors
-    LinkedList<Integer> mPlotLineColors = new LinkedList<>();
+    private LinkedList<Integer> mPlotLineColors = new LinkedList<>();
 
     //used to generate loader ids
     private Random mRandom = new Random();

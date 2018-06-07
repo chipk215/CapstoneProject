@@ -17,7 +17,7 @@ import java.lang.ref.WeakReference;
  */
 public class StartSegmentTask extends AsyncTask<Void, Void, Segment> {
 
-    public static final String SEGMENT_ID_KEY = "com.keyeswest.fleetracker.com.segmentId";
+    public static final String SEGMENT_ID_KEY = "com.keyeswest.trackme.com.segmentId";
 
 
     public interface ResultsCallback{

@@ -46,7 +46,7 @@ public class NewTripActivity  extends AppCompatActivity {
         return intent.getBooleanExtra(STOP_TRIP_EXTRA, false);
     }
 
-    NewTripFragment mFragment;
+    private NewTripFragment mFragment;
 
 
     @Override

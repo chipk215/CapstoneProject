@@ -19,7 +19,6 @@
     <string name="duration">Duration:</string>
     <string name="trip_summary">Trip Summary</string>
     <string name="date">Date:</string>
-    <string name="date_lbl">Date</string>
     <string name="start_time">Start Time:</string>
 
 
@@ -60,7 +59,7 @@
     <!-- ConfirmDeleteDialog -->
     <string name="confirm_trip_delete">Confirm Trip Deletion</string>
     <string name="delete_confirm">DELETE</string>
-    <string name="cancel">CANCEL</string>
+    <string name="cancel">Cancel</string>
     <string name="trip_deleted">Trip Deleted</string>
     <string name="trip_delete_cancel">Trip Delete Cancelled</string>
 
@@ -92,11 +91,8 @@
     <string name="launch_activity">Open TrackMe</string>
     <string name="remove_location_updates">Stop updates</string>
 
-    <!-- LocationPreferences -->
-    <string name="location_updated">Location Updated: %1$s</string>
 
     <!-- Widget -->
-    <string name="open_list">Open trip list</string>
     <string name="start_trip">Start Trip</string>
     <string name="stop_trip">Stop Trip</string>
 
@@ -119,8 +115,8 @@
         <item quantity="one">mile</item>
         <item quantity="other">miles</item>
     </plurals>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
+
+
     <string name="launch_app_icon">Launch app icon</string>
     <string name="trip_log">Trip Log</string>
     <string name="tracks">Tracks</string>

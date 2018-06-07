@@ -9,7 +9,7 @@ import com.keyeswest.trackme.receivers.BatteryLevelReceiver;
 
 
 @SuppressLint("Registered")
-public abstract class  TrackMe extends Application {
+abstract class  TrackMe extends Application {
 
     private BatteryLevelReceiver mBatteryLevelReceiver = new BatteryLevelReceiver();
 

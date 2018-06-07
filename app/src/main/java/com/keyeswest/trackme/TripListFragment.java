@@ -85,7 +85,7 @@ public class TripListFragment extends Fragment
     public TripListFragment() {}
 
     public static final int MAX_TRIP_SELECTIONS = 4;
-    public static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
+    private static final String ARG_SELECTED_SEGMENTS = "argSelectedSegments";
     private static final String TWO_PANE_EXTRA = "twoPaneExtra";
 
     private static final String FILTER_STATE_EXTRA = "filterStateExtra";

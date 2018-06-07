@@ -29,7 +29,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
         return new Intent(packageContext, TripListActivity.class);
     }
 
-    public static final String ARG_SELECTED_TRIPS = "argSelectedTrips";
+    private static final String ARG_SELECTED_TRIPS = "argSelectedTrips";
     private static final String TRIP_MAP_TAG = "tripMapTag";
     private static final String TRIP_LIST_TAG = "tripListTag";
 

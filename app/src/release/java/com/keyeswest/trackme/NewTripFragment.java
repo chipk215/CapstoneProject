@@ -11,6 +11,8 @@ import android.support.v4.app.Fragment;
 
 import com.keyeswest.trackme.services.FusedLocationService;
 
+import java.util.Objects;
+
 import timber.log.Timber;
 
 /**
@@ -57,7 +59,7 @@ public class NewTripFragment extends BaseTripFragment {
 
         // Bind to the service. If the service is in foreground mode, this signals to the service
         // that since this activity is in the foreground, the service can exit foreground mode.
-        getContext().bindService(new Intent(getContext(), FusedLocationService.class), mServiceConnection,
+        Objects.requireNonNull(getContext()).bindService(new Intent(getContext(), FusedLocationService.class), mServiceConnection,
                 Context.BIND_AUTO_CREATE);
     }
 

@@ -119,7 +119,7 @@ public abstract class BaseTripFragment extends Fragment
         SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TRACKED_SEGMENT_EXTRA = "trackedSegmentIdExtra";
-    protected static final String INITIAL_NEW_TRIP_STARTED_EXTRA = "initialNewTripStartedExtra";
+    static final String INITIAL_NEW_TRIP_STARTED_EXTRA = "initialNewTripStartedExtra";
 
     private static final int LOCATION_LOADER = 1;
 
@@ -151,14 +151,14 @@ public abstract class BaseTripFragment extends Fragment
     // Holds previously plotted points (locations) read from the database when the activity is
     // resumed. This is the key data object for distinguishing when the app is restarted without
     // being removed from memory.
-    List<LatLng> mPlottedPoints = new ArrayList<>();
+    private List<LatLng> mPlottedPoints = new ArrayList<>();
 
     // The service which provides location updates. A mocked location service is used for the mock
     // variant of the app. The FusedLocationService is used for the real app.
-    protected LocationService mService = null;
+    LocationService mService = null;
 
     // Tracks the bound state of the service.
-    protected boolean mBound = false;
+    boolean mBound = false;
 
     // Created when a new trip is started and corresponds to the segment that contains the locations
     private Segment mTrackingSegment;
@@ -167,7 +167,7 @@ public abstract class BaseTripFragment extends Fragment
     protected abstract ServiceConnection getServiceConnection();
 
     // Monitors the state of the connection to the service.
-    final protected ServiceConnection mServiceConnection = getServiceConnection();
+    final ServiceConnection mServiceConnection = getServiceConnection();
 
     // State variables used when tracking is initiated by the app widget.
     private boolean mStartTrip = false;
@@ -301,7 +301,7 @@ public abstract class BaseTripFragment extends Fragment
 
     @Override
     public void onPause() {
-        Timber.d("Trip tracking paused, unregistering plot receiver");
+        Timber.d("Trip tracking paused, un-registering plot receiver");
         LocalBroadcastManager.getInstance(Objects.requireNonNull(getContext())).unregisterReceiver(mSampleReceiver);
 
         if (mBatteryPreferences != null) {

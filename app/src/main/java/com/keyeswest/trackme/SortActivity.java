@@ -24,8 +24,7 @@ import static com.keyeswest.trackme.utilities.SortSharedPreferences.getSortByCod
 public class SortActivity extends AppCompatActivity {
 
     public static Intent newIntent(Context packageContext){
-        Intent intent = new Intent(packageContext, SortActivity.class);
-        return intent;
+        return new Intent(packageContext, SortActivity.class);
     }
 
     public static SortResult getSortChangedResult(Intent data){
