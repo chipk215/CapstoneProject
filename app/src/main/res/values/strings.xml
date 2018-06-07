@@ -128,5 +128,7 @@
     <string name="low_battery_message">Low battery level. Tracking disabled until battery charges.</string>
     <string name="exit_track_battery">Low Battery. Exit trip tracking until battery charges.</string>
     <string name="application_icon">Application Icon</string>
+    <string name="sort_list">Sort List</string>
+    <string name="filter_list">Filter List</string>
 
 </resources>

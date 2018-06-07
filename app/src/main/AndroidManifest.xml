@@ -3,6 +3,7 @@
     package="com.keyeswest.trackme">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
 
@@ -28,7 +29,13 @@
             android:launchMode="singleTop"
             android:parentActivityName=".TripListActivity"/>
 
-        <activity android:name=".SortActivity" />
+        <activity android:name=".SortActivity"
+            android:label="@string/sort_list"
+            android:parentActivityName=".TripListActivity"/>
+
+        <activity android:name=".FilterActivity"
+            android:label="@string/filter_list"
+            android:parentActivityName=".TripListActivity"/>
 
         <activity
             android:name=".PermissionActivity"
@@ -64,8 +71,6 @@
         <service android:name=".widget.TrackMeWidgetService" />
 
 
-        <activity android:name=".FilterActivity" />
-
         <receiver android:name=".widget.TrackMeWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -77,11 +82,10 @@
         </receiver>
 
 
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="85d1239bead425363847e4e9a35af89356cfe88f" />
     </application>
 
-    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>

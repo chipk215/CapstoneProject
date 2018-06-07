@@ -2,14 +2,19 @@
 <resources>
 
     <!-- Common -->
-    <dimen name="margin_16">16dp</dimen>
-    <dimen name="margin_8">8dp</dimen>
-    <dimen name="margin_24">24dp</dimen>
-    <dimen name="margin_12">12dp</dimen>
-    <dimen name="margin_10">10dp</dimen>
     <dimen name="margin_2">2dp</dimen>
     <dimen name="margin_4">4dp</dimen>
+    <dimen name="margin_8">8dp</dimen>
+    <dimen name="margin_10">10dp</dimen>
+    <dimen name="margin_12">12dp</dimen>
+    <dimen name="margin_16">16dp</dimen>
+    <dimen name="margin_24">24dp</dimen>
+    <dimen name="margin_32">32dp</dimen>
     <dimen name="margin_48">48dp</dimen>
+    <dimen name="margin_140">140dp</dimen>
+    <dimen name="margin_168">168dp</dimen>
+
+
     <dimen name="tall_ok_40">40dp</dimen>
 
 
