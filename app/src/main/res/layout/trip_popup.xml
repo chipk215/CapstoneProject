@@ -26,7 +26,6 @@
         android:id="@+id/date_lbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="@string/date"
@@ -52,8 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="25dp"
-        android:layout_marginLeft="@dimen/margin_16"
-        android:layout_marginRight="25dp"
+
         android:layout_marginStart="@dimen/margin_16"
         android:layout_marginTop="@dimen/margin_8"
         android:text="@string/duration"
@@ -127,7 +125,6 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_4"
 
-        android:layout_marginRight="@dimen/margin_4"
         android:layout_marginTop="7dp"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toStartOf="@+id/distance_unit_lbl"

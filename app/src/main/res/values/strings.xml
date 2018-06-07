@@ -9,8 +9,8 @@
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
     <string name="settings">Settings</string>
-    <string name="permission_justify">Location  access permission required.</string>
-    <string name="exit_app">Location permission not granted. Exit application.</string>
+    <string name="permission_justify">Location access permission required.</string>
+    <string name="exit_app">Location permission not granted.</string>
     <string name="exit">Exit</string>
 
 
@@ -125,7 +125,8 @@
     <string name="trip_log">Trip Log</string>
     <string name="tracks">Tracks</string>
     <string name="log">Log</string>
-    <string name="low_battery_message">Low battery level... Tracking disabled until battery charges.</string>
-    <string name="exit_track_battery">Low Battery... Exit trip tracking until battery charges.</string>
+    <string name="low_battery_message">Low battery level. Tracking disabled until battery charges.</string>
+    <string name="exit_track_battery">Low Battery. Exit trip tracking until battery charges.</string>
+    <string name="application_icon">Application Icon</string>
 
 </resources>

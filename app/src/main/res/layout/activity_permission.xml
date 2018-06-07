@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,7 +22,7 @@
         android:id="@+id/exit_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/ap_tall_margin_top"
+        android:layout_marginTop="16dp"
         android:text="@string/exit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -35,6 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/ap_32_margin_top"
+        android:padding="@dimen/margin_8"
         android:text="@string/exit_app"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -52,7 +52,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/perm_justify_tv"
-        app:srcCompat="@drawable/track" />
+        app:srcCompat="@drawable/track"
+        android:contentDescription="@string/application_icon" />
 
     <TextView
         android:id="@+id/app_title_tv"

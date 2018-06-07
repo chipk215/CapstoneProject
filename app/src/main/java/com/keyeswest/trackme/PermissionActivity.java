@@ -30,6 +30,9 @@ public class PermissionActivity extends AppCompatActivity {
     private TextView mExitTextView;
     private Button mExitButton;
 
+    private boolean mAskedOnce;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,16 +58,11 @@ public class PermissionActivity extends AppCompatActivity {
             }
         });
 
-        mExitTextView.setVisibility(View.INVISIBLE);
-        mExitButton.setVisibility(View.INVISIBLE);
+       // mExitTextView.setVisibility(View.INVISIBLE);
+      //  mExitButton.setVisibility(View.INVISIBLE);
 
+        mAskedOnce = false;
 
-        if (!checkPermissions()){
-            requestPermissions();
-
-        }else {
-            startTripListActivity();
-        }
     }
 
 
@@ -73,13 +71,29 @@ public class PermissionActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Timber.d("onResume invoked");
-        int value =getIntent().getIntExtra(PERMISSION_EXTRA, 0);
-        if (value == 1){
-            Timber.d("Terminate app");
-            mExitTextView.setVisibility(View.VISIBLE);
-            mExitButton.setVisibility(View.VISIBLE);
+
+        if (!checkPermissions()) {
+
+            int value = getIntent().getIntExtra(PERMISSION_EXTRA, 0);
+            if (value == 1) {
+                Timber.d("Terminate app");
+                //      mExitTextView.setVisibility(View.VISIBLE);
+                //     mExitButton.setVisibility(View.VISIBLE);
+            } else {
+
+                requestPermissions();
+            }
+        }else{
+            startTripListActivity();
         }
 
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Timber.d("onStart invoked");
     }
 
     @Override
@@ -190,7 +204,10 @@ public class PermissionActivity extends AppCompatActivity {
             // Request permission. It's possible this can be auto answered if device policy
             // sets the permission in a given state or the user denied the permission
             // previously and checked "Never ask again".
-            startLocationPermissionRequest();
+            if (! mAskedOnce) {
+                startLocationPermissionRequest();
+                mAskedOnce = true;
+            }
         }
     }
 
