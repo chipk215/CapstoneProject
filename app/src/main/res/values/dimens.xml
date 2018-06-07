@@ -10,6 +10,7 @@
     <dimen name="margin_2">2dp</dimen>
     <dimen name="margin_4">4dp</dimen>
     <dimen name="margin_48">48dp</dimen>
+    <dimen name="tall_ok_40">40dp</dimen>
 
 
     <!-- Activity Filter -->
