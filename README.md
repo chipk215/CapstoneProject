@@ -35,13 +35,16 @@ Trip tracking records the location and movement of the user creating a new trip.
 The trip is completed when the user taps the "Stop Tracking" button. Tracking can also be initiated using the desk top app widget:  
 ![Widget](docs/readmeImages/widget.png)
 
-##Tracking Service
+## Tracking Service
 The tracking service continues to run if the user pauses the app using the Android Home button and exits to the Home Screen. If the user exits the tracking screen with either the Up button or the Back button tracking stops and the trip is completed.  If the Home button is used, the tracking service continues executing and a notification is posted to the notification tray. The notification indicates the tracking service is running while the app is paused and provides a mechanism to stop the tracking service and open the app. Here is a screen shot of the notification:
 
 ![Notification](docs/readmeImages/notification.png)
 
 The notification is removed if the user resumes using the app in the foreground where the plot of the trip being tracked is displayed. No other screen of the app is accessible while the app is tracking.  
 
+### Sharing Trip Log and Trip Tracks  
+The trip log and plots of trip tracks can be shared by email using the envelope icon in the options menu.    
+  
 ### Battery Usage
 Generally, in a vehicle, fine grain location data is priovided by GPS, perhaps augmented with cell tower data if the device has cellular connectivity.  GPS updates consume battery power.  If the device is powered within the vehicle the battery will charge and offset the GPS drain.
 
