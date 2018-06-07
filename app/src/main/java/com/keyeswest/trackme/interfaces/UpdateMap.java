@@ -1,7 +1,6 @@
 package com.keyeswest.trackme.interfaces;
 
 
-
 import com.keyeswest.trackme.models.Segment;
 
 public interface UpdateMap {

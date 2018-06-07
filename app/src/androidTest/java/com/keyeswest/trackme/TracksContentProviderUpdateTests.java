@@ -20,8 +20,6 @@ import static java.lang.Math.abs;
 
 public class TracksContentProviderUpdateTests extends TracksContentProviderBaseTest {
 
-    private static double epsilon = 1E-6;
-
     @Test
     public void testUpdateSegmentWhenAddingLocations(){
 
@@ -41,7 +39,7 @@ public class TracksContentProviderUpdateTests extends TracksContentProviderBaseT
         double minLon = -116.0d;
         double maxLon = -115.0d;
         double distance = 10d;
-        long elpasedTime = 10l;
+        long elpasedTime = 10L;
 
         int rowsUpdated = Queries.updateSegmentBoundsDistanceElapsedTime(mContext,segmentId.toString(), minLat, maxLat,
                 minLon,maxLon, distance, elpasedTime);
@@ -52,10 +50,11 @@ public class TracksContentProviderUpdateTests extends TracksContentProviderBaseT
         Segment segment = Queries.getSegmentFromSegmentId(mContext,segmentId.toString());
         Assert.assertNotNull(segment);
 
-        Assert.assertTrue(abs(minLat - segment.getMinLatitude()) <= epsilon );
-        Assert.assertTrue(abs(maxLat - segment.getMaxLatitude()) <= epsilon );
-        Assert.assertTrue(abs(minLon - segment.getMinLongitude()) <= epsilon );
-        Assert.assertTrue(abs(maxLon - segment.getMaxLongitude()) <= epsilon );
+        double epsilon = 1E-6;
+        Assert.assertTrue(abs(minLat - segment.getMinLatitude()) <= epsilon);
+        Assert.assertTrue(abs(maxLat - segment.getMaxLatitude()) <= epsilon);
+        Assert.assertTrue(abs(minLon - segment.getMinLongitude()) <= epsilon);
+        Assert.assertTrue(abs(maxLon - segment.getMaxLongitude()) <= epsilon);
         Assert.assertTrue(abs(distance - segment.getDistance()) <= epsilon);
 
 

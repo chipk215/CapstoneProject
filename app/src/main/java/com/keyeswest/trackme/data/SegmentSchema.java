@@ -5,7 +5,7 @@ import android.net.Uri;
 public class SegmentSchema {
     public static final String AUTHORITY = "com.keyeswest.trackme";
 
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
+    static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     public static final String PATH_SEGMENT = SegmentSchema.SegmentTable.TABLE_NAME;
 

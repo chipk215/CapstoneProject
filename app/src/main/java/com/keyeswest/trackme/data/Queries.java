@@ -1,5 +1,6 @@
 package com.keyeswest.trackme.data;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,12 +16,17 @@ import java.util.UUID;
 import timber.log.Timber;
 
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
+
 import static com.keyeswest.trackme.data.TrackerBaseHelper.createSegmentRecord;
 
 
-import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordBoundsDistanceElapsed;
+import static com.keyeswest.trackme.data.TrackerBaseHelper
+        .updateSegmentRecordBoundsDistanceElapsed;
+
 import static com.keyeswest.trackme.data.TrackerBaseHelper.updateSegmentRecordFavoriteStatus;
-import static com.keyeswest.trackme.data.TracksContentProvider.CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
+
+import static com.keyeswest.trackme.data.TracksContentProvider
+        .CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 
 public class Queries {
 
@@ -33,20 +39,12 @@ public class Queries {
         Uri queryUri = LocationSchema.LocationTable.CONTENT_URI;
         queryUri = queryUri.buildUpon().appendQueryParameter("limit","1").build();
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(
-                queryUri,
-                /* Columns; leaving this null returns every column in the table */
-                null,
-                /* Optional specification for columns in the "where" clause above */
-                selectionClause,
-                /* Values for "where" clause */
-                selectionArgs,
-                /* Sort order to return in Cursor */
+        @SuppressLint("Recycle")
+        Cursor cursor = resolver.query(queryUri, null, selectionClause, selectionArgs,
                 orderByClause);
 
         if (cursor != null){
-            LocationCursor locationCursor = new LocationCursor(cursor);
-            return locationCursor;
+            return new LocationCursor(cursor);
         }
 
         return null;
@@ -54,55 +52,9 @@ public class Queries {
     }
 
 
-    public static SegmentCursor getSegmentsForDateRange(Context context, long startTime,
-                                                        long endTime){
-        String[] selectionArgs = {Long.toString(startTime), Long.toString(endTime)};
-        String selectionClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " BETWEEN ? AND ? ";
-        Uri queryUri = SegmentSchema.SegmentTable.CONTENT_URI;
-        ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(
-                queryUri,
-                /* Columns; leaving this null returns every column in the table */
-                null,
-                /* Optional specification for columns in the "where" clause above */
-                selectionClause,
-                /* Values for "where" clause */
-                selectionArgs,
-                /* Sort order to return in Cursor */
-                null);
-
-        return new SegmentCursor(cursor);
-
-    }
-
-    public static Cursor getSegmentLocationFirstLastTimeStamps(Context context, String segmentId){
-        String[] selectionArgs = {segmentId};
-        String selectionClause = LocationSchema.LocationTable.COLUMN_SEGMENT_ID + " = ?";
-        String column = LocationSchema.LocationTable.COLUMN_TIME_STAMP;
-        String[] projection = {"MIN(" + column + ")", "MAX("+ column + ") "};
-
-        Uri queryUri = LocationSchema.LocationTable.CONTENT_URI;
-        ContentResolver resolver = context.getContentResolver();
-
-        Cursor cursor = resolver.query(
-                queryUri,
-                /* Columns; leaving this null returns every column in the table */
-                projection,
-                /* Optional specification for columns in the "where" clause above */
-                selectionClause,
-                /* Values for "where" clause */
-                selectionArgs,
-                /* Sort order to return in Cursor */
-                null);
-
-        return cursor;
-
-    }
-
-
     /***
      * Inserts a new segment.
-     * @param context
+     * @param context - context of client
      * @return segmentId of the new segment
      */
     public static Uri createNewSegment(Context context) {
@@ -116,8 +68,7 @@ public class Queries {
         ContentResolver contentResolver = context.getContentResolver();
 
         try {
-            Uri segment = contentResolver.insert(SegmentSchema.SegmentTable.CONTENT_URI, values);
-            return segment;
+            return contentResolver.insert(SegmentSchema.SegmentTable.CONTENT_URI, values);
         } catch (Exception ex) {
             Timber.e(ex, "Exception raised inserting segment to db.");
             return null;
@@ -129,20 +80,15 @@ public class Queries {
     public static Segment getSegmentFromUri(Context context, Uri uri){
 
         ContentResolver resolver = context.getContentResolver();
-        Cursor cursor = resolver.query(
-                uri,
-                /* Columns; leaving this null returns every column in the table */
-                null,
-                /* Optional specification for columns in the "where" clause above */
-                null,
-                /* Values for "where" clause */
-                null,
-                /* Sort order to return in Cursor */
+        @SuppressLint("Recycle")
+        Cursor cursor = resolver.query(uri, null, null, null,
                 null);
+
         if (cursor != null){
             SegmentCursor segmentCursor = new SegmentCursor(cursor);
             segmentCursor.moveToNext();
             Segment segment = segmentCursor.getSegment();
+            segmentCursor.close();
             return segment;
         }
 
@@ -158,73 +104,47 @@ public class Queries {
         ContentResolver resolver = context.getContentResolver();
 
         Cursor cursor = resolver.query(
-                 SegmentSchema.SegmentTable.CONTENT_URI,
-                /* Columns; leaving this null returns every column in the table */
-                null,
-                /* Optional specification for columns in the "where" clause above */
-                selectionClause,
-                /* Values for "where" clause */
-                selectionArgs,
-                /* Sort order to return in Cursor */
-                null);
+                 SegmentSchema.SegmentTable.CONTENT_URI, null, selectionClause,
+                selectionArgs, null);
 
         if (cursor != null){
             SegmentCursor segmentCursor = new SegmentCursor(cursor);
             segmentCursor.moveToFirst();
             Segment segment = segmentCursor.getSegment();
-            segmentCursor.close();
+            cursor.close();
             return segment;
         }
 
         return null;
-
     }
 
 
     public static int updateSegmentBoundsDistanceElapsedTime(Context context, String segmentId,
                                                   double minLat, double maxLat,
                                                   double minLon, double maxLon,
-                                                  double distance, long elpasedTime){
+                                                  double distance, long elapsedTime){
 
         //update the segment
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         String[] selectionArgs = {segmentId};
         ContentValues updateValues = updateSegmentRecordBoundsDistanceElapsed(minLat, maxLat,
-                minLon, maxLon, distance, elpasedTime);
+                minLon, maxLon, distance, elapsedTime);
         ContentResolver resolver = context.getContentResolver();
-        int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
-                selectionClause, selectionArgs);
 
-        return rowsUpdated;
+        return resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
+                selectionClause, selectionArgs);
 
     }
 
-    public static int updateSegmentFavoriteStatus(Context context, UUID segmentId,
+    public static void updateSegmentFavoriteStatus(Context context, UUID segmentId,
                                                   boolean favoriteStatus){
         //update the segment
         String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         String[] selectionArgs = {segmentId.toString()};
         ContentValues updateValues = updateSegmentRecordFavoriteStatus(favoriteStatus);
-
         ContentResolver resolver = context.getContentResolver();
-        int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
+        resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
                 selectionClause, selectionArgs);
-
-
-        return rowsUpdated;
-    }
-
-    public static int updateSegmentDuration(Context context, String segmentId, long duration){
-        String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
-        String[] selectionArgs = {segmentId};
-        ContentValues updateValues = TrackerBaseHelper.updateSegmentDuration(duration);
-
-        ContentResolver resolver = context.getContentResolver();
-        int rowsUpdated =resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
-                selectionClause, selectionArgs);
-
-
-        return rowsUpdated;
     }
 
 
@@ -238,10 +158,8 @@ public class Queries {
         ContentValues locationValues = createLocationRecord(epochTimeSec,
                 sample.getLatitude(), sample.getLongitude(), segmentId);
 
-        Uri newLocation =contentResolver.insert(LocationSchema.LocationTable.CONTENT_URI,
+        return contentResolver.insert(LocationSchema.LocationTable.CONTENT_URI,
                 locationValues);
-
-        return newLocation;
 
     }
 
@@ -250,11 +168,11 @@ public class Queries {
         Uri requestUri = CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
         requestUri = requestUri.buildUpon().appendPath(segmentRowId).build();
         ContentResolver contentResolver = context.getContentResolver();
+        @SuppressLint("Recycle")
         Cursor cursor = contentResolver.query(requestUri, null, null,
                 null, null);
 
-        LocationCursor locCursor = new LocationCursor(cursor);
-        return locCursor;
+        return new LocationCursor(cursor);
     }
 
     public static SegmentCursor getSegmentsFromUriList(Context context, List<Uri> segments){
@@ -276,12 +194,11 @@ public class Queries {
 
         ContentResolver contentResolver = context.getContentResolver();
 
+        @SuppressLint("Recycle")
         Cursor cursor = contentResolver.query(queryUri, null, selectionClause,
                 null, null);
 
-        SegmentCursor segmentCursor = new SegmentCursor(cursor);
-
-        return segmentCursor;
+        return new SegmentCursor(cursor);
 
     }
 
@@ -301,6 +218,54 @@ public class Queries {
         selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
         contentResolver.delete(segmentQueryUri, selectionClause, selectionArgs);
 
-
     }
 }
+
+
+
+/* * Unused queries * */
+
+/*
+     public static SegmentCursor getSegmentsForDateRange(Context context, long startTime,
+                                                        long endTime){
+        String[] selectionArgs = {Long.toString(startTime), Long.toString(endTime)};
+        String selectionClause = SegmentSchema.SegmentTable.COLUMN_TIME_STAMP + " BETWEEN ? AND ? ";
+        Uri queryUri = SegmentSchema.SegmentTable.CONTENT_URI;
+        ContentResolver resolver = context.getContentResolver();
+        Cursor cursor = resolver.query(queryUri, null, selectionClause, selectionArgs,
+                null);
+
+        return new SegmentCursor(cursor);
+
+    }
+
+
+     public static Cursor getSegmentLocationFirstLastTimeStamps(Context context, String segmentId){
+        String[] selectionArgs = {segmentId};
+        String selectionClause = LocationSchema.LocationTable.COLUMN_SEGMENT_ID + " = ?";
+        String column = LocationSchema.LocationTable.COLUMN_TIME_STAMP;
+        String[] projection = {"MIN(" + column + ")", "MAX("+ column + ") "};
+
+        Uri queryUri = LocationSchema.LocationTable.CONTENT_URI;
+        ContentResolver resolver = context.getContentResolver();
+
+        Cursor cursor = resolver.query(queryUri, projection, selectionClause, selectionArgs,
+                null);
+
+        return cursor;
+
+    }
+
+
+    public static int updateSegmentDuration(Context context, String segmentId, long duration){
+        String selectionClause = SegmentSchema.SegmentTable.COLUMN_ID + " = ?";
+        String[] selectionArgs = {segmentId};
+        ContentValues updateValues = TrackerBaseHelper.updateSegmentDuration(duration);
+
+        ContentResolver resolver = context.getContentResolver();
+        return resolver.update(SegmentSchema.SegmentTable.CONTENT_URI, updateValues,
+                selectionClause, selectionArgs);
+    }
+
+
+ */

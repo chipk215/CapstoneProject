@@ -28,7 +28,7 @@ public class TestUtilities {
             mHT = ht;
         }
 
-        static public TestContentObserver getTestContentObserver() {
+        static TestContentObserver getTestContentObserver() {
             HandlerThread ht = new HandlerThread("ContentObserverThread");
             ht.start();
             return new TestContentObserver(ht);

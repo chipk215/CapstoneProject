@@ -22,7 +22,7 @@ public class TripMapActivity extends AppCompatActivity
 
     /**
      * Activity requires an intent with a list of segment URIs to be plotted on the map.
-     * @param packageContext
+     * @param packageContext - client context
      * @param segments - segment URIs
      * @return Intent to start Activity
      */

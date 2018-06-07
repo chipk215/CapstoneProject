@@ -1,13 +1,9 @@
 package com.keyeswest.trackme.utilities;
 
 import android.content.Context;
-import android.location.Location;
 import android.preference.PreferenceManager;
 
-import com.keyeswest.trackme.R;
 
-import java.text.DateFormat;
-import java.util.Date;
 
 public class LocationPreferences {
 

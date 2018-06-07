@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Objects;
+
 import timber.log.Timber;
 
 
@@ -22,12 +24,9 @@ public class TracksContentProvider extends ContentProvider {
     public static final int LOCATION_WITH_ID = 101;
     public static final int LOCATION_FROM_JOIN = 102;
 
-
     //Segment data
     public static final int SEGMENT_DIRECTORY = 200;
     public static final int SEGMENT_WITH_ID = 201;
-
-
 
     private static final String PATH_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS =
             "relationship_join_segment_get_locations";
@@ -35,7 +34,6 @@ public class TracksContentProvider extends ContentProvider {
     public static final Uri CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS =
             Uri.parse(LocationSchema.BASE_CONTENT_URI + "/" +
                     PATH_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS);
-
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
@@ -62,12 +60,10 @@ public class TracksContentProvider extends ContentProvider {
         matcher.addURI(LocationSchema.AUTHORITY, PATH_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS +
         "/#",LOCATION_FROM_JOIN);
 
-
         return matcher;
     }
 
     private TrackerBaseHelper mTrackerBaseHelper;
-
 
     @Override
     public boolean onCreate() {
@@ -142,7 +138,7 @@ public class TracksContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        cursor.setNotificationUri(Objects.requireNonNull(getContext()).getContentResolver(), uri);
         return cursor;
     }
 
@@ -151,6 +147,7 @@ public class TracksContentProvider extends ContentProvider {
     public String getType(@NonNull Uri uri) {
         throw new UnsupportedOperationException("Not implemented");
     }
+
 
     @Nullable
     @Override
@@ -165,9 +162,11 @@ public class TracksContentProvider extends ContentProvider {
             case LOCATION_DIRECTORY:
 
                 try {
-                    long locationId = db.insertOrThrow(LocationSchema.LocationTable.TABLE_NAME, null, values);
+                    long locationId = db.insertOrThrow(LocationSchema.LocationTable.TABLE_NAME,
+                            null, values);
                     if (locationId > 0){
-                        returnUri = ContentUris.withAppendedId(LocationSchema.LocationTable.CONTENT_URI, locationId);
+                        returnUri = ContentUris.withAppendedId(
+                                LocationSchema.LocationTable.CONTENT_URI, locationId);
                     }
                 }catch(SQLException ex){
                     Timber.e(ex, "Failed to insert record");
@@ -177,9 +176,12 @@ public class TracksContentProvider extends ContentProvider {
 
                 break;
             case SEGMENT_DIRECTORY:
-                long segmentId = db.insert(SegmentSchema.SegmentTable.TABLE_NAME, null, values);
+                long segmentId = db.insert(SegmentSchema.SegmentTable.TABLE_NAME,
+                        null, values);
+
                 if (segmentId > 0){
-                    returnUri = ContentUris.withAppendedId(SegmentSchema.SegmentTable.CONTENT_URI, segmentId);
+                    returnUri = ContentUris.withAppendedId(SegmentSchema.SegmentTable.CONTENT_URI,
+                            segmentId);
                 }else{
                     throw new SQLException("Failed to insert row into " + uri);
                 }
@@ -188,28 +190,31 @@ public class TracksContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unsupported insert operation.");
         }
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
 
         return returnUri;
-
-
     }
 
+
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, @Nullable String selection,
+                      @Nullable String[] selectionArgs) {
+
         final SQLiteDatabase db = mTrackerBaseHelper.getWritableDatabase();
 
         int match = sUriMatcher.match(uri);
-        int rowsDeleted = 0;
+        int rowsDeleted;
 
         switch (match){
             case LOCATION_DIRECTORY:
-                rowsDeleted = db.delete(LocationSchema.LocationTable.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(LocationSchema.LocationTable.TABLE_NAME, selection,
+                        selectionArgs);
 
                 break;
 
             case SEGMENT_DIRECTORY:
-                rowsDeleted = db.delete(SegmentSchema.SegmentTable.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(SegmentSchema.SegmentTable.TABLE_NAME, selection,
+                        selectionArgs);
                 break;
 
             default:
@@ -218,23 +223,25 @@ public class TracksContentProvider extends ContentProvider {
         }
 
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
-
     }
 
+
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection,
+                      @Nullable String[] selectionArgs) {
         final SQLiteDatabase db = mTrackerBaseHelper.getWritableDatabase();
 
         int match = sUriMatcher.match(uri);
 
-        int rowsUpdated = 0;
+        int rowsUpdated;
 
         switch (match){
             case SEGMENT_DIRECTORY:
 
-                rowsUpdated = db.update(SegmentSchema.SegmentTable.TABLE_NAME, values, selection,  selectionArgs);
+                rowsUpdated = db.update(SegmentSchema.SegmentTable.TABLE_NAME, values, selection,
+                        selectionArgs);
 
                 break;
             default:
@@ -242,7 +249,8 @@ public class TracksContentProvider extends ContentProvider {
         }
 
         if (rowsUpdated > 0){
-            getContext().getContentResolver().notifyChange(uri, null);
+            Objects.requireNonNull(getContext()).getContentResolver().notifyChange(uri,
+                    null);
         }
 
         return rowsUpdated;

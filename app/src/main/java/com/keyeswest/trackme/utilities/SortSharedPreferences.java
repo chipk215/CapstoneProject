@@ -1,5 +1,6 @@
 package com.keyeswest.trackme.utilities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -18,6 +19,7 @@ public class SortSharedPreferences {
      * @param force - if true overwrite existing preferences, otherwise only save preferences if
      *              they have not previously been saved.
      */
+    @SuppressLint("ApplySharedPref")
     public static void saveDefaultSortPreferences(Context context, boolean force){
 
         SharedPreferences sharedPreferences =
@@ -51,13 +53,12 @@ public class SortSharedPreferences {
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);
 
-        String sortByCode = sharedPreferences.getString(SORT_PREFERENCES_KEY,
+        return sharedPreferences.getString(SORT_PREFERENCES_KEY,
                 SortSharedPreferences.DEFAULT_SORT.getCode());
-
-        return sortByCode;
     }
 
 
+    @SuppressLint("ApplySharedPref")
     public static void setSortOrder(Context context, String sortOrder){
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(SORT_PREFERENCES, MODE_PRIVATE);

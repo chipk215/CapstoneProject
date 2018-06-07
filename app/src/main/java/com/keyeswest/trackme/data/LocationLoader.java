@@ -26,7 +26,7 @@ public class LocationLoader extends CursorLoader {
         Uri requestUri = CONTENT_URI_RELATIONSHIP_JOIN_SEGMENT_GET_LOCATIONS;
 
         requestUri = requestUri.buildUpon().appendPath(segmentRowId).build();
-        Timber.d("Join request Uri: " + requestUri.toString());
+        Timber.d("Join request Uri: %s", requestUri.toString());
         return new LocationLoader(context, requestUri);
     }
 

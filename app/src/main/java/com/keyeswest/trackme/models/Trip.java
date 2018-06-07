@@ -2,7 +2,6 @@ package com.keyeswest.trackme.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
 
 public class Trip {
 

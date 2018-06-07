@@ -8,14 +8,15 @@ import android.os.AsyncTask;
 import android.support.v4.content.FileProvider;
 import android.widget.Toast;
 
-import com.keyeswest.trackme.models.Segment;
-
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.Locale;
+
+import timber.log.Timber;
+
 
 public class EmailMapTask extends AsyncTask<Void, Void, File>  {
 
@@ -29,12 +30,12 @@ public class EmailMapTask extends AsyncTask<Void, Void, File>  {
         void onComplete(File file);
     }
 
-    private Context mContext;
+    private WeakReference<Context> mContext;
     private Bitmap mBitmap;
     private ResultsCallback mCallback;
 
     public EmailMapTask(Context context, Bitmap snapShot, ResultsCallback callback ){
-        mContext = context;
+        mContext =  new WeakReference<>(context);
         mBitmap = snapShot;
         mCallback = callback;
     }
@@ -43,37 +44,42 @@ public class EmailMapTask extends AsyncTask<Void, Void, File>  {
     protected File doInBackground(Void... voids) {
 
         // create the file for saving the snapshot
-        File imagesDirectory = new File(mContext.getFilesDir(), IMAGES_DIRECTORY);
-        imagesDirectory.mkdir();
-        File mapsDirectory = new File(imagesDirectory, MAPS_DIRECTORY);
-        mapsDirectory.mkdirs();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        String currentDateandTime = sdf.format(new Date());
-        File out = new File(mapsDirectory, "map_"+ currentDateandTime +".png");
-
-        try {
-            FileOutputStream os = new FileOutputStream(out);
-            mBitmap.compress(Bitmap.CompressFormat.PNG,100, os);
-            os.close();
-
-            Uri contentUri = FileProvider.getUriForFile(mContext,
-                    FILE_PROVIDER_AUTHORITY,out);
-
-            Intent mailIntent = new Intent(Intent.ACTION_SEND);
-            mailIntent.setType("message/rfc822");
-            mailIntent.putExtra(Intent.EXTRA_SUBJECT, SUBJECT );
-            mailIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+        File imagesDirectory = new File(mContext.get().getFilesDir(), IMAGES_DIRECTORY);
+        boolean mkdir = imagesDirectory.mkdir();
+        if (mkdir) {
+            File mapsDirectory = new File(imagesDirectory, MAPS_DIRECTORY);
+            mkdir = mapsDirectory.mkdirs();
+            if (! mkdir){
+                return null;
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
+            String currentDateAndTime = sdf.format(new Date());
+            File out = new File(mapsDirectory, "map_" + currentDateAndTime + ".png");
 
             try {
-                mContext.startActivity(Intent.createChooser(mailIntent, "Send email.."));
-            } catch (android.content.ActivityNotFoundException ex) {
-                Toast.makeText(mContext, "No email service", Toast.LENGTH_SHORT).show();
+                FileOutputStream os = new FileOutputStream(out);
+                mBitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+                os.close();
+
+                Uri contentUri = FileProvider.getUriForFile(mContext.get(),
+                        FILE_PROVIDER_AUTHORITY, out);
+
+                Intent mailIntent = new Intent(Intent.ACTION_SEND);
+                mailIntent.setType("message/rfc822");
+                mailIntent.putExtra(Intent.EXTRA_SUBJECT, SUBJECT);
+                mailIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+
+                try {
+                    mContext.get().startActivity(Intent.createChooser(mailIntent, "Send email.."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(mContext.get(), "No email service", Toast.LENGTH_SHORT).show();
+                }
+
+                return out;
+
+            } catch (Exception ex) {
+               Timber.e(ex);
             }
-
-            return out;
-
-        }catch(Exception ex){
-
         }
 
         return null;

@@ -575,26 +575,33 @@ public class TripListFragment extends Fragment
     private void shareTripList(){
         if (mSegmentCursor != null) {
             mSegmentCursor.moveToPosition(-1);
-            String message="";
+            StringBuilder message= new StringBuilder();
             int count = 1;
             String newLine = System.getProperty("line.separator");
             while(mSegmentCursor.moveToNext()){
                 Segment segment = mSegmentCursor.getSegment();
-                message += getString(R.string.trip) + " " + Integer.toString(count) +  newLine;
-                message += getString(R.string.date) + "  " + segment.getDate() +  newLine;
-                message += getString(R.string.start_time) + "  " + segment.getTime() +  newLine;
+                message.append(getString(R.string.trip)).append(" ")
+                        .append(Integer.toString(count)).append(newLine);
+
+                message.append(getString(R.string.date)).append("  ")
+                        .append(segment.getDate()).append(newLine);
+
+                message.append(getString(R.string.start_time))
+                        .append("  ").append(segment.getTime()).append(newLine);
+
                 DurationRecord durationRecord = segment.getSegmentDuration(getContext());
 
-                message+= getString(R.string.trip_elapsed) + " " +
-                        durationRecord.getValue()+ " " +
-                        durationRecord.getDimension() + newLine;
+                message.append(getString(R.string.trip_elapsed)).append(" ")
+                        .append(durationRecord.getValue()).append(" ")
+                        .append(durationRecord.getDimension()).append(newLine);
 
-                message += getString(R.string.distance) + "  " +
-                        segment.getDistanceMiles() + " " +
-                        Objects.requireNonNull(getContext()).getResources()
-                                .getQuantityString(R.plurals.miles_plural,
-                                        PluralHelpers.getPluralQuantity(segment.getDistance()));
-                message += newLine + newLine;
+                message.append(getString(R.string.distance)).append("  ")
+                        .append(segment.getDistanceMiles()).append(" ")
+                        .append(Objects.requireNonNull(getContext()).getResources()
+                        .getQuantityString(R.plurals.miles_plural,
+                                PluralHelpers.getPluralQuantity(segment.getDistance())));
+
+                message.append(newLine).append(newLine);
                 count++;
 
             }
@@ -604,14 +611,14 @@ public class TripListFragment extends Fragment
                     .setType("text/plain")
                     .setSubject(Objects.requireNonNull(getContext())
                     .getString(R.string.trip_list_subject))
-                    .setText(message)
+                    .setText(message.toString())
                     .getIntent(), getString(R.string.action_share)));
         }
     }
 
 
     /**
-     * If the battery is in a low battery state, disable teh new trip menu item and post a low
+     * If the battery is in a low battery state, disable the new trip menu item and post a low
      * battery state message. Otherwise, enable tracking functionality.
      */
     private void configureMenusWithBatteryStateInformation(){

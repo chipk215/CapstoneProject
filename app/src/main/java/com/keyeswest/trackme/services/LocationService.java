@@ -8,7 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Binder;
@@ -20,9 +20,6 @@ import android.support.v4.app.NotificationCompat;
 
 import com.keyeswest.trackme.NewTripActivity;
 import com.keyeswest.trackme.R;
-import com.keyeswest.trackme.receivers.BatteryLevelReceiver;
-
-import java.util.Objects;
 
 import timber.log.Timber;
 
@@ -69,7 +66,6 @@ public abstract class LocationService extends Service
     protected HandlerThread mHandlerThread;
 
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -89,7 +85,6 @@ public abstract class LocationService extends Service
             Timber.d("registering for shared prefs notification");
             mBatteryPreferences.registerOnSharedPreferenceChangeListener(this);
         }
-
     }
 
 
@@ -214,6 +209,11 @@ public abstract class LocationService extends Service
     public boolean serviceIsRunningInForeground(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(
                 Context.ACTIVITY_SERVICE);
+
+        if (manager == null){
+            return false;
+        }
+
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(
                 Integer.MAX_VALUE)) {
             if (getClass().getName().equals(service.service.getClassName())) {
@@ -240,8 +240,6 @@ public abstract class LocationService extends Service
                 }
 
             }
-
-
 
         }
     }

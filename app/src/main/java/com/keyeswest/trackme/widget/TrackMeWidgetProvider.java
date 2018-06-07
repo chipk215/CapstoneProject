@@ -28,7 +28,7 @@ public class TrackMeWidgetProvider extends AppWidgetProvider {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.track_me_widget);
 
-        Timber.d("Set Track Button State: " + Boolean.toString(sIsTracking));
+        Timber.d("Set Track Button State: %s", Boolean.toString(sIsTracking));
         // enable or disable buttons based upon tracking state
         views.setBoolean(R.id.start_track_id, "setEnabled", ! sIsTracking);
         views.setBoolean(R.id.stop_track_id, "setEnabled", sIsTracking);

@@ -1,5 +1,6 @@
 package com.keyeswest.trackme.utilities;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -21,6 +22,7 @@ public class FilterSharedPreferences {
     private static final boolean DEFAULT_USE_DATE_RANGE = false;
 
 
+    @SuppressLint("ApplySharedPref")
     public static void clearFilters(Context context, boolean force){
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, MODE_PRIVATE);
@@ -55,8 +57,11 @@ public class FilterSharedPreferences {
 
     }
 
+    @SuppressLint("ApplySharedPref")
     public static void saveFavoriteFilter(Context context, boolean isSelected){
-        Timber.d("Saving favorite filter setting to shared prefs: %s", Boolean.toString(isSelected));
+        Timber.d("Saving favorite filter setting to shared prefs: %s",
+                Boolean.toString(isSelected));
+
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, MODE_PRIVATE);
 
@@ -66,6 +71,7 @@ public class FilterSharedPreferences {
 
     }
 
+    @SuppressLint("ApplySharedPref")
     public static void saveDateRangeFilter(Context context, long startDate, long endDate){
 
         SharedPreferences sharedPreferences =
@@ -100,7 +106,7 @@ public class FilterSharedPreferences {
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, MODE_PRIVATE);
 
-        return sharedPreferences.getLong(START_DATE_KEY,0l);
+        return sharedPreferences.getLong(START_DATE_KEY, 0L);
 
     }
 
@@ -108,7 +114,7 @@ public class FilterSharedPreferences {
         SharedPreferences sharedPreferences =
                 context.getSharedPreferences(FILTER_PREFERENCES, MODE_PRIVATE);
 
-        return sharedPreferences.getLong(END_DATE_KEY,0l);
+        return sharedPreferences.getLong(END_DATE_KEY, 0L);
 
     }
 

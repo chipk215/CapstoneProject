@@ -1,7 +1,6 @@
 package com.keyeswest.trackme;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -18,14 +17,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
 
-import static com.keyeswest.trackme.data.TrackerBaseHelper.createLocationRecord;
-import static com.keyeswest.trackme.data.TrackerBaseHelper.createSegmentRecord;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
@@ -225,6 +221,7 @@ public class TracksContentProviderQueryTests extends TracksContentProviderBaseTe
         LocationCursor locationCursor = Queries.getLatestLocationBySegmentId(mContext,
                 segmentIds[0].toString());
 
+        assert locationCursor != null;
         locationCursor.moveToFirst();
         Location location = locationCursor.getLocation();
 

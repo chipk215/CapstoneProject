@@ -22,9 +22,7 @@ import java.util.GregorianCalendar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import timber.log.Timber;
 
-import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getEndDate;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getFavoriteFilterSetting;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.getStartDate;
 import static com.keyeswest.trackme.utilities.FilterSharedPreferences.isDateRangeSet;
@@ -47,28 +45,24 @@ public class FilterActivity extends AppCompatActivity {
     // Helper for invoking client to determine if result of filter request changed the filter
     //settings.
     public static boolean getFilterChangedResult(Intent data){
-        boolean filterChanged = data.getBooleanExtra(EXTRA_CHANGE_FILTER_RESULT,
+        return data.getBooleanExtra(EXTRA_CHANGE_FILTER_RESULT,
                 true);
-        return filterChanged;
     }
 
     //Helper for invoking client to determine if user cleared filters during filter request.
     public static boolean getFiltersClearedResult(Intent data){
-        boolean filtersCleared = data.getBooleanExtra(EXTRA_CLEAR_FILTERS,false);
-        return filtersCleared;
+        return data.getBooleanExtra(EXTRA_CLEAR_FILTERS,false);
     }
 
 
     //Helper for invoking client to determine if user set a date range.
     public static boolean isDateFilterSet(Intent data){
-        boolean isSet = data.getBooleanExtra(EXTRA_DATE_FILTER, false);
-        return isSet;
+        return data.getBooleanExtra(EXTRA_DATE_FILTER, false);
     }
 
     //Helper for invoking client to determine if user set the favorites only filter..
     public static boolean isFavoriteFilterSet(Intent data){
-        boolean isSet = data.getBooleanExtra(EXTRA_FAVORITE_FILTER, false);
-        return isSet;
+        return data.getBooleanExtra(EXTRA_FAVORITE_FILTER, false);
     }
 
     private static final String EXTRA_CHANGE_FILTER_RESULT = "extraChangeFilterResult";
@@ -188,7 +182,7 @@ public class FilterActivity extends AppCompatActivity {
                     //read the date range from shared preferences
                     mStartDate = getStartDate(FilterActivity.this);
 
-                    long endDate = getEndDate(FilterActivity.this);
+                    //long endDate = getEndDate(FilterActivity.this);
 
                 }else if (mStartDate == null){
                     // use today's date to initialize picker
@@ -207,7 +201,6 @@ public class FilterActivity extends AppCompatActivity {
 
                 //TODO reconstruct the end date for the range
                 // use DatePickerDialog setHighlightedDays method to show the duration of the range
-
 
                 // https://github.com/borax12/MaterialDateRangePicker
                 DatePickerDialog dpd = DatePickerDialog.newInstance(
@@ -334,7 +327,6 @@ public class FilterActivity extends AppCompatActivity {
 
     private static String getDateString(long timeStamp){
         Date date = new Date(timeStamp * 1000);
-        String dateString = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
-        return dateString;
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(date);
     }
 }

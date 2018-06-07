@@ -27,7 +27,6 @@ public class TrackMeWidgetService extends IntentService {
 
 
     public static void getTrackingState(Context context){
-        Timber.d("getTrackingState invoked");
         Intent intent = new Intent(context, TrackMeWidgetService.class);
         intent.setAction(ACTION_GET_TRACKING_STATE);
         context.startService(intent);
@@ -46,9 +45,8 @@ public class TrackMeWidgetService extends IntentService {
 
 
     private void handleGetTrackingState(){
-        Timber.d("handle get tracking state");
         boolean isTracking = LocationPreferences.requestingLocationUpdates(this);
-        Timber.d("Tracking is : " + Boolean.toString(isTracking));
+        Timber.d("Tracking is : %s", Boolean.toString(isTracking));
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,
                 TrackMeWidgetProvider.class));

@@ -10,8 +10,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
 
-import com.keyeswest.trackme.tasks.DeleteTripTask;
-
+import java.util.Objects;
 import java.util.UUID;
 
 
@@ -47,9 +46,11 @@ public class ConfirmDeleteDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-        mSegmentId = UUID.fromString(getArguments().getString(ARG_SEGMENT_ID));
+        mSegmentId = UUID.fromString(Objects.requireNonNull(getArguments())
+                .getString(ARG_SEGMENT_ID));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog
+                .Builder(Objects.requireNonNull(getActivity()));
 
         builder.setMessage(R.string.confirm_trip_delete)
                 .setPositiveButton(R.string.delete_confirm, new DialogInterface.OnClickListener(){

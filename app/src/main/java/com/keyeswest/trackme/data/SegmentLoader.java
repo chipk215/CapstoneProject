@@ -1,7 +1,6 @@
 package com.keyeswest.trackme.data;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v4.content.CursorLoader;
 
@@ -87,12 +86,12 @@ public class SegmentLoader extends CursorLoader {
             selectionArgs = new String[] {dateRangeArgs[0], dateRangeArgs[1],
                     favoriteSelectionArgs[0]};
 
-        }else if (dateRangeSelected && ! filterFavorites){
+        }else if (dateRangeSelected){
             // date range and no favorite filter
             selectionClause = dateRangeSelectionClause;
             selectionArgs = dateRangeArgs;
 
-        }else if(filterFavorites && ! dateRangeSelected){
+        }else if(filterFavorites){
             // favorites only no date range
             selectionClause = favoriteSelectionClause;
             selectionArgs = favoriteSelectionArgs;
@@ -124,11 +123,6 @@ public class SegmentLoader extends CursorLoader {
 
         Uri queryUri = SegmentSchema.SegmentTable.CONTENT_URI;
         return new SegmentLoader(context, queryUri, null, selectionClause, null, null);
-    }
-
-    // request a particular segment
-    public static SegmentLoader newSegmentInstance(Context context, Uri segmentUri){
-        return new SegmentLoader(context, segmentUri, null, null, null, null);
     }
 
     private SegmentLoader(Context context, Uri uri, String[] projection, String selection,

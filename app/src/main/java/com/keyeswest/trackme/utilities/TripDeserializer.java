@@ -19,12 +19,10 @@ public class TripDeserializer {
         // read the raw resource json file
         InputStream inputStream = context.getResources().openRawResource(R.raw.sampletrips);
         String jsonString = null;
-        Scanner scanner = new Scanner(inputStream);
-        try {
+        try (Scanner scanner = new Scanner(inputStream)) {
             jsonString = scanner.useDelimiter("\\A").next();
         } catch (Exception ex) {
-            Timber.e(ex, "Error reading trip data"); } finally {
-            scanner.close();
+            Timber.e(ex, "Error reading trip data");
         }
 
         Trip[] trips=null;

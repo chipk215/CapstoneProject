@@ -26,8 +26,7 @@ import timber.log.Timber;
 public class TripListActivity extends AppCompatActivity implements TripListFragment.TripListListener {
 
     public static Intent newIntent(Context packageContext){
-        Intent intent = new Intent(packageContext, TripListActivity.class);
-        return intent;
+        return new Intent(packageContext, TripListActivity.class);
     }
 
     public static final String ARG_SELECTED_TRIPS = "argSelectedTrips";
@@ -152,7 +151,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
             Fragment fragment = fragmentManager.findFragmentByTag(TRIP_MAP_TAG);
             if (fragment instanceof TripMapFragment ) {
                 TripMapFragment tripMapFragment = (TripMapFragment)fragment;
-                if ((tripMapFragment != null) && (tripMapFragment.isVisible())) {
+                if (tripMapFragment.isVisible()) {
                     tripMapFragment.addSegment(selectedSegment);
                 }
             }else{
@@ -171,7 +170,7 @@ public class TripListActivity extends AppCompatActivity implements TripListFragm
             Fragment fragment = fragmentManager.findFragmentByTag(TRIP_MAP_TAG);
             if (fragment instanceof TripMapFragment ) {
                 TripMapFragment tripMapFragment = (TripMapFragment)fragment;
-                if ((tripMapFragment != null) && (tripMapFragment.isVisible())){
+                if (tripMapFragment.isVisible()){
                     tripMapFragment.removeSegment(segment);
                 }
             }else{

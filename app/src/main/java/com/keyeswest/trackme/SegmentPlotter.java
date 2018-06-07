@@ -39,12 +39,13 @@ public class SegmentPlotter<T> extends HandlerThread {
         mSegmentPlotterListener = listener;
     }
 
-    public SegmentPlotter(Handler responseHandler){
+    SegmentPlotter(Handler responseHandler){
         super(TAG);
         mResponseHandler = responseHandler;
     }
 
 
+    @SuppressWarnings("unchecked")  //https://stackoverflow.com/a/2592661/9128441
     @SuppressLint("HandlerLeak")
     @Override
     protected void onLooperPrepared(){
@@ -83,7 +84,7 @@ public class SegmentPlotter<T> extends HandlerThread {
         LocationCursor locationCursor = mRequestMap.get(target);
         locationCursor.moveToPosition(-1);
         int numberLocationSamples = locationCursor.getCount();
-        Timber.d("Location samples= " + numberLocationSamples);
+        Timber.d("Location samples= %s", numberLocationSamples);
 
         // create 10 batches of locations
         int batchSize = numberLocationSamples / NUMBER_LOCATION_BATCHES;
@@ -136,7 +137,7 @@ public class SegmentPlotter<T> extends HandlerThread {
         mRequestMap.remove(target);
     }
 
-    public void clearQueue(){
+    private void clearQueue(){
         mRequestHandler.removeMessages(MESSAGE_PLOT);
         mRequestMap.clear();
     }

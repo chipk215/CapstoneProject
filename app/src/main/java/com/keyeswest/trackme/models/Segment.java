@@ -6,7 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
-import com.keyeswest.trackme.R;
+
 import com.keyeswest.trackme.data.SegmentSchema;
 
 import java.text.DateFormat;
@@ -14,11 +14,9 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.UUID;
 
-import timber.log.Timber;
+
 
 public class Segment implements Parcelable {
-
-    private static double METERS_TO_MILES = 0.000621371;
 
     @SerializedName("ID")
     private UUID mId;
@@ -55,7 +53,7 @@ public class Segment implements Parcelable {
 
         public Segment createFromParcel(Parcel in){
             return new Segment(in);
-        };
+        }
 
         public Segment[] newArray(int size){
             return new Segment[size];
@@ -189,6 +187,7 @@ public class Segment implements Parcelable {
 
     public String getDistanceMiles(){
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        double METERS_TO_MILES = 0.000621371;
         return decimalFormat.format(mDistance * METERS_TO_MILES);
     }
 
@@ -200,30 +199,20 @@ public class Segment implements Parcelable {
         return mMinLatitude;
     }
 
-    public String getDateTime(){
-
-        Date date = new Date(mTimeStamp * 1000);
-        String dateString = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date);
-        return dateString;
-    }
-
     public String getDate(){
         Date date = new Date(mTimeStamp * 1000);
-        String dateString = DateFormat.getDateInstance(DateFormat.SHORT).format(date);
-        return dateString;
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(date);
 
     }
 
     public String getTime(){
         Date date = new Date(mTimeStamp * 1000);
-        String timeString = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
-        return timeString;
+        return DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
 
     }
 
     public DurationRecord getSegmentDuration(Context context){
-        DurationRecord record = new DurationRecord(context, mElapsedTime);
-        return record;
+        return new DurationRecord(context, mElapsedTime);
     }
 
     public long getRowId() {
@@ -242,14 +231,9 @@ public class Segment implements Parcelable {
         mElapsedTime = elapsedTime;
     }
 
-    public Double getMaximumSpeed() {
-        return mMaximumSpeed;
-    }
-
     public void setMaximumSpeed(Double maximumSpeed) {
         mMaximumSpeed = maximumSpeed;
     }
-
 
     public Uri getSegmentUri(){
         return SegmentSchema.SegmentTable.buildItemUri(mRowId);

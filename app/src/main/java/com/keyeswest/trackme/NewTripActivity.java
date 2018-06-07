@@ -56,9 +56,9 @@ public class NewTripActivity  extends AppCompatActivity {
 
         Intent intent= getIntent();
         boolean newTrip = isStartTrip(intent);
-        Timber.d("Start Trip: " + Boolean.toString(newTrip));
+        Timber.d("Start Trip: %s", Boolean.toString(newTrip));
         boolean stopTrip = isStopTrip(intent);
-        Timber.d("Stop Trip: " + Boolean.toString(stopTrip));
+        Timber.d("Stop Trip: %s", Boolean.toString(stopTrip));
 
 
         FragmentManager fm = getSupportFragmentManager();
@@ -91,7 +91,7 @@ public class NewTripActivity  extends AppCompatActivity {
      * Handle the case where the user has navigated to the new trip screen and has not started
      * tracking. The user then pauses the app and goes to the home screen and uses the app widget
      * to start tracking a new trip.
-     * @param intent
+     * @param intent - restart intent
      */
     @Override
     protected void onNewIntent(Intent intent) {

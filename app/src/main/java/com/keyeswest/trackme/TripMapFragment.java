@@ -55,6 +55,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -179,8 +180,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     private List<File> mEmailAttachments = new ArrayList<>();
 
-    private Menu mMenu;
-
     private PopupWindow mPopupWindow;
 
 
@@ -191,7 +190,9 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
         setHasOptionsMenu(true);
 
-        mMasterSegmentUriList = getArguments().getParcelableArrayList(EXTRA_URI);
+        mMasterSegmentUriList = Objects.requireNonNull(getArguments())
+                .getParcelableArrayList(EXTRA_URI);
+
         mIsTwoPane = getArguments().getBoolean(TWO_PANE_EXTRA);
 
         // Handles plotting a batch of location points
@@ -217,7 +218,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
 
         mInflater = inflater;
@@ -286,7 +287,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
         inflater.inflate(R.menu.fragment_trip_map, menu);
-        mMenu = menu;
 
     }
 
@@ -326,6 +326,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         }
 
         for (File file : mEmailAttachments){
+            //noinspection ResultOfMethodCallIgnored
             file.delete();
         }
 
@@ -398,8 +399,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             while(mSegmentCursor.moveToNext()){
                 Segment segment = mSegmentCursor.getSegment();
                 Timber.d("Loaded Segment Info");
-                Timber.d("Segment uuid= " + segment.getId().toString());
-                Timber.d("Segment rowid= " + segment.getRowId());
+                Timber.d("Segment uuid= %s", segment.getId().toString());
+                Timber.d("Segment rowid= %s", segment.getRowId());
                 mSegmentList.add(segment);
             }
 
@@ -465,7 +466,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Timber.d("onMap Ready TripMapFragment");
-        setMapReady(true);
+        setMapReady();
         mMap = googleMap;
 
         mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener(){
@@ -478,6 +479,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
                 final Segment segment = (Segment)polyline.getTag();
 
+                @SuppressLint("InflateParams")
                 View customView = mInflater.inflate(R.layout.trip_popup,null);
 
                 mPopupWindow = new PopupWindow(customView, ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -494,13 +496,15 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
 
                 TextView dateView = customView.findViewById(R.id.date_tv);
-                dateView.setText(segment.getDate());
+                if (segment != null) {
+                    dateView.setText(segment.getDate());
+                }
 
                 TextView distanceView = customView.findViewById(R.id.distance_tv);
-                distanceView.setText(segment.getDistanceMiles());
+                distanceView.setText(Objects.requireNonNull(segment).getDistanceMiles());
                 TextView distanceDimension = customView.findViewById(R.id.distance_unit_lbl);
 
-                distanceDimension.setText(getContext().getResources()
+                distanceDimension.setText(Objects.requireNonNull(getContext()).getResources()
                         .getQuantityString(R.plurals.miles_plural,
                                 PluralHelpers.getPluralQuantity(segment.getDistance())));
 
@@ -530,7 +534,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     @Override
     public void addSegment(Segment segment) {
-        Timber.d("Adding segment id= " + segment.getId().toString());
+        Timber.d("Adding segment id= %s", segment.getId().toString());
         Uri segmentUri = segment.getSegmentUri();
         mMasterSegmentUriList.add(segmentUri);
         mLoadSegmentUriList.clear();
@@ -542,13 +546,13 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
     @Override
     public void removeSegment(Segment segment) {
-        Timber.d("Request to Remove segment id= " + segment.getId().toString());
+        Timber.d("Request to Remove segment id= %s", segment.getId().toString());
         Uri segmentUri = segment.getSegmentUri();
         mMasterSegmentUriList.remove(segmentUri);
         Polyline removeLine = null;
         for (Polyline pLine : mPolyLines){
             Segment pSegment = (Segment)pLine.getTag();
-            if (segment.getId().equals(pSegment.getId())){
+            if (segment.getId().equals(Objects.requireNonNull(pSegment).getId())){
                 removeLine = pLine;
             }
         }
@@ -667,14 +671,14 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             //debugSegmentToLocationsMap();
             for (Segment segment : mSegmentList) {
 
-                //Timber.d("Constructing segment uri, segment rowid= " + Long.toString(segment.getRowId()));
                 Uri segmentUri = SegmentSchema.SegmentTable.buildItemUri(segment.getRowId());
                 //Timber.d("Constructed segment uri= " + segmentUri.toString());
 
                 LocationCursor locationCursor = mSegmentToLocationsMap.get(segmentUri);
                 if (locationCursor == null){
                     // Error state
-                    Timber.d("Invalid cursor for segemnt uri: " +  segmentUri.toString());
+                    Timber.e("Invalid cursor for segment uri: %s", segmentUri.toString());
+                    return;
                 }
 
                 PolylineOptions options = new PolylineOptions()
@@ -682,7 +686,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                         .clickable(true);
 
                 Polyline plotLine = mMap.addPolyline(options);
-                // setting the tag create association between polyline and the segment it corresponds to
+                // setting the tag create association between polyline and
+                // the segment it corresponds to
                 plotLine.setTag(segment);
                 mPolyLines.add(plotLine);
 
@@ -749,28 +754,33 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
     private void getLastLocation(){
 
         FusedLocationProviderClient fusedLocationClient;
-        fusedLocationClient =LocationServices.getFusedLocationProviderClient(getContext());
+        fusedLocationClient =LocationServices
+                .getFusedLocationProviderClient(Objects.requireNonNull(getContext()));
+
         fusedLocationClient.getLastLocation()
-                .addOnCompleteListener(getActivity(),new OnCompleteListener<Location>() {
+                .addOnCompleteListener(Objects.requireNonNull(getActivity()),new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null){
                             mLastLocation = task.getResult();
-                            Timber.d("Current Location lat= %s", Double.toString(mLastLocation.getLatitude()));
-                            Timber.d("Current Location lon= %s", Double.toString(mLastLocation.getLongitude()));
+                            Timber.d("Current Location lat= %s",
+                                    Double.toString(mLastLocation.getLatitude()));
+                            Timber.d("Current Location lon= %s",
+                                    Double.toString(mLastLocation.getLongitude()));
 
                             mCurrentLocationReady = true;
                             displayMap();
 
                         }else{
                             // handle error case where location not known
+                            Timber.e("Failed to obtain current location");
                         }
                     }
                 });
     }
 
-    private  void setMapReady(boolean value){
-        mMapReady = value;
+    private  void setMapReady(){
+        mMapReady = true;
     }
 
     private void disablePolylineClicks(){

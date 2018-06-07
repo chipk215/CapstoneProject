@@ -94,7 +94,7 @@ public class LocationProcessorService extends IntentService {
                     return;
                 }
 
-                if (previousLocationCursor.getCount() == 1){
+                if ( (previousLocationCursor != null) && (previousLocationCursor.getCount() == 1)){
                     // a previous location exists for the segment, this is not the first location
                     previousLocationCursor.moveToFirst();
                     previousLocation = previousLocationCursor.getLocation();
@@ -191,14 +191,8 @@ public class LocationProcessorService extends IntentService {
     }
 
 
-    /**
-     *
+    /*
      * Write the location sample to the database.
-     *
-     *
-     * @param location
-     * @param segmentId
-     * @return
      */
     private void saveLocationSamples(Location location, String segmentId){
 
@@ -210,9 +204,9 @@ public class LocationProcessorService extends IntentService {
         double longitude = location.getLongitude();
 
         Date d = new Date(location.getTime());
-        Timber.d("Date: " + d.toString());
-        Timber.d("Lat: " + Double.toString(latitude));
-        Timber.d("Lon: " + Double.toString(longitude));
+        Timber.d("Date: %s", d.toString());
+        Timber.d("Lat: %s", Double.toString(latitude));
+        Timber.d("Lon: %s", Double.toString(longitude));
         Timber.d("++++++++++++++++");
 
         // save location sample to db

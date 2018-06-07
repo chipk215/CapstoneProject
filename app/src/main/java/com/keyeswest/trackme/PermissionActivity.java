@@ -30,8 +30,6 @@ public class PermissionActivity extends AppCompatActivity {
     private TextView mExitTextView;
     private Button mExitButton;
 
-    private boolean mRequiresPermission = true;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -231,7 +229,7 @@ public class PermissionActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        getIntent().putExtra(PERMISSION_EXTRA, mRequiresPermission ? 1: 0);
+        getIntent().putExtra(PERMISSION_EXTRA, 1);
         super.onStop();
     }
 }

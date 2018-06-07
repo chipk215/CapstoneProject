@@ -114,13 +114,14 @@ public class TracksContentProviderInsertTests  extends TracksContentProviderBase
         int timeStamp = 1000;
 
         //insert a location
-        ContentValues locationValues = createLocationRecord(timeStamp, 45.0d, 45.0d,null);
+        ContentValues locationValues = createLocationRecord(timeStamp,
+                45.0d, 45.0d,null);
 
         ContentResolver contentResolver = mContext.getContentResolver();
 
         Boolean result = FALSE;
         try {
-            Uri locationUri = contentResolver.insert(LocationSchema.LocationTable.CONTENT_URI, locationValues);
+            contentResolver.insert(LocationSchema.LocationTable.CONTENT_URI, locationValues);
         }catch(SQLException e){
             result = TRUE;
         }finally {

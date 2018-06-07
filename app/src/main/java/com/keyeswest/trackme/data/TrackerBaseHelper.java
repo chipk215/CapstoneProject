@@ -5,17 +5,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.google.gson.Gson;
-
-import com.keyeswest.trackme.R;
 import com.keyeswest.trackme.models.Location;
 
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.models.Trip;
 import com.keyeswest.trackme.utilities.TripDeserializer;
-
-import java.io.InputStream;
-import java.util.Scanner;
 
 
 import timber.log.Timber;
@@ -41,11 +35,14 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
+
+        /*
         if (!db.isReadOnly()) {
             // Enable foreign key constraints
             //TODO Revisit
            // db.execSQL("PRAGMA foreign_keys=ON;");
         }
+        */
     }
 
     @Override
@@ -135,10 +132,10 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
-    public static ContentValues createTripSegmentRecord(String id, long timeStamp,double distance,
-                                                        double minLat, double minLon,
-                                                        double maxLat, double maxLon,
-                                                        double duration){
+    private static ContentValues createTripSegmentRecord(String id, long timeStamp, double distance,
+                                                         double minLat, double minLon,
+                                                         double maxLat, double maxLon,
+                                                         double duration){
         ContentValues values = new ContentValues();
         values.put(SegmentSchema.SegmentTable.COLUMN_ID, id);
         values.put(SegmentSchema.SegmentTable.COLUMN_TIME_STAMP, timeStamp);
@@ -155,9 +152,9 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
-    public static ContentValues updateSegmentRecordBoundsDistanceElapsed(Double minLat, Double maxLat,
-                                                                      Double minLon, Double maxLon,
-                                                                      Double distance, long elapsed){
+    static ContentValues updateSegmentRecordBoundsDistanceElapsed(Double minLat, Double maxLat,
+                                                                  Double minLon, Double maxLon,
+                                                                  Double distance, long elapsed){
 
         ContentValues values = new ContentValues();
         values.put(SegmentSchema.SegmentTable.COLUMN_MIN_LAT, minLat);
@@ -171,7 +168,7 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public static ContentValues updateSegmentRecordFavoriteStatus(boolean favoriteStatus){
+    static ContentValues updateSegmentRecordFavoriteStatus(boolean favoriteStatus){
         ContentValues values = new ContentValues();
 
         values.put(SegmentSchema.SegmentTable.COLUMN_FAVORITE, favoriteStatus ? 1: 0);
@@ -179,13 +176,6 @@ public class TrackerBaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
-    public static ContentValues updateSegmentDuration(long duration){
-        ContentValues values = new ContentValues();
-
-        values.put(SegmentSchema.SegmentTable.COLUMN_ELAPSED_TIME, duration);
-
-        return values;
-    }
 
     private void seedWithTripData(SQLiteDatabase db){
 

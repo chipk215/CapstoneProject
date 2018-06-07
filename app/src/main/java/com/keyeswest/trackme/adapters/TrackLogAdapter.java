@@ -52,9 +52,8 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     public LogHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.list_item_log, parent, false);
-        final TrackLogAdapter.LogHolder holder = new TrackLogAdapter.LogHolder(view);
 
-        return holder;
+        return new LogHolder(view);
     }
 
     @Override
@@ -151,12 +150,12 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             return mSegment;
         }
 
-        public void checkSelection(){
+        void checkSelection(){
             mCheckBox.setChecked(true);
         }
 
 
-        public LogHolder(View view){
+        LogHolder(View view){
             super(view);
             mItemView = view;
             mDateView = view.findViewById(R.id.date_lbl);
@@ -198,7 +197,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
         }
 
-        public void setOnClickListener(View.OnClickListener onClickListener){
+        void setOnClickListener(View.OnClickListener onClickListener){
             mItemView.setOnClickListener(onClickListener);
         }
 

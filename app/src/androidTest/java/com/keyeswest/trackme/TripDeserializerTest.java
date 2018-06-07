@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.google.gson.Gson;
+
 import com.keyeswest.trackme.models.Location;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.models.Trip;
@@ -15,16 +15,12 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.InputStream;
-import java.util.Scanner;
-
-import timber.log.Timber;
 
 @RunWith(AndroidJUnit4.class)
 public class TripDeserializerTest {
 
     // Context used to access various parts of the system
-    protected final Context mContext = InstrumentationRegistry.getTargetContext();
+    private final Context mContext = InstrumentationRegistry.getTargetContext();
 
     @Test
     public void deserializeTripsTest(){
