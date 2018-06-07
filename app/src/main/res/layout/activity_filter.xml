@@ -15,7 +15,8 @@
         android:text="@string/filter_trip_list"
         android:textSize="@dimen/af_text_size"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Switch
         android:id="@+id/favorite_sw"
@@ -52,22 +53,22 @@
         android:id="@+id/cancel_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_24"
+        android:layout_marginTop="@dimen/margin_16"
         android:text="@string/cancel"
         app:layout_constraintEnd_toStartOf="@+id/submit_btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/end_lbl_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/date_btn" />
 
     <TextView
         android:id="@+id/start_lbl_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_16"
+        android:layout_marginStart="@dimen/margin_16"
         android:text="@string/start_date"
         android:visibility="visible"
-        app:layout_constraintStart_toStartOf="@+id/date_btn"
-        app:layout_constraintTop_toBottomOf="@+id/date_btn" />
+        app:layout_constraintStart_toEndOf="@+id/date_btn"
+        app:layout_constraintTop_toTopOf="@+id/date_btn" />
 
     <TextView
         android:id="@+id/start_date_tv"

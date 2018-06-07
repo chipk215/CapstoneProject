@@ -11,7 +11,7 @@
         android:id="@+id/sort_heading_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_16"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="@dimen/margin_16"
         android:text="@string/sort_trip_list"
         android:textSize="18sp"
@@ -65,7 +65,7 @@
         android:layout_marginTop="@dimen/margin_8"
         android:text="@string/submit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.398"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
@@ -74,6 +74,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_begin="@dimen/as_constraint_guide" />
+        app:layout_constraintGuide_begin="188dp" />
 
 </android.support.constraint.ConstraintLayout>
