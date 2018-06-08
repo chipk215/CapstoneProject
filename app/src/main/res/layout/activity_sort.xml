@@ -11,12 +11,12 @@
         android:id="@+id/sort_heading_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
+        android:layout_marginEnd="@dimen/margin_32"
         android:layout_marginTop="@dimen/margin_16"
         android:text="@string/sort_trip_list"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/radioFilterGroup"
         app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
@@ -24,9 +24,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_8"
-        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginTop="@dimen/margin_16"
         android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="@+id/sort_heading_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sort_heading_tv">
 
         <RadioButton
@@ -65,7 +67,7 @@
         android:layout_marginTop="@dimen/margin_8"
         android:text="@string/submit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.398"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
