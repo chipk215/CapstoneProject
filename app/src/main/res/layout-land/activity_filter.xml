@@ -10,12 +10,12 @@
         android:id="@+id/filter_heading_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_16"
-        android:layout_marginTop="@dimen/margin_16"
+        android:layout_marginEnd="@dimen/margin_32"
+        android:layout_marginTop="@dimen/margin_24"
         android:text="@string/filter_trip_list"
         android:textSize="@dimen/af_text_size"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/favorite_sw"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Switch
@@ -23,16 +23,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_16"
-        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginTop="@dimen/margin_16"
         android:text="@string/favorites_only"
-        app:layout_constraintStart_toStartOf="@+id/filter_heading_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.41"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/filter_heading_tv" />
 
     <Button
         android:id="@+id/date_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginTop="@dimen/margin_16"
         android:text="@string/date_range"
         app:layout_constraintStart_toStartOf="@+id/favorite_sw"
         app:layout_constraintTop_toBottomOf="@+id/favorite_sw" />
@@ -41,7 +43,7 @@
         android:id="@+id/submit_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/margin_16"
         android:text="@string/submit"
         app:layout_constraintStart_toEndOf="@+id/cancel_btn"
         app:layout_constraintTop_toTopOf="@+id/cancel_btn" />
@@ -51,10 +53,9 @@
         android:id="@+id/cancel_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="@string/cancel"
-        app:layout_constraintStart_toStartOf="@+id/date_btn"
+        app:layout_constraintStart_toStartOf="@+id/filter_heading_tv"
         app:layout_constraintTop_toBottomOf="@+id/date_btn" />
 
     <TextView
@@ -85,7 +86,7 @@
         android:text="@string/end_date"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="@+id/start_lbl_tv"
-        app:layout_constraintTop_toBottomOf="@+id/start_date_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/start_lbl_tv" />
 
     <TextView
         android:id="@+id/end_date_tv"
