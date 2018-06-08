@@ -48,6 +48,7 @@ import com.keyeswest.trackme.models.DurationRecord;
 import com.keyeswest.trackme.models.Segment;
 import com.keyeswest.trackme.tasks.EmailMapTask;
 import com.keyeswest.trackme.utilities.LatLonBounds;
+import com.keyeswest.trackme.utilities.NetworkUtilities;
 import com.keyeswest.trackme.utilities.PluralHelpers;
 
 import java.io.File;
@@ -249,8 +250,32 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
         displayLegend();
 
+        mRootView = view;
+
+        return view;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+        // Check the network, getMapAsync's callback should be invoked even when there is
+        // no network connectivity.
+        //  I'm finding that if there is no network availability on the
+        // first launch after install the getMapAsync callback is not invoked.
+        //
+        // Perhaps the map tiles are not cached and which results in no callback?
+        //Just log for now.
+        if (! NetworkUtilities.isNetworkAvailable(Objects.requireNonNull(getContext()))){
+            Timber.e("Detected no network");
+
+        }
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
 
@@ -262,7 +287,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
         if ( mLoadSegmentUriList.size() > 0) {
             Timber.d("Initializing Segment Loader");
 
-           // Bundle args = createLoaderArgument(true);
+            // Bundle args = createLoaderArgument(true);
             int loaderId = mRandom.nextInt();
             mSegmentLoaderIds.add(loaderId);
             getLoaderManager().initLoader(loaderId, null, this);
@@ -278,17 +303,11 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 displayMap();
             }
         }
-
-        mRootView = view;
-
-        return view;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         inflater.inflate(R.menu.fragment_trip_map, menu);
-
     }
 
     @Override
@@ -434,7 +453,8 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
             mSegmentToLocationsMap.put(segmentUri, locationCursor);
             //debugSegmentToLocationsMap();
 
-            // increment the count of location loaders that have completed - one load for each segment
+            // increment the count of location loaders that have completed - one load
+            // for each segment
             mLocationLoadsFinishedCount++;
 
         }
@@ -521,7 +541,6 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
                 DurationRecord record = segment.getSegmentDuration(getContext());
                 durationView.setText(record.getValue());
                 durationDimension.setText(record.getDimension());
-
 
                 mPopupWindow.showAtLocation(mRootView.findViewById(R.id.map), Gravity.CENTER, 0, 0);
 

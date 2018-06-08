@@ -24,9 +24,12 @@ import static com.keyeswest.trackme.utilities.BatteryStatePreferences.setLowBatt
 public class PermissionActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    private static final String PERMISSION_EXTRA = "permissionExtra";
 
     private TextView mPermissionTextView;
+
+    private TextView mNoPermissionTextView;
+
+    private Button mExitButton;
 
     private boolean mAskedOnce;
 
@@ -46,17 +49,19 @@ public class PermissionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_permission);
 
         mPermissionTextView = findViewById(R.id.perm_justify_tv);
+        mNoPermissionTextView = findViewById(R.id.exit_tv);
 
-        Button exitButton = findViewById(R.id.exit_btn);
-        exitButton.setOnClickListener(new View.OnClickListener() {
+        mExitButton = findViewById(R.id.exit_btn);
+        mExitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
 
+        mNoPermissionTextView.setVisibility(View.GONE);
+        mExitButton.setVisibility(View.GONE);
         mAskedOnce = false;
-
     }
 
 
@@ -64,23 +69,16 @@ public class PermissionActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
         Timber.d("onResume invoked");
 
         if (!checkPermissions()) {
 
-            int value = getIntent().getIntExtra(PERMISSION_EXTRA, 0);
-            if (value == 1) {
-                Timber.d("Terminate app");
-                //      mExitTextView.setVisibility(View.VISIBLE);
-                //     mExitButton.setVisibility(View.VISIBLE);
-            } else {
+            requestPermissions();
 
-                requestPermissions();
-            }
         }else{
             startTripListActivity();
         }
-
 
     }
 
@@ -118,23 +116,18 @@ public class PermissionActivity extends AppCompatActivity {
                 // receive empty arrays.
                 Timber.i( "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.i( "Permission granted.");
-
+                Timber.d( "Permission granted.");
                 startTripListActivity();
             } else {
 
-                mPermissionTextView.setVisibility(View.VISIBLE);
-
                 // Permission denied.
+
+                mNoPermissionTextView.setVisibility(View.VISIBLE);
+                mExitButton.setVisibility(View.VISIBLE);
+
 
                 // Notify the user via a SnackBar that they have rejected a core permission for the
                 // app, which makes the Activity useless.
-                //
-                // Additionally, it is important to remember that a permission might have been
-                // rejected without asking the user for permission (device policy or "Never ask
-                // again" prompts). Therefore, a user interface affordance is typically implemented
-                // when permissions are denied. Otherwise, your app could appear unresponsive to
-                // touches or interactions which have required permissions.
                 showSnackBar(R.string.permission_denied_explanation,
                         R.string.settings, new View.OnClickListener() {
                             @Override
@@ -201,6 +194,9 @@ public class PermissionActivity extends AppCompatActivity {
             if (! mAskedOnce) {
                 startLocationPermissionRequest();
                 mAskedOnce = true;
+            }else{
+                mNoPermissionTextView.setVisibility(View.VISIBLE);
+                mExitButton.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -216,6 +212,8 @@ public class PermissionActivity extends AppCompatActivity {
 
 
     private void startTripListActivity(){
+        mNoPermissionTextView.setVisibility(View.GONE);
+        mExitButton.setVisibility(View.GONE);
         Intent intent = TripListActivity.newIntent(this);
         startActivity(intent);
         finish();
@@ -238,9 +236,5 @@ public class PermissionActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStop() {
-        getIntent().putExtra(PERMISSION_EXTRA, 1);
-        super.onStop();
-    }
+
 }
