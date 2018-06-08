@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -228,7 +229,7 @@ public class TripMapFragment extends Fragment  implements OnMapReadyCallback,
 
         for (int i : plotLineColorResources){
             //append colors to list (enqueue)
-            mPlotLineColors.add(getResources().getColor(i));
+            mPlotLineColors.add(ContextCompat.getColor(Objects.requireNonNull(getContext()),i));
         }
 
         mUnbinder = ButterKnife.bind(this, view);

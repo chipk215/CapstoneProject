@@ -191,7 +191,7 @@ public abstract class LocationService extends Service
                 .setContentText(text)
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setOngoing(true)
-                .setPriority(Notification.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setSmallIcon(R.drawable.ic_stat_track)
                 .setTicker(text)
                 .setWhen(System.currentTimeMillis());
@@ -201,29 +201,7 @@ public abstract class LocationService extends Service
     }
 
 
-    /**
-     * Returns true if this is a foreground service.
-     *
-     * @param context The {@link Context}.
-     */
-    protected boolean serviceIsRunningInForeground(Context context) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(
-                Context.ACTIVITY_SERVICE);
 
-        if (manager == null){
-            return false;
-        }
-
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(
-                Integer.MAX_VALUE)) {
-            if (getClass().getName().equals(service.service.getClassName())) {
-                if (service.foreground) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -233,11 +211,7 @@ public abstract class LocationService extends Service
 
                 setServiceAborted(this, true);
 
-                if (serviceIsRunningInForeground(this)){
-
-                    // NewTri[Activity handles low battery state if service not in foreground
-                    removeLocationUpdates();
-                }
+                removeLocationUpdates();
 
             }
 

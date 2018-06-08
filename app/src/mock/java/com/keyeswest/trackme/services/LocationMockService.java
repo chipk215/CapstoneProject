@@ -172,14 +172,9 @@ public class LocationMockService extends LocationService {
 
         mStopped = true;
 
-        if (serviceIsRunningInForeground(this)){
-            Timber.d("Service is in foreground ");
-            stopForeground(true);
-            stopSelf();
-        }else {
-            Timber.d("Service is not in foreground ");
-            stopSelf();
-        }
+        stopForeground(true);
+        stopSelf();
+
     }
 
     @Override
