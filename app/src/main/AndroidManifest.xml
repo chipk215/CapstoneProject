@@ -48,7 +48,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDwTgn9W5j2j3vK-rLjR9szTkC_vtzD7Mo" />
+            android:value="AIzaSyAXmMrgdaKruZQE10X4qivNe05tjfdgZcg" />
 
         <provider
             android:name=".data.TracksContentProvider"
