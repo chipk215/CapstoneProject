@@ -48,7 +48,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAXmMrgdaKruZQE10X4qivNe05tjfdgZcg" />
+            android:value="@string/google_maps_key" />
 
         <provider
             android:name=".data.TracksContentProvider"
@@ -82,9 +82,7 @@
         </receiver>
 
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="85d1239bead425363847e4e9a35af89356cfe88f" />
+
     </application>
 
 
