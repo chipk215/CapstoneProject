@@ -1,3 +1,5 @@
+*Note: Project submitted and accepted on June 8, 2018.  The Google API credentials have been invalidated.*
+
 # Udacity CapstoneProject (*TrackMe*)
 *TrackMe* is my final project for [Udacity's Android Developer Nanodegree Program](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801 ).
 
