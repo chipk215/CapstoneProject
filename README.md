@@ -1,3 +1,6 @@
+*Note: A partial refactor of this project to use Room, LiveData, Data Binding, and a more MVVM like architecture can be found at:
+[MvvmTOY](https://github.com/chipk215/MvvmToy).
+
 *Note: Project submitted and accepted on June 8, 2018.  The Google API credentials have been invalidated.*
 
 # Udacity CapstoneProject (*TrackMe*)
