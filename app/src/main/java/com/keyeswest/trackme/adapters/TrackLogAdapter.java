@@ -21,7 +21,7 @@ import java.util.List;
 import timber.log.Timber;
 
 
-public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHolder>   {
+public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHolder> {
 
     private boolean mSelectionsFrozen;
     private SegmentCursor mCursor;
@@ -29,23 +29,13 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
     private List<Segment> mInitialSelectedSegments;
     private Context mContext;
 
-    public interface SegmentClickListener{
-        void onItemChecked(Segment segment );
-        void onItemUnchecked(Segment segment);
-        void onDeleteClick(Segment segment);
-        void onFavoriteClick(Segment segment, boolean selected);
-    }
-
-
-    public TrackLogAdapter(SegmentCursor cursor, Context context, List<Segment> selectedSegments, SegmentClickListener listener){
+    public TrackLogAdapter(SegmentCursor cursor, Context context, List<Segment> selectedSegments, SegmentClickListener listener) {
         mCursor = cursor;
         mSegmentClickListener = listener;
         mInitialSelectedSegments = selectedSegments;
         mSelectionsFrozen = false;
         mContext = context;
     }
-
-
 
     @NonNull
     @Override
@@ -64,21 +54,21 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         holder.mDistanceView.setText(mCursor.getSegment().getDistanceMiles());
 
         String mileOrMiles = mContext.getResources().getQuantityString(R.plurals.miles_plural,
-                        PluralHelpers.getPluralQuantity(mCursor.getSegment().getDistance()));
+                PluralHelpers.getPluralQuantity(mCursor.getSegment().getDistance()));
         holder.mMilesLabel.setText(mileOrMiles);
         holder.mSegment = mCursor.getSegment();
 
         boolean favoriteState = holder.mSegment.isFavorite();
-        if (favoriteState){
+        if (favoriteState) {
             holder.mFavoriteButton.setImageResource(R.drawable.fav_star_filled);
             holder.mFavoriteButton.setTag(true);
-        }else{
+        } else {
             holder.mFavoriteButton.setImageResource(R.drawable.fav_star_border);
             holder.mFavoriteButton.setTag(false);
         }
 
         // check the box if we are reloading the cursor data
-        if (mInitialSelectedSegments.contains(holder.mSegment)){
+        if (mInitialSelectedSegments.contains(holder.mSegment)) {
             Timber.d("Setting checkbox for Segment ID: %s",
                     holder.mSegment.getId().toString());
             holder.checkSelection();
@@ -89,20 +79,20 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             @Override
             public void onClick(View v) {
 
-                if (mSelectionsFrozen &&  (! holder.mCheckBox.isChecked()) ){
+                if (mSelectionsFrozen && (!holder.mCheckBox.isChecked())) {
 
                     Toast.makeText(v.getContext(), R.string.max_trips_selected, Toast.LENGTH_SHORT).show();
 
-                }else{
-                    holder.mCheckBox.setChecked( ! holder.mCheckBox.isChecked());
-                    if (holder.mCheckBox.isChecked()){
+                } else {
+                    holder.mCheckBox.setChecked(!holder.mCheckBox.isChecked());
+                    if (holder.mCheckBox.isChecked()) {
                         mSegmentClickListener.onItemChecked(holder.mSegment);
 
-                    }else{
+                    } else {
                         mSegmentClickListener.onItemUnchecked(holder.mSegment);
 
                         // once the segment is unselected we don't have to bind against it
-                        if (mInitialSelectedSegments.contains(holder.mSegment)){
+                        if (mInitialSelectedSegments.contains(holder.mSegment)) {
                             mInitialSelectedSegments.remove(holder.mSegment);
                         }
                     }
@@ -116,8 +106,6 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         return mCursor.getCount();
     }
 
-
-
     //TODO Figure out why the next two methods are needed so that the trip list items are stable
     @Override
     public long getItemId(int position) {
@@ -129,11 +117,21 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         return position;
     }
 
-    public void setSelectionsFrozen(boolean freeze){
+    public void setSelectionsFrozen(boolean freeze) {
         mSelectionsFrozen = freeze;
     }
 
-     public class LogHolder extends RecyclerView.ViewHolder {
+    public interface SegmentClickListener {
+        void onItemChecked(Segment segment);
+
+        void onItemUnchecked(Segment segment);
+
+        void onDeleteClick(Segment segment);
+
+        void onFavoriteClick(Segment segment, boolean selected);
+    }
+
+    public class LogHolder extends RecyclerView.ViewHolder {
 
         private TextView mDateView;
         private TextView mTimeView;
@@ -146,16 +144,7 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
         private Segment mSegment;
         private TextView mMilesLabel;
 
-        public Segment getSegment(){
-            return mSegment;
-        }
-
-        void checkSelection(){
-            mCheckBox.setChecked(true);
-        }
-
-
-        LogHolder(View view){
+        LogHolder(View view) {
             super(view);
             mItemView = view;
             mDateView = view.findViewById(R.id.date_lbl);
@@ -179,14 +168,14 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
             mFavoriteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    boolean isFavorite = (Boolean)mFavoriteButton.getTag();
-                    if (isFavorite){
+                    boolean isFavorite = (Boolean) mFavoriteButton.getTag();
+                    if (isFavorite) {
                         // change to not favorite
                         mFavoriteButton.setTag(false);
                         mFavoriteButton.setImageResource(R.drawable.fav_star_border);
                         mSegmentClickListener.onFavoriteClick(mSegment, false);
 
-                    }else{
+                    } else {
                         mFavoriteButton.setTag(true);
                         mFavoriteButton.setImageResource(R.drawable.fav_star_filled);
                         mSegmentClickListener.onFavoriteClick(mSegment, true);
@@ -197,7 +186,15 @@ public class TrackLogAdapter extends RecyclerView.Adapter<TrackLogAdapter.LogHol
 
         }
 
-        void setOnClickListener(View.OnClickListener onClickListener){
+        public Segment getSegment() {
+            return mSegment;
+        }
+
+        void checkSelection() {
+            mCheckBox.setChecked(true);
+        }
+
+        void setOnClickListener(View.OnClickListener onClickListener) {
             mItemView.setOnClickListener(onClickListener);
         }
 
