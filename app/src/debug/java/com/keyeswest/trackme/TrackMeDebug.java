@@ -10,7 +10,7 @@ public class TrackMeDebug extends TrackMe {
     public void onCreate(){
         super.onCreate();
 
-        Timber.plant(new Timber.DebugTree(){
+        Timber.plant(new FileLoggingTree(getApplicationContext()){
             // include line numbers
             @Override
             protected String createStackElementTag(StackTraceElement element){
